@@ -3,26 +3,14 @@ use sdl2::render::Canvas;
 use sdl2::video::Window;
 use sdl2::render::Texture;
 use sdl2::rect;
-use super::entities::world::HasWorldInfo;
+use super::entities::TEntity;
+// use super::entities::world::TWorldInfo;
 
 use std::collections::HashMap;
-
-pub trait DrawEntity {
-    fn draw_entity(&self, canvas: &mut Canvas<Window>,  textures: &HashMap<String, Texture>);
-}
 
 pub trait AssetsConfig {
     fn asset_name(&self) -> &str;
     fn asset_path(&self) -> &str;
-}
-
-impl <T: HasWorldInfo + AssetsConfig> DrawEntity for T {
-    fn draw_entity(&self, canvas: &mut Canvas<Window>,  textures: &HashMap<String, Texture>){
-        let texture = textures.get(self.asset_name()).unwrap();
-        let world_info = self.get_world_info();
-        let r = rect::Rect::new(world_info.pos.x as i32, world_info.pos.y as i32, world_info.size.x, world_info.size.y);
-        canvas.copy(&texture, None, r).unwrap();
-    }
 }
 
 pub struct Renderer {
@@ -64,10 +52,10 @@ impl Renderer {
         self.textures.insert(obj.asset_name().to_string(), texture);
     }
 
-    pub fn draw<T: AssetsConfig + HasWorldInfo>(&mut self, obj: &T){
+    pub fn draw<T: AssetsConfig + TEntity>(&mut self, obj: &mut T){
         let texture = self.textures.get(obj.asset_name()).unwrap();
-        let world_info = obj.get_world_info();
-        let r = rect::Rect::new(world_info.pos.x as i32, world_info.pos.y as i32, world_info.size.x, world_info.size.y);
+        let world = obj.get_world();
+        let r = rect::Rect::new(world.pos.x as i32, world.pos.y as i32, world.size.x, world.size.y);
         self.canvas.copy(&texture, None, r).unwrap();
     }
 

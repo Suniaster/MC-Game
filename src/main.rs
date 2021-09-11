@@ -2,26 +2,51 @@ extern crate sdl2;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use std::time::{Duration, Instant};
+use std::time::{Instant};
 
-mod entities;
-mod drawer;
+mod components;
+mod scene;
 
-use entities::physics::Physics2D;
+use ncollide2d::world::CollisionWorld;
+
+use ncollide2d::shape::ShapeHandle;
+use ncollide2d::shape::Cuboid;
+use ncollide2d::math::Vector;
 
 
 fn main() {
+    // let _world:CollisionWorld<f64, ComponentIndex> = CollisionWorld::new(0.012);
+    // let rect = ShapeHandle::new(Cuboid::new(Vector::new(5., 5.)));
+
+
+    let mut world = scene::GameScene::new();
+
     
-    let mut renderer = drawer::Renderer::new();
+    let sdl_context = sdl2::init().unwrap();
+    let video_subsystem = sdl_context.video().unwrap();
+    
+    // let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)?;
+    
+    let window = video_subsystem.window("rust-sdl2 demo", 800, 600)
+    .position_centered()
+    .build()
+    .expect("could not initialize video subsystem");
+    
+    let mut canvas = window.into_canvas().build()
+    .expect("could not make a canvas");
+    
+    let texture_creator:sdl2::render::TextureCreator<sdl2::video::WindowContext> = canvas.texture_creator();
+    
+    world.create_blob(&texture_creator);
+    world.create_enemy(&texture_creator);
 
-    let mut entity = entities::Person::new();
-    renderer.add_texture_for(&entity);
-
-    let mut event_pump = renderer.sdl_context.event_pump().expect("");    
+    let mut event_pump = sdl_context.event_pump().expect("");    
     let mut start = Instant::now();
     
     'running: loop {
-        renderer.clear_screen();
+        canvas.clear();
+        // handle keyboard events
+        
         for event in event_pump.poll_iter() {
             match event {
                 Event::Quit {..} |
@@ -34,12 +59,12 @@ fn main() {
         // The rest of the game loop goes here...
         let delta_t = start.elapsed().as_micros() as f64 /1_000_000.;
         start = Instant::now();
-        entity.move_dt(delta_t);
-        renderer.draw(&entity);
-        renderer.draw_screen();
-        print!("\rFPS: {:?}", 1./delta_t as f64);
+
+        world.physics_system(delta_t);
+        world.render_system(&mut canvas);
         
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 70));
+        canvas.present();
+        print!("\rFPS: {:?}", 1./delta_t);
     }
     println!();
 }
