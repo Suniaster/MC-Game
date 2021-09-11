@@ -20,13 +20,17 @@ pub struct GameScene {
   textures: ComponentMap<sdl2::render::Texture>,
   sizes:  ComponentMap<(f64, f64)>,
 
+  // Resources
+  scene_size: (f64, f64), // Width, heigth
+  time_scale: f64,
+
   // Entities
   blobs: Vec<EntityIdx>,
 }
 
 
 impl GameScene {
-  pub fn new() -> GameScene {
+  pub fn new(size: (f64, f64)) -> GameScene {
     return GameScene{
       entity_allocator: ComponentVecAllocator::new(),
       
@@ -34,6 +38,9 @@ impl GameScene {
       physics: ComponentMap::new(), 
       textures: ComponentMap::new(),
       sizes: ComponentMap::new(),
+
+      scene_size: size,
+      time_scale: 5.,
 
       blobs: vec![],
     }
@@ -45,7 +52,7 @@ impl GameScene {
 
     self.positions.set(&blob_idx, Vector::new(30.0, 30.0));
     self.textures.set(&blob_idx, texture);
-    self.physics.set(&blob_idx, PhysicsComponent::new());
+    self.physics.set(&blob_idx, PhysicsComponent::new(Vector::new(0.,0.), Vector::new(0., 10.)));
     self.sizes.set(&blob_idx, (40., 40.));
 
     self.blobs.push(blob_idx);
@@ -86,13 +93,57 @@ impl GameScene {
     let data_iter = self.positions.data_mut().iter_mut()
       .zip(self.physics.data_mut().iter_mut());
 
+    let real_dt = self.time_scale * dt;
     for (pos, physics) in data_iter {
       let pos = pos.as_mut().unwrap();
       let physics = physics.as_mut().unwrap();
 
-      physics.value.vel += physics.value.accel *dt;
-      pos.value += physics.value.vel * dt;
+      physics.value.vel += physics.value.accel *real_dt;
+      pos.value += physics.value.vel * real_dt;
+    }
+  }
+
+  pub fn circular_world_system(&mut self){
+    let data_iter = self.positions.data_mut().iter_mut();
+
+    for pos in data_iter {
+      let pos = pos.as_mut().unwrap();
+      if pos.value.y > self.scene_size.1{
+        pos.value.y = 0.;
+      }
+      if pos.value.y < 0. {
+        pos.value.y = self.scene_size.1 - 1.;
+      }
+      if pos.value.x > self.scene_size.0{
+        pos.value.x = 0.;
+      }
+      if pos.value.x < 0.{
+        pos.value.x = self.scene_size.0;
+      }
     }
   }
 }
 
+
+// pub fn bounce_world_system(&mut self){
+//   let data_iter = self.positions.data_mut().iter()
+//     .zip(self.physics.data_mut().iter_mut());
+
+//   for (pos, physic) in data_iter {
+//     let pos = pos.as_ref().unwrap();
+//     let physic = physic.as_mut().unwrap();
+    
+//     if pos.value.y > self.scene_size.1{
+//       physic.value.vel.y *= -1.;
+//     }
+//     if pos.value.y < 0. {
+//       physic.value.vel.y *= -1.;
+//     }
+//     if pos.value.x > self.scene_size.0{
+//       physic.value.vel.x *= -1.;
+//     }
+//     if pos.value.x < 0.{
+//       physic.value.vel.x *= -1.;
+//     }
+//   }
+// }

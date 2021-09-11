@@ -11,9 +11,9 @@ pub struct PhysicsComponent {
 }
 
 impl PhysicsComponent {
-  pub fn new() -> PhysicsComponent{
+  pub fn new(vel: Vector<f64>, accel: Vector<f64>) -> PhysicsComponent{
     return PhysicsComponent {
-      vel: Vector::new(5., 5.), accel: Vector::new(5., 5.)
+      vel, accel
     }
   }
 }

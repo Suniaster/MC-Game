@@ -19,7 +19,7 @@ fn main() {
     // let rect = ShapeHandle::new(Cuboid::new(Vector::new(5., 5.)));
 
 
-    let mut world = scene::GameScene::new();
+    let mut world = scene::GameScene::new((800., 600.));
 
     
     let sdl_context = sdl2::init().unwrap();
@@ -62,6 +62,7 @@ fn main() {
 
         world.physics_system(delta_t);
         world.render_system(&mut canvas);
+        world.circular_world_system();
         
         canvas.present();
         print!("\rFPS: {:?}", 1./delta_t);
