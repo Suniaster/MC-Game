@@ -7,20 +7,17 @@ use std::time::{Instant};
 mod components;
 mod scene;
 
-use ncollide2d::world::CollisionWorld;
 
-use ncollide2d::shape::ShapeHandle;
-use ncollide2d::shape::Cuboid;
-use ncollide2d::math::Vector;
-
+// Proximos Objetivos
+// - Adicionar Colisao
+// - Adicionar Input
+// - Ajustar estrutura do loop principal
+// - Adicionar fixed dt
+// - Decidir como estruturar melhor sistemas em arquivos separados
+// - Fazer alguma parada massa
 
 fn main() {
-    // let _world:CollisionWorld<f64, ComponentIndex> = CollisionWorld::new(0.012);
-    // let rect = ShapeHandle::new(Cuboid::new(Vector::new(5., 5.)));
-
-
     let mut world = scene::GameScene::new((800., 600.));
-
     
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -53,6 +50,9 @@ fn main() {
                 Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'running;
                 },
+                Event::KeyDown {keycode: Some(Keycode::E), ..} => {
+                    world.create_blob(&texture_creator);
+                }
                 _ => {}
             }
         }
@@ -60,12 +60,12 @@ fn main() {
         let delta_t = start.elapsed().as_micros() as f64 /1_000_000.;
         start = Instant::now();
 
-        world.physics_system(delta_t);
+        scene::physics_system(&mut world.positions, &mut world.physics, delta_t, world.time_scale);
         world.render_system(&mut canvas);
-        world.circular_world_system();
-        
+        scene::circular_world_system(&mut world.positions, &world.scene_size);
         canvas.present();
-        print!("\rFPS: {:?}", 1./delta_t);
+
+        print!("\rFPS: {:.3} \t||| Entities: {:?}", 1./delta_t, world.blobs.len());
     }
     println!();
 }
