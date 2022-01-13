@@ -23,3 +23,4 @@ impl PhysicsComponent {
 }
 
 pub struct PositionComponent(pub Vector<f64>);
+pub struct SizeComponent(pub f64, pub f64);

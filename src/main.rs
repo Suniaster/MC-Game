@@ -41,7 +41,6 @@ fn main() {
     let mut start = Instant::now();
     
     'running: loop {
-        canvas.clear();
         // handle keyboard events
         
         for event in event_pump.poll_iter() {
@@ -61,10 +60,11 @@ fn main() {
         start = Instant::now();
 
         systems::physics_system(&mut world.positions, &mut world.physics, delta_t, world.time_scale);
-        world.render_system(&mut canvas);
         systems::circular_world_system(&mut world.positions, &world.scene_size);
-        canvas.present();
-
+   
+        systems::render_system(&mut canvas, 
+            &world.positions, &world.textures, &world.sizes
+        );
         print!("\rFPS: {:.3} \t||| Entities: {:?}", 1./delta_t, world.blobs.len());
     }
     println!();
