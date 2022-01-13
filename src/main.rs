@@ -6,7 +6,7 @@ use std::time::{Instant};
 
 mod components;
 mod scene;
-
+mod systems;
 
 // Proximos Objetivos
 // - Adicionar Colisao
@@ -60,9 +60,9 @@ fn main() {
         let delta_t = start.elapsed().as_micros() as f64 /1_000_000.;
         start = Instant::now();
 
-        scene::physics_system(&mut world.positions, &mut world.physics, delta_t, world.time_scale);
+        systems::physics_system(&mut world.positions, &mut world.physics, delta_t, world.time_scale);
         world.render_system(&mut canvas);
-        scene::circular_world_system(&mut world.positions, &world.scene_size);
+        systems::circular_world_system(&mut world.positions, &world.scene_size);
         canvas.present();
 
         print!("\rFPS: {:.3} \t||| Entities: {:?}", 1./delta_t, world.blobs.len());
