@@ -30,7 +30,7 @@ pub fn render_system(
             pos.value.0.x as i32,
             pos.value.0.y as i32, 
             size.value.0 as u32, 
-            size.value.0 as u32
+            size.value.1 as u32
           )
         ).unwrap();
       },
