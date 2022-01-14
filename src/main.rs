@@ -30,15 +30,15 @@ fn main() {
     .expect("could not initialize video subsystem");
     
     let mut canvas = window.into_canvas().build()
-    .expect("could not make a canvas");
+        .expect("could not make a canvas");
     
     let texture_creator:sdl2::render::TextureCreator<sdl2::video::WindowContext> = canvas.texture_creator();
     
-    world.create_blob(&texture_creator);
-    world.create_enemy(&texture_creator);
-
     let mut event_pump = sdl_context.event_pump().expect("");    
     let mut start = Instant::now();
+    
+    world.setup_components();
+    world.setup_assets(&texture_creator);
     
     'running: loop {
         // handle keyboard events
@@ -50,7 +50,7 @@ fn main() {
                     break 'running;
                 },
                 Event::KeyDown {keycode: Some(Keycode::E), ..} => {
-                    world.create_blob(&texture_creator);
+                    world.create_blob();
                 }
                 _ => {}
             }
@@ -59,12 +59,10 @@ fn main() {
         let delta_t = start.elapsed().as_micros() as f64 /1_000_000.;
         start = Instant::now();
 
-        systems::physics_system(&mut world.positions, &mut world.physics, delta_t, world.time_scale);
-        systems::circular_world_system(&mut world.positions, &world.scene_size);
+        systems::physics_system(&mut world.components, delta_t, world.time_scale);
+        systems::circular_world_system(&mut world.components, &world.scene_size);
    
-        systems::render_system(&mut canvas, 
-            &world.positions, &world.textures, &world.sizes
-        );
+        systems::render_system(&world.components, &world.assets, &mut canvas);
         print!("\rFPS: {:.3} \t||| Entities: {:?}", 1./delta_t, world.blobs.len());
     }
     println!();

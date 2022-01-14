@@ -7,6 +7,7 @@ edition = "2018"
 [dependencies]
 ncollide2d = "0.22" # For 2D collision detection.
 ecs = {path="./ecs"}
+shred = "0.12.0"
 
 [dependencies.sdl2]
 git = "https://github.com/rust-sdl2/rust-sdl2"

@@ -8,6 +8,10 @@ pub struct ArrayEntry<T> {
 // An associative array from GenerationalIndex to some Value T.
 pub struct GenerationalIndexArray<T>(Vec<Option<ArrayEntry<T>>>);
 
+impl<T> std::default::Default for GenerationalIndexArray<T>{
+    fn default() -> Self {Self(vec![])}
+}
+
 impl<T> GenerationalIndexArray<T> {
     pub fn new()->GenerationalIndexArray<T>{
         return GenerationalIndexArray(vec![]);

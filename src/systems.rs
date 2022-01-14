@@ -1,22 +1,31 @@
 use super::components::*;
-
+use shred::{World, Write, Read};
+use super::scene::Assets;
 
 pub fn render_system(
-  canvas: &mut sdl2::render::Canvas<sdl2::video::Window>,
-  positions: &ComponentMap<PositionComponent>,
-  textures: &ComponentMap<sdl2::render::Texture>,
-  sizes: &ComponentMap<SizeComponent>
+  components: &World,
+  assets: &Assets,
+  canvas: &mut sdl2::render::Canvas<sdl2::video::Window>
 ){
+  let system_data: (
+    Read<ComponentMap<PositionComponent>>, 
+    Read<ComponentMap<TextureId>>,
+    Read<ComponentMap<SizeComponent>>,
+  ) = components.system_data();
+
+  let (positions, textures, sizes ) = system_data;
+
   canvas.clear();
 
   let data_iter = positions.data().into_iter()
     .zip(textures.data().into_iter())
     .zip(sizes.data().into_iter());
   
-  for ((pos, texture), size) in data_iter{
-    match (pos, texture, size){
-      (Some(pos), Some(texture), Some(size))=>{
-        canvas.copy(&texture.value, None, 
+  for ((pos, texture_id), size) in data_iter{
+    match (pos, texture_id, size){
+      (Some(pos), Some(texture_id), Some(size))=>{
+        let texture = assets.get(&texture_id.value.0).unwrap();
+        canvas.copy(&texture, None, 
           sdl2::rect::Rect::new(
             pos.value.0.x as i32,
             pos.value.0.y as i32, 
@@ -33,14 +42,19 @@ pub fn render_system(
 }
 
 pub fn physics_system(
-  positions: &mut ComponentMap<PositionComponent>,
-  physics: &mut ComponentMap<PhysicsComponent>,
+  components: &mut World,
   dt: f64,
   time_scale: f64
 ){
+
+  let system_data: (Write<ComponentMap<PositionComponent>>, Write<ComponentMap<PhysicsComponent>>) = components.system_data();
+  let mut positions = system_data.0;
+  let mut physics = system_data.1;
+
   let data_iter = positions.data_mut().iter_mut().zip(
     physics.data_mut().iter_mut()
   );
+
   let dt = dt * time_scale;
 
   for (pos, physics) in data_iter {
@@ -54,7 +68,11 @@ pub fn physics_system(
   }
 }
 
-pub fn circular_world_system(positions: &mut ComponentMap<PositionComponent>, scene_size: &(f64, f64)){
+pub fn circular_world_system(components: &mut World, scene_size: &(f64, f64)){
+  
+  let system_data: Write<ComponentMap<PositionComponent>> = components.system_data();
+  let mut positions = system_data;
+
   let data = positions.data_mut();
 
   for pos in data.iter_mut(){
