@@ -7,6 +7,7 @@ use std::time::{Instant};
 mod components;
 mod scene;
 mod systems;
+mod entities;
 
 // Proximos Objetivos
 // - Adicionar Colisao
@@ -50,7 +51,7 @@ fn main() {
                     break 'running;
                 },
                 Event::KeyDown {keycode: Some(Keycode::E), ..} => {
-                    world.create_blob();
+                    entities::Blob::create(&mut world);
                 }
                 _ => {}
             }

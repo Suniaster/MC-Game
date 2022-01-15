@@ -10,12 +10,10 @@ use crate::sdl2::image::LoadTexture;
 use crate::sdl2;
 use ecs::ComponentVecAllocator;
 
-use ncollide2d::math::Vector;
-
 pub type Assets = HashMap<String, sdl2::render::Texture>;
 
 pub struct GameScene {
-  entity_allocator:  ComponentVecAllocator,
+  pub entity_allocator:  ComponentVecAllocator,
 
   // Components
   pub components: World,
@@ -54,26 +52,5 @@ impl GameScene {
   pub fn setup_assets(&mut self, texture_creator: &sdl2::render::TextureCreator<sdl2::video::WindowContext>){
     self.assets.insert(String::from("test"), texture_creator.load_texture("./assets/av.jpg").expect(""));
   }
-  
-  pub fn create_blob(&mut self){
-    let blob_idx = self.entity_allocator.allocate();
 
-    self.components.get_mut::<ComponentMap::<PositionComponent>>().unwrap().set(
-      &blob_idx, PositionComponent(Vector::new(100., 100.))
-    );
-
-    self.components.get_mut::<ComponentMap::<PhysicsComponent>>().unwrap().set(
-      &blob_idx, PhysicsComponent::new_random()
-    );
-
-    self.components.get_mut::<ComponentMap::<SizeComponent>>().unwrap().set(
-      &blob_idx, SizeComponent(40., 40.)
-    );
-
-    self.components.get_mut::<ComponentMap::<TextureId>>().unwrap().set(
-      &blob_idx, TextureId(String::from("test"))
-    );
-
-    self.blobs.push(blob_idx);
-  }
 }
