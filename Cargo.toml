@@ -2,11 +2,13 @@
 name = "teste"
 version = "0.1.0"
 edition = "2018"
+resolver="2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
 ncollide2d = "0.22" # For 2D collision detection.
 ecs = {path="./ecs"}
+view = {path="./view"}
 shred = "0.12.0"
 
 [dependencies.sdl2]

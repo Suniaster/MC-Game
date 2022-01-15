@@ -2,12 +2,13 @@ extern crate sdl2;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use std::time::{Instant};
+use std::time::Instant;
 
 mod components;
+mod entities;
 mod scene;
 mod systems;
-mod entities;
+use view;
 
 // Proximos Objetivos
 // - Adicionar Colisao
@@ -18,57 +19,72 @@ mod entities;
 // - Fazer alguma parada massa
 
 fn main() {
-    let mut world = scene::GameScene::new((800., 600.));
+    view::main();
     
+    let mut world = scene::GameScene::new((800., 600.));
+
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
-    
+
     // let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)?;
-    
-    let window = video_subsystem.window("rust-sdl2 demo", 800, 600)
-    .position_centered()
-    .build()
-    .expect("could not initialize video subsystem");
-    
-    let mut canvas = window.into_canvas().build()
+
+    let window = video_subsystem
+        .window("rust-sdl2 demo", 800, 600)
+        .position_centered()
+        .build()
+        .expect("could not initialize video subsystem");
+
+    let mut canvas = window
+        .into_canvas()
+        .build()
         .expect("could not make a canvas");
-    
-    let texture_creator:sdl2::render::TextureCreator<sdl2::video::WindowContext> = canvas.texture_creator();
-    
-    let mut event_pump = sdl_context.event_pump().expect("");    
+
+    let texture_creator: sdl2::render::TextureCreator<sdl2::video::WindowContext> =
+        canvas.texture_creator();
+
+    let mut event_pump = sdl_context.event_pump().expect("");
     let mut start = Instant::now();
-    
+
     world.setup_components();
     world.setup_assets(&texture_creator);
-    
+
     'running: loop {
         // handle keyboard events
-        
+
         for event in event_pump.poll_iter() {
             match event {
-                Event::Quit {..} |
-                Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => {
                     break 'running;
-                },
-                Event::KeyDown {keycode: Some(Keycode::E), ..} => {
+                }
+                Event::KeyDown {
+                    keycode: Some(Keycode::E),
+                    ..
+                } => {
                     entities::Blob::create(&mut world);
                 }
                 _ => {}
             }
         }
         // The rest of the game loop goes here...
-        let delta_t = start.elapsed().as_micros() as f64 /1_000_000.;
+        let delta_t = start.elapsed().as_micros() as f64 / 1_000_000.;
         start = Instant::now();
 
         systems::physics_system(&mut world.components, delta_t, world.time_scale);
         systems::circular_world_system(&mut world.components, &world.scene_size);
-   
+
         systems::render_system(&world.components, &world.assets, &mut canvas);
-        print!("\rFPS: {:.3} \t||| Entities: {:?}", 1./delta_t, world.blobs.len());
+        print!(
+            "\rFPS: {:.3} \t||| Entities: {:?}",
+            1. / delta_t,
+            world.blobs.len()
+        );
     }
     println!();
 }
-
 
 // fn main() -> Result<(), String> {
 //     let sdl_context = sdl2::init()?;
@@ -86,7 +102,7 @@ fn main() {
 //         .build()
 //         .map_err(|e| e.to_string())?;
 //     let texture_creator = canvas.texture_creator();
-    
+
 //     canvas.set_draw_color(sdl2::pixels::Color::RGBA(0, 0, 0, 255));
 
 //     let timer = sdl_context.timer()?;
