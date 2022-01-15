@@ -3,9 +3,12 @@ use ncollide2d::math::Vector;
 use ecs::vec_storage::GenerationalIndexArray;
 use ecs::GenerationalIndex;
 
+// Meta data
+
 pub type ComponentMap<T> = GenerationalIndexArray<T>;
 pub type EntityIdx = GenerationalIndex;
 
+// Components Definition
 pub struct PhysicsComponent {
   pub vel: Vector<f64>, pub accel: Vector<f64>
 }

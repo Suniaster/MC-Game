@@ -53,4 +53,8 @@ impl GameScene {
     self.assets.insert(String::from("test"), texture_creator.load_texture("./assets/av.jpg").expect(""));
   }
 
+  pub fn add_component<T: shred::Resource>(&mut self, idx: &EntityIdx, c: T){
+    self.components.get_mut::<ComponentMap<T>>()
+      .unwrap().set(idx, c);
+  }
 }

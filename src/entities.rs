@@ -9,19 +9,19 @@ impl Blob{
   pub fn create(scene: &mut GameScene){
     let blob_idx = scene.entity_allocator.allocate();
 
-    scene.components.get_mut::<ComponentMap::<PositionComponent>>().unwrap().set(
+    scene.add_component(
       &blob_idx, PositionComponent(Vector::new(100., 100.))
     );
 
-    scene.components.get_mut::<ComponentMap::<PhysicsComponent>>().unwrap().set(
+    scene.add_component(
       &blob_idx, PhysicsComponent::new_random()
     );
 
-    scene.components.get_mut::<ComponentMap::<SizeComponent>>().unwrap().set(
+    scene.add_component(
       &blob_idx, SizeComponent(40., 40.)
     );
 
-    scene.components.get_mut::<ComponentMap::<TextureId>>().unwrap().set(
+    scene.add_component(
       &blob_idx, TextureId(String::from("test"))
     );
 
