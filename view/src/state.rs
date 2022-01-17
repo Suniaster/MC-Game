@@ -6,6 +6,7 @@ use winit::{
 };
 
 use super::shaders;
+use wgpu::util::DeviceExt;
 
 pub struct State {
     surface: wgpu::Surface,
@@ -15,6 +16,12 @@ pub struct State {
     pub size: winit::dpi::PhysicalSize<u32>,
     red_color: f64,
     render_pipeline: wgpu::RenderPipeline,
+
+    // Buffer
+    vertex_buffer: wgpu::Buffer,
+    num_vertices: u32,
+    index_buffer: wgpu::Buffer, 
+    num_indices: u32,
 }
 
 impl State {
@@ -73,7 +80,9 @@ impl State {
             vertex: wgpu::VertexState {
                 module: &shader,
                 entry_point: "vs_main", // 1.
-                buffers: &[], // 2.
+                buffers: &[
+                    shaders::Vertex::desc(),
+                ], // 2.
             },
             fragment: Some(wgpu::FragmentState { // 3.
                 module: &shader,
@@ -104,6 +113,23 @@ impl State {
             },
             multiview: None, // 5.
         });
+
+        let vertex_buffer = device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Vertex Buffer"),
+                contents: bytemuck::cast_slice(shaders::VERTICES),
+                usage: wgpu::BufferUsages::VERTEX,
+            }
+        );
+        let index_buffer = device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Index Buffer"),
+                contents: bytemuck::cast_slice(shaders::INDICES),
+                usage: wgpu::BufferUsages::INDEX,
+            }
+        );
+        let num_indices = shaders::INDICES.len() as u32;
+
         Self {
             surface,
             device,
@@ -112,6 +138,10 @@ impl State {
             size,
             red_color: 1.,
             render_pipeline,
+            vertex_buffer,
+            num_vertices: shaders::VERTICES.len() as u32,
+            index_buffer,
+            num_indices        
         }
     }
 
@@ -167,7 +197,9 @@ impl State {
                 depth_stencil_attachment: None,
             });
             render_pass.set_pipeline(&self.render_pipeline); // 2.
-            render_pass.draw(0..3, 0..1); // 3.        
+            render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
+            render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
+            render_pass.draw_indexed(0..self.num_indices, 0, 0..1); // 2.        
         }
 
         // submit will accept anything that implements IntoIter
