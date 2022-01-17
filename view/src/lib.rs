@@ -5,6 +5,7 @@ use winit::{
 };
 
 mod state;
+mod shaders;
 use state::State;
 
 pub fn main() {
