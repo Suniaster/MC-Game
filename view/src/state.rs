@@ -11,6 +11,7 @@ pub struct State {
     queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
     pub size: winit::dpi::PhysicalSize<u32>,
+    red_color: f64,
 }
 
 impl State {
@@ -57,6 +58,7 @@ impl State {
             queue,
             config,
             size,
+            red_color: 1.,
         }
     }
 
@@ -70,6 +72,24 @@ impl State {
     }
 
     pub fn input(&mut self, event: &WindowEvent) -> bool {
+        match event{
+            WindowEvent::KeyboardInput{
+                input: KeyboardInput {
+                    state: ElementState::Pressed,
+                    ..
+                },
+                ..
+            } => {
+                println!("LLKTTT");
+            },
+            WindowEvent::CursorMoved{
+                position, ..
+            } => {
+                println!("{:?}", position.x);
+                self.red_color = position.x / self.size.width as f64;
+            },
+            _ => {}
+        }
         false
     }
 
@@ -93,7 +113,7 @@ impl State {
                     resolve_target: None,
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
+                            r: self.red_color,
                             g: 0.2,
                             b: 0.3,
                             a: 1.0,
