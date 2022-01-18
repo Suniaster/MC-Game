@@ -6,6 +6,7 @@ use winit::{
 };
 
 use super::shaders;
+use super::texture;
 use wgpu::util::DeviceExt;
 
 pub struct State {
@@ -19,9 +20,12 @@ pub struct State {
 
     // Buffer
     vertex_buffer: wgpu::Buffer,
-    num_vertices: u32,
     index_buffer: wgpu::Buffer, 
     num_indices: u32,
+
+    // Textures
+    diffuse_bind_group: wgpu::BindGroup, // NEW!
+    diffuse_texture: texture::Texture, // NEW
 }
 
 impl State {
@@ -62,6 +66,56 @@ impl State {
             present_mode: wgpu::PresentMode::Fifo,
         };
         surface.configure(&device, &config);
+        
+        let diffuse_bytes = include_bytes!("ha.png"); // CHANGED!
+        let diffuse_texture = texture::Texture::from_bytes(&device, &queue, diffuse_bytes, "happy-tree.png").unwrap(); // CHANGED!
+
+        let texture_bind_group_layout = device.create_bind_group_layout(
+            &wgpu::BindGroupLayoutDescriptor {
+                entries: &[
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 0,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Texture {
+                            multisampled: false,
+                            view_dimension: wgpu::TextureViewDimension::D2,
+                            sample_type: wgpu::TextureSampleType::Float { filterable: true },
+                        },
+                        count: None,
+                    },
+                    wgpu::BindGroupLayoutEntry {
+                        binding: 1,
+                        visibility: wgpu::ShaderStages::FRAGMENT,
+                        ty: wgpu::BindingType::Sampler(
+                            // SamplerBindingType::Comparison is only for TextureSampleType::Depth
+                            // SamplerBindingType::Filtering if the sample_type of the texture is:
+                            //     TextureSampleType::Float { filterable: true }
+                            // Otherwise you'll get an error.
+                            wgpu::SamplerBindingType::Filtering,
+                        ),
+                        count: None,
+                    },
+                ],
+                label: Some("texture_bind_group_layout"),
+            }
+        );
+        
+        let diffuse_bind_group = device.create_bind_group(
+            &wgpu::BindGroupDescriptor {
+                layout: &texture_bind_group_layout,
+                entries: &[
+                    wgpu::BindGroupEntry {
+                        binding: 0,
+                        resource: wgpu::BindingResource::TextureView(&diffuse_texture.view), // CHANGED!
+                    },
+                    wgpu::BindGroupEntry {
+                        binding: 1,
+                        resource: wgpu::BindingResource::Sampler(&diffuse_texture.sampler), // CHANGED!
+                    }
+                ],
+                label: Some("diffuse_bind_group"),
+            }
+        );
 
         let shader = device.create_shader_module(&wgpu::ShaderModuleDescriptor {
             label: Some("Shader"),
@@ -71,7 +125,7 @@ impl State {
         let render_pipeline_layout =
             device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
                 label: Some("Render Pipeline Layout"),
-                bind_group_layouts: &[],
+                bind_group_layouts: &[&texture_bind_group_layout],
                 push_constant_ranges: &[],
             });
         let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -139,9 +193,10 @@ impl State {
             red_color: 1.,
             render_pipeline,
             vertex_buffer,
-            num_vertices: shaders::VERTICES.len() as u32,
             index_buffer,
-            num_indices        
+            num_indices   ,
+            diffuse_bind_group,    
+            diffuse_texture, // NEW 
         }
     }
 
@@ -197,6 +252,8 @@ impl State {
                 depth_stencil_attachment: None,
             });
             render_pass.set_pipeline(&self.render_pipeline); // 2.
+            render_pass.set_bind_group(0, &self.diffuse_bind_group, &[]); // NEW!
+
             render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
             render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
             render_pass.draw_indexed(0..self.num_indices, 0, 0..1); // 2.        
