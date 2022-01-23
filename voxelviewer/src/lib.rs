@@ -87,32 +87,30 @@ impl CameraController {
         }
     }
 
-    fn process_events(&mut self, event: &WindowEvent) -> bool {
+    fn process_events(&mut self, event: &DeviceEvent) -> bool {
         match event {
-            WindowEvent::KeyboardInput {
-                input: KeyboardInput {
+            DeviceEvent::Key (
+                KeyboardInput {
+                    virtual_keycode: Some(key),
                     state,
-                    virtual_keycode: Some(keycode),
                     ..
-                },
-                ..
-            } => {
-                let is_pressed = *state == ElementState::Pressed;
-                match keycode {
+                }
+            ) => {
+                match key {
                     VirtualKeyCode::W | VirtualKeyCode::Up => {
-                        self.is_forward_pressed = is_pressed;
+                        self.is_forward_pressed = *state == ElementState::Pressed;
                         true
                     }
                     VirtualKeyCode::A | VirtualKeyCode::Left => {
-                        self.is_left_pressed = is_pressed;
+                        self.is_left_pressed = *state == ElementState::Pressed;
                         true
                     }
                     VirtualKeyCode::S | VirtualKeyCode::Down => {
-                        self.is_backward_pressed = is_pressed;
+                        self.is_backward_pressed = *state == ElementState::Pressed;
                         true
                     }
                     VirtualKeyCode::D | VirtualKeyCode::Right => {
-                        self.is_right_pressed = is_pressed;
+                        self.is_right_pressed = *state == ElementState::Pressed;
                         true
                     }
                     _ => false,
@@ -429,8 +427,7 @@ impl State {
 
     // UPDATED!
     fn input(&mut self, event: &DeviceEvent) -> bool {
-        false
-        //self.camera_controller.process_events(event)
+        self.camera_controller.process_events(event)
     }
 
     fn update(&mut self, dt: std::time::Duration) {
@@ -545,6 +542,7 @@ pub fn main() {
                 let dt = now - last_render_time;
                 last_render_time = now;
                 state.update(dt);
+                print!("\r FPS: {}", 1000./(dt.as_millis() as f64));
                 match state.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if lost
