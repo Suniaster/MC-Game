@@ -9,6 +9,7 @@ resolver="2"
 ncollide2d = "0.22" # For 2D collision detection.
 ecs = {path="./ecs"}
 view = {path="./view"}
+voxelviewer = {path="./voxelviewer"}
 shred = "0.12.0"
 
 [dependencies.sdl2]

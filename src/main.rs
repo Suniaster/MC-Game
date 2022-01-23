@@ -9,6 +9,7 @@ mod entities;
 mod scene;
 mod systems;
 use view;
+use voxelviewer;
 
 // Proximos Objetivos
 // - Adicionar Colisao
@@ -19,7 +20,7 @@ use view;
 // - Fazer alguma parada massa
 
 fn main() {
-    view::main();
+    voxelviewer::main();
     
     let mut world = scene::GameScene::new((800., 600.));
 

@@ -1594,6 +1594,7 @@ dependencies = [
  "sdl2",
  "shred",
  "view",
+ "voxelviewer",
 ]
 
 [[package]]
@@ -1700,6 +1701,22 @@ dependencies = [
  "env_logger",
  "fs_extra",
  "glob",
+ "image",
+ "log",
+ "pollster",
+ "tobj",
+ "wgpu",
+ "winit",
+]
+
+[[package]]
+name = "voxelviewer"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "bytemuck",
+ "cgmath",
+ "env_logger",
  "image",
  "log",
  "pollster",
