@@ -17,12 +17,14 @@ pub struct ViewActions{
 
 pub struct ViewController{
     pub on_update: fn(actions: &ViewActions, dt: std::time::Duration) -> (),
+    pub on_keybord_input: fn(actions: &ViewActions, key: VirtualKeyCode, state: ElementState) -> (),
 }
 
 impl ViewController{
     pub fn new() -> ViewController{
         ViewController{
             on_update: |_,_|{},
+            on_keybord_input: |_,_,_|{},
         }
     }
 }
@@ -54,6 +56,18 @@ pub fn main(controller: ViewController) {
                 .. // We're not using device_id currently
             } => {
                 actions.state.input(event);
+                match event{
+                    DeviceEvent::Key(
+                        KeyboardInput {
+                            virtual_keycode: Some(key),
+                            state,
+                            ..
+                        }
+                    ) => {
+                        (controller.on_keybord_input)(&actions, *key, *state);
+                    }
+                    _ => {}
+                }
             }
             // UPDATED!
             Event::WindowEvent {
