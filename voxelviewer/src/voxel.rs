@@ -1,3 +1,5 @@
+use cgmath::prelude::*;
+
 pub trait Vertex {
     fn desc<'a>() -> wgpu::VertexBufferLayout<'a>;
 }
@@ -6,7 +8,8 @@ pub trait Vertex {
 #[derive(Copy, Clone, Debug, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct DefaultVertex {
     position: [f32; 3],
-    color: [f32; 3]
+    color: [f32; 3],
+    normal: [f32; 3]
 }
 
 impl Vertex for DefaultVertex {
@@ -25,12 +28,25 @@ impl Vertex for DefaultVertex {
                     offset: mem::size_of::<[f32; 3]>() as wgpu::BufferAddress,
                     shader_location: 1,
                     format: wgpu::VertexFormat::Float32x3,
+                },
+                wgpu::VertexAttribute {
+                    offset: mem::size_of::<[f32; 6]>() as wgpu::BufferAddress,
+                    shader_location: 2,
+                    format: wgpu::VertexFormat::Float32x3,
                 }
             ],
         }
     }
 }
 
+impl DefaultVertex{
+    pub fn new(position: [f32; 3], normal: [f32; 3]) -> DefaultVertex{
+        DefaultVertex{
+            position, normal,
+            color: [0.1, 0.9, 0.3]
+        }
+    }
+}
 
 pub struct DefaultQuad{
     position: cgmath::Vector3<f32>,
@@ -47,21 +63,45 @@ impl DefaultQuad{
         }
     }
 
-    pub fn getVertexList(&self) -> Vec<DefaultVertex> {
+    pub fn get_vertex_list(&self) -> Vec<DefaultVertex> {
         vec![
-            DefaultVertex{position: [self.position.x,               self.position.y,                self.position.z], color: [0.1, 0.9, 0.3]},
-            DefaultVertex{position: [self.position.x,               self.position.y + self.size,    self.position.z], color: [0.1, 0.9, 0.3]},
-            DefaultVertex{position: [self.position.x + self.size,   self.position.y + self.size,    self.position.z], color: [0.1, 0.9, 0.3]},
-            DefaultVertex{position: [self.position.x + self.size,   self.position.y,                self.position.z], color: [0.1, 0.9, 0.3]},
+            DefaultVertex::new([self.position.x,               self.position.y,                self.position.z], [0.1, 0.9, 0.3]),
+            DefaultVertex::new([self.position.x,               self.position.y + self.size,    self.position.z], [0.1, 0.9, 0.3]),
+            DefaultVertex::new([self.position.x + self.size,   self.position.y + self.size,    self.position.z], [0.1, 0.9, 0.3]),
+            DefaultVertex::new([self.position.x + self.size,   self.position.y,                self.position.z], [0.1, 0.9, 0.3]),
             
-            DefaultVertex{position: [self.position.x,               self.position.y,                self.position.z + self.size], color: [0.1, 0.9, 0.3]},
-            DefaultVertex{position: [self.position.x,               self.position.y + self.size,    self.position.z + self.size], color: [0.1, 0.9, 0.3]},
-            DefaultVertex{position: [self.position.x + self.size,   self.position.y + self.size,    self.position.z + self.size], color: [0.1, 0.9, 0.3]},
-            DefaultVertex{position: [self.position.x + self.size,   self.position.y,                self.position.z + self.size], color: [0.1, 0.9, 0.3]}
+            DefaultVertex::new([self.position.x,               self.position.y,                self.position.z + self.size], [0.1, 0.9, 0.3]),
+            DefaultVertex::new([self.position.x,               self.position.y + self.size,    self.position.z + self.size], [0.1, 0.9, 0.3]),
+            DefaultVertex::new([self.position.x + self.size,   self.position.y + self.size,    self.position.z + self.size], [0.1, 0.9, 0.3]),
+            DefaultVertex::new([self.position.x + self.size,   self.position.y,                self.position.z + self.size], [0.1, 0.9, 0.3])
         ]
     }
 
-    pub fn getIndexList(&self) -> Vec<u16>{
+    pub fn get_complete_vertexes(&self) -> Vec<DefaultVertex>{
+        let mut ret_vec = vec![];
+        let vextexes = self.get_vertex_list();
+        let indexes = self.get_indexes();
+        
+        for triangle_i in 0..(indexes.len()/3){
+            let mut v1:DefaultVertex = vextexes[indexes[triangle_i*3 + 0] as usize];
+            let mut v2:DefaultVertex = vextexes[indexes[triangle_i*3 + 1] as usize];
+            let mut v3:DefaultVertex = vextexes[indexes[triangle_i*3 + 2] as usize];
+
+            let c = cgmath::Vector3::from(v1.position);
+            let b = cgmath::Vector3::from(v2.position);
+            let a = cgmath::Vector3::from(v3.position);
+            
+            let dir = (b - a).cross(c - a);
+            v1.normal = dir.normalize().into();
+            v2.normal = dir.normalize().into();
+            v3.normal = dir.normalize().into();
+
+            ret_vec.push(v3);ret_vec.push(v2);ret_vec.push(v1);
+        }
+        return ret_vec;
+    }
+
+    pub fn get_indexes(&self) -> Vec<u16>{
         vec![
             2, 1, 0,
             2, 0, 3,
@@ -94,19 +134,24 @@ pub struct Instance {
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct InstanceRaw {
     model: [[f32; 4]; 4],
+    normal: [[f32; 3]; 3]
 }
  
 // NEW!
 impl Instance {
     pub fn to_raw(&self) -> InstanceRaw {
+        let model =
+            cgmath::Matrix4::from_translation(self.position) * cgmath::Matrix4::from(self.rotation);
         InstanceRaw {
-            model: (cgmath::Matrix4::from_translation(self.position) * cgmath::Matrix4::from(self.rotation)).into(),
+            model: model.into(),
+            // NEW!
+            normal: cgmath::Matrix3::from(self.rotation).into(),
         }
     }
 }
 
-impl InstanceRaw {
-    pub fn desc<'a>() -> wgpu::VertexBufferLayout<'a> {
+impl Vertex for InstanceRaw {
+    fn desc<'a>() -> wgpu::VertexBufferLayout<'a> {
         use std::mem;
         wgpu::VertexBufferLayout {
             array_stride: mem::size_of::<InstanceRaw>() as wgpu::BufferAddress,
@@ -119,28 +164,44 @@ impl InstanceRaw {
                     offset: 0,
                     // While our vertex shader only uses locations 0, and 1 now, in later tutorials we'll
                     // be using 2, 3, and 4, for Vertex. We'll start at slot 5 not conflict with them later
-                    shader_location: 2,
-                    format: wgpu::VertexFormat::Float32x4,
-                },
-                // A mat4 takes up 4 vertex slots as it is technically 4 vec4s. We need to define a slot
-                // for each vec4. We'll have to reassemble the mat4 in
-                // the shader.
-                wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 4]>() as wgpu::BufferAddress,
                     shader_location: 3,
                     format: wgpu::VertexFormat::Float32x4,
                 },
+                // A mat4 takes up 4 vertex slots as it is technically 4 vec4s. We need to define a slot
+                // for each vec4. We don't have to do this in code though.
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 8]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 4]>() as wgpu::BufferAddress,
                     shader_location: 4,
                     format: wgpu::VertexFormat::Float32x4,
                 },
                 wgpu::VertexAttribute {
-                    offset: mem::size_of::<[f32; 12]>() as wgpu::BufferAddress,
+                    offset: mem::size_of::<[f32; 8]>() as wgpu::BufferAddress,
                     shader_location: 5,
                     format: wgpu::VertexFormat::Float32x4,
+                },
+                wgpu::VertexAttribute {
+                    offset: mem::size_of::<[f32; 12]>() as wgpu::BufferAddress,
+                    shader_location: 6,
+                    format: wgpu::VertexFormat::Float32x4,
+                },
+                // NEW!
+                wgpu::VertexAttribute {
+                    offset: mem::size_of::<[f32; 16]>() as wgpu::BufferAddress,
+                    shader_location: 7,
+                    format: wgpu::VertexFormat::Float32x3,
+                },
+                wgpu::VertexAttribute {
+                    offset: mem::size_of::<[f32; 19]>() as wgpu::BufferAddress,
+                    shader_location: 8,
+                    format: wgpu::VertexFormat::Float32x3,
+                },
+                wgpu::VertexAttribute {
+                    offset: mem::size_of::<[f32; 22]>() as wgpu::BufferAddress,
+                    shader_location: 9,
+                    format: wgpu::VertexFormat::Float32x3,
                 },
             ],
         }
     }
 }
+ 

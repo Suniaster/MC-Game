@@ -176,7 +176,6 @@ struct State {
     
     default_vertex_pipeline: wgpu::RenderPipeline,
     vertex_buffer: wgpu::Buffer,
-    index_buffer: wgpu::Buffer,
 
     depth_texture: texture::Texture,
 
@@ -415,28 +414,23 @@ impl State {
         let vertex_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Vertex Buffer"),
-                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
-                contents: bytemuck::cast_slice(&new_voxel.getVertexList()),
+                usage: wgpu::BufferUsages::VERTEX,
+                contents: bytemuck::cast_slice(&new_voxel.get_complete_vertexes()),
             }
         );
-        
-        let index_buffer = device.create_buffer_init(
-            &wgpu::util::BufferInitDescriptor {
-                label: Some("Index Buffer"),
-                usage: wgpu::BufferUsages::INDEX,
-                contents: bytemuck::cast_slice(&new_voxel.getIndexList()),
-            }
-        );
-
                 
         let instances:Vec<voxel::Instance> = vec![
             voxel::Instance{
-                position: cgmath::Vector3{x: 0.1, y: 0.1, z: 0.1},
-                rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 1., y: 2., z: 3.}).normalize(), cgmath::Deg(45.0))
+                position: cgmath::Vector3::from(light_uniform.position),
+                rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.0))
             },
             voxel::Instance{
-                position: cgmath::Vector3{x: -0.5, y: -0.5, z: -0.5},
-                rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 1., y: 2., z: 3.}).normalize(), cgmath::Deg(45.0))
+                position: cgmath::Vector3{x: 1.5, y: 0., z: 0.0},
+                rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.))
+            },
+            voxel::Instance{
+                position: cgmath::Vector3{x: -1.5, y: 0., z: 0.},
+                rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.))
             }
         ];
 
@@ -445,7 +439,7 @@ impl State {
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Instance Buffer"),
                 contents: bytemuck::cast_slice(&instance_data),
-                usage: wgpu::BufferUsages::VERTEX,
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
             }
         );
 
@@ -459,7 +453,6 @@ impl State {
             default_vertex_pipeline,
             depth_texture,
             vertex_buffer,
-            index_buffer,
             camera,
             camera_uniform,
             camera_buffer,
@@ -468,7 +461,7 @@ impl State {
 
             instances, instance_buffer,
 
-            light_uniform, light_buffer, light_bind_group
+            light_uniform, light_buffer, light_bind_group,
         }
     }
 
@@ -501,6 +494,8 @@ impl State {
                 * old_position)
                 .into();
         self.queue.write_buffer(&self.light_buffer, 0, bytemuck::cast_slice(&[self.light_uniform]));
+        self.instances[0].position = cgmath::Vector3::from(self.light_uniform.position);
+        self.queue.write_buffer(&self.instance_buffer, 0, bytemuck::cast_slice(&[self.instances[0].to_raw()]));
     }
 
     fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
@@ -549,8 +544,7 @@ impl State {
             render_pass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
             render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
 
-            render_pass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-            render_pass.draw_indexed(0..36, 0, 0..self.instances.len() as _);
+            render_pass.draw(0..36, 0..self.instances.len() as _);
         }
         self.queue.submit(iter::once(encoder.finish()));
         output.present();
