@@ -304,12 +304,12 @@ impl State {
                 rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.0))
             },
             voxel::Instance{
-                position: cgmath::Vector3{x: 1.5, y: 0., z: 0.0},
+                position: cgmath::Vector3{x: 0., y: 0., z: 0.0},
                 color: [0.1, 0.2, 0.3],
                 rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.))
             },
             voxel::Instance{
-                position: cgmath::Vector3{x: -1.5, y: 0., z: 0.},
+                position: cgmath::Vector3{x: 0.5, y: 0., z: 0.},
                 color: [0.1, 0.2, 0.3],
                 rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.))
             }
@@ -463,7 +463,23 @@ impl State {
     }
 }
 
-pub fn main() {
+pub struct ViewActions{
+    state: State
+}
+
+pub struct ViewController{
+    pub on_update: fn(actions: &ViewActions, dt: std::time::Duration) -> (),
+}
+
+impl ViewController{
+    pub fn new() -> ViewController{
+        ViewController{
+            on_update: |_,_|{},
+        }
+    }
+}
+
+pub fn main(controller: ViewController) {
     env_logger::init();
     let event_loop = EventLoop::new();
     let title = env!("CARGO_PKG_NAME");
@@ -471,10 +487,17 @@ pub fn main() {
         .with_title(title)
         .build(&event_loop)
         .unwrap();
-    let mut state = pollster::block_on(State::new(&window)); // NEW!
+
+    let mut actions = ViewActions{state: pollster::block_on(State::new(&window))};
+
     let mut last_render_time = std::time::Instant::now();
-    
+    let mut loop_dt = std::time::Instant::now();
     event_loop.run(move |event, _, control_flow| {
+        let now = std::time::Instant::now();
+        let dt = now - loop_dt;
+        loop_dt = now;
+        (controller.on_update)(&actions, dt);
+
         *control_flow = ControlFlow::Poll;
         match event {
             Event::MainEventsCleared => window.request_redraw(),
@@ -482,7 +505,7 @@ pub fn main() {
                 ref event,
                 .. // We're not using device_id currently
             } => {
-                state.input(event);
+                actions.state.input(event);
             }
             // UPDATED!
             Event::WindowEvent {
@@ -501,10 +524,10 @@ pub fn main() {
                         ..
                     } => *control_flow = ControlFlow::Exit,
                     WindowEvent::Resized(physical_size) => {
-                        state.resize(*physical_size);
+                        actions.state.resize(*physical_size);
                     }
                     WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
-                        state.resize(**new_inner_size);
+                        actions.state.resize(**new_inner_size);
                     }
                     _ => {}
                 }
@@ -514,12 +537,11 @@ pub fn main() {
                 let now = std::time::Instant::now();
                 let dt = now - last_render_time;
                 last_render_time = now;
-                state.update(dt);
-                print!("\r FPS: {}", 1000./(dt.as_millis() as f64));
-                match state.render() {
+                actions.state.update(dt);
+                match actions.state.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if lost
-                    Err(wgpu::SurfaceError::Lost) => state.resize(state.size),
+                    Err(wgpu::SurfaceError::Lost) => actions.state.resize(actions.state.size),
                     // The system is out of memory, we should probably quit
                     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
                     // All other errors (Outdated, Timeout) should be resolved by the next frame

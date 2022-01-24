@@ -20,14 +20,17 @@ use voxelviewer;
 // - Fazer alguma parada massa
 
 fn main() {
-    voxelviewer::main();
+
+    let mut controller = voxelviewer::ViewController::new();
+    controller.on_update = |_, dt|{
+        print!("\r FPS: {}", 1./dt.as_secs_f32());
+    };
+    voxelviewer::main(controller);
     
     let mut world = scene::GameScene::new((800., 600.));
 
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
-
-    // let _image_context = sdl2::image::init(InitFlag::PNG | InitFlag::JPG)?;
 
     let window = video_subsystem
         .window("rust-sdl2 demo", 800, 600)
