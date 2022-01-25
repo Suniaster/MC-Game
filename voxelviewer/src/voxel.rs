@@ -115,10 +115,32 @@ impl DefaultQuad{
     }
 }
 
+static mut INSTANCE_ID: u32 = 0;
+
+unsafe fn gen_instance_id() -> u32{
+    INSTANCE_ID += 1;
+    INSTANCE_ID
+}
 pub struct Instance {
     pub color: [f32; 3],
     pub position: cgmath::Vector3<f32>,
     pub rotation: cgmath::Quaternion<f32>,
+    pub idx: u32,
+}
+
+impl Instance{
+    pub fn new(position: cgmath::Vector3<f32>, color: [f32; 3]) -> Instance{
+        let idx: u32;
+        unsafe{
+            idx = gen_instance_id();
+        }
+        Instance{
+            position, 
+            color, 
+            idx,
+            rotation:  cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.)),
+        }
+    }
 }
 
 // NEW!

@@ -1,11 +1,7 @@
-mod components;
-mod entities;
-mod scene;
-mod systems;
-
 use winit::event::{VirtualKeyCode};
 
 use voxelviewer;
+use world;
 
 // Proximos Objetivos
 // - Adicionar Colisao
@@ -14,36 +10,30 @@ use voxelviewer;
 // - Adicionar fixed dt
 // - Decidir como estruturar melhor sistemas em arquivos separados
 // - Fazer alguma parada massa
-use rand::prelude::*;
 
 fn main() {
+    let world_scene = world::scene::GameScene::new((800., 600.));
     let mut controller = voxelviewer::ViewController::new();
+    // world.setup_assets(&texture_creator);
     
-    controller.on_update = |_, dt|{
+    controller.on_update = |_,_, dt|{
         print!("\r FPS: {}", 1./dt.as_secs_f32());
     };
-    controller.on_keybord_input = |action, key, _ |{
+    controller.on_keybord_input = |action, world, key, _ |{
         let mut rng = rand::thread_rng();
         match key{
             VirtualKeyCode::Z =>{
-                action.create_cube(
-                    [
-                        rng.gen::<f32>() * 100. - 50., 
-                        rng.gen::<f32>() * 100. - 50.,
-                        rng.gen::<f32>() * 100. - 50.,
-                    ],
-                    [0.2, 0.1, 0.1]
-                );
+                // action.world;
+                // entities::Cube::create(&mut world, view_actions: &mut voxelviewer::ViewActions)
             }
             _ => {}
         }
     };
-    voxelviewer::main(controller);
+
+    voxelviewer::main(controller, world_scene);
     
-    // let mut world = scene::GameScene::new((800., 600.));
 
     // world.setup_components();
-    // world.setup_assets(&texture_creator);
 
     
 

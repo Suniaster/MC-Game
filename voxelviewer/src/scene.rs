@@ -299,21 +299,18 @@ impl State {
         );
                 
         let instances:Vec<voxel::Instance> = vec![
-            voxel::Instance{
-                position: cgmath::Vector3::from(light_uniform.position),
-                color: [1., 1., 1.],
-                rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.0))
-            },
-            voxel::Instance{
-                position: cgmath::Vector3{x: 0., y: 0., z: 0.0},
-                color: [0.1, 0.2, 0.3],
-                rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.))
-            },
-            voxel::Instance{
-                position: cgmath::Vector3{x: 0.5, y: 0., z: 0.},
-                color: [0.1, 0.2, 0.3],
-                rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.))
-            }
+            voxel::Instance::new(
+                cgmath::Vector3::from(light_uniform.position),
+                [1., 1., 1.],
+            ),
+            voxel::Instance::new(
+                cgmath::Vector3{x: 0., y: 0., z: 0.0},
+                [0.1, 0.2, 0.3],
+            ),
+            voxel::Instance::new(
+                cgmath::Vector3{x: 0.5, y: 0., z: 0.},
+                [0.1, 0.2, 0.3],
+            )
         ];
 
         let instance_data = instances.iter().map(Instance::to_raw).collect::<Vec<_>>();

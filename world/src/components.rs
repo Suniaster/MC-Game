@@ -26,4 +26,4 @@ impl PhysicsComponent {
 
 pub struct PositionComponent(pub Vector<f64>);
 pub struct SizeComponent(pub f64, pub f64);
-pub struct TextureId(pub String);
+pub struct RenderComponent{pub cube_idx: u32}

@@ -4,7 +4,6 @@ use shred::World;
 
 use components::PhysicsComponent;
 use components::*;
-
 use ecs::ComponentVecAllocator;
 
 
@@ -19,7 +18,7 @@ pub struct GameScene {
     pub time_scale: f64,
 
     // Entities
-    pub blobs: Vec<EntityIdx>,
+    pub cubes: Vec<EntityIdx>,
 }
 
 impl GameScene {
@@ -32,7 +31,7 @@ impl GameScene {
             scene_size: size,
             time_scale: 5.,
 
-            blobs: vec![],
+            cubes: vec![],
         };
     }
 
@@ -42,7 +41,7 @@ impl GameScene {
         self.components
             .insert(ComponentMap::<PhysicsComponent>::new());
         self.components.insert(ComponentMap::<SizeComponent>::new());
-        self.components.insert(ComponentMap::<TextureId>::new());
+        self.components.insert(ComponentMap::<RenderComponent>::new());
     }
 
 

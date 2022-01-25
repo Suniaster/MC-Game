@@ -2,19 +2,21 @@ use super::components::*;
 use super::scene::GameScene;
 use ncollide2d::math::Vector;
 
-pub struct Blob;
-impl Blob {
-    pub fn create(scene: &mut GameScene) {
-        let blob_idx = scene.entity_allocator.allocate();
+pub struct Cube;
+impl Cube {
+    pub fn create(scene: &mut GameScene, view_actions: &mut voxelviewer::ViewActions) {
+        let cube_idx = scene.entity_allocator.allocate();
 
-        scene.add_component(&blob_idx, PositionComponent(Vector::new(100., 100.)));
+        scene.add_component(&cube_idx, PositionComponent(Vector::new(10., 10.)));
 
-        scene.add_component(&blob_idx, PhysicsComponent::new_random());
+        scene.add_component(&cube_idx, PhysicsComponent::new_random());
 
-        scene.add_component(&blob_idx, SizeComponent(40., 40.));
+        scene.add_component(&cube_idx, SizeComponent(40., 40.));
 
-        scene.add_component(&blob_idx, TextureId(String::from("test")));
+        scene.add_component(&cube_idx, RenderComponent{
+            cube_idx: view_actions.create_cube([10., 10., 2.], [0.1, 0.1, 0.5])
+        });
 
-        scene.blobs.push(blob_idx);
+        scene.cubes.push(cube_idx);
     }
 }

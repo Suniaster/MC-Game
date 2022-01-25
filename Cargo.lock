@@ -1594,6 +1594,7 @@ dependencies = [
  "shred",
  "voxelviewer",
  "winit",
+ "world",
 ]
 
 [[package]]
@@ -1692,6 +1693,7 @@ dependencies = [
  "tobj",
  "wgpu",
  "winit",
+ "world",
 ]
 
 [[package]]
@@ -2014,6 +2016,15 @@ dependencies = [
  "web-sys",
  "winapi",
  "x11-dl",
+]
+
+[[package]]
+name = "world"
+version = "0.1.0"
+dependencies = [
+ "ecs",
+ "ncollide2d",
+ "shred",
 ]
 
 [[package]]

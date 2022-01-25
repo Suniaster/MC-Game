@@ -14,3 +14,4 @@ log = "0.4"
 tobj = "3.0"
 wgpu = "0.12"
 winit = "0.26"
+world = {path="../world"}

@@ -9,23 +9,35 @@ mod camera;
 mod scene;
 use scene::*;
 
-use cgmath::prelude::*;
 use wgpu::util::DeviceExt;
-// use voxel::*;
-
+use world::scene::GameScene;
 
 pub struct ViewActions{
     state: State
 }
 
 impl ViewActions{
-    pub fn create_cube(&mut self, position: [f32;3], color: [f32;3]){
-        self.state.instances.push(voxel::Instance{
-            position: cgmath::Vector3::from(position),
-            color,
-            rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.))
-        });
+    pub fn create_cube(&mut self, position: [f32;3], color: [f32;3])->u32{
+        self.state.instances.push(voxel::Instance::new(
+            cgmath::Vector3::from(position),
+            color
+        ));
         self.update_entire_cube_buffer();
+        self.state.instances.last().unwrap().idx
+    }
+
+    pub fn update_cube(&mut self, idx: u32, position: [f32; 3]){
+        let size_raw = std::mem::size_of::<voxel::InstanceRaw>() as wgpu::BufferAddress;
+
+        let instance_index = self.state.instances.iter().position(|r| r.idx == idx).unwrap();
+        let instance = &mut self.state.instances[instance_index];
+        instance.position = cgmath::Vector3::from(position);
+
+        self.state.queue.write_buffer(
+            &self.state.instance_buffer, 
+            size_raw * instance_index as wgpu::BufferAddress, 
+            bytemuck::cast_slice(&[instance.to_raw()])
+        );
     }
 
     #[inline(always)]
@@ -43,20 +55,20 @@ impl ViewActions{
 }
 
 pub struct ViewController{
-    pub on_update: fn(actions: &mut ViewActions, dt: std::time::Duration) -> (),
-    pub on_keybord_input: fn(actions: &mut ViewActions, key: VirtualKeyCode, state: ElementState) -> (),
+    pub on_update: fn(&mut ViewActions,&mut GameScene, dt:std::time::Duration) -> (),
+    pub on_keybord_input: fn(&mut ViewActions, &mut GameScene, VirtualKeyCode, ElementState) -> (),
 }
 
 impl ViewController{
     pub fn new() -> ViewController{
         ViewController{
-            on_update: |_,_|{},
-            on_keybord_input: |_,_,_|{},
+            on_update: |_,_,_|{},
+            on_keybord_input: |_,_,_,_|{},
         }
     }
 }
 
-pub fn main(controller: ViewController) {
+pub fn main(controller: ViewController, game_scene: world::scene::GameScene) {
     env_logger::init();
     let event_loop = EventLoop::new();
     let title = env!("CARGO_PKG_NAME");
@@ -65,6 +77,8 @@ pub fn main(controller: ViewController) {
         .build(&event_loop)
         .unwrap();
 
+
+    let mut game_scene = game_scene;
     let mut actions = ViewActions{state: pollster::block_on(State::new(&window))};
 
     let mut last_render_time = std::time::Instant::now();
@@ -73,7 +87,7 @@ pub fn main(controller: ViewController) {
         let now = std::time::Instant::now();
         let dt = now - loop_dt;
         loop_dt = now;
-        (controller.on_update)(&mut actions, dt);
+        (controller.on_update)(&mut actions, &mut game_scene, dt);
 
         *control_flow = ControlFlow::Poll;
         match event {
@@ -91,7 +105,7 @@ pub fn main(controller: ViewController) {
                             ..
                         }
                     ) => {
-                        (controller.on_keybord_input)(&mut actions, *key, *state);
+                        (controller.on_keybord_input)(&mut actions, &mut game_scene, *key, *state);
                     }
                     _ => {}
                 }
