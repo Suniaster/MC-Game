@@ -1,52 +1,38 @@
-use super::components::*;
 use shred::{Read, World, Write};
+use voxelviewer::ViewActions;
+use world::components::*;
 
 pub fn render_system(
     components: &World,
-    // assets: &Assets,
-    // canvas: &mut sdl2::render::Canvas<sdl2::video::Window>,
+    view: &mut ViewActions
 ) {
-    // let system_data: (
-    //     Read<ComponentMap<PositionComponent>>,
-    //     Read<ComponentMap<TextureId>>,
-    //     Read<ComponentMap<SizeComponent>>,
-    // ) = components.system_data();
+    let system_data: (
+        Read<ComponentMap<PositionComponent>>,
+        Read<ComponentMap<RenderComponent>>,
+    ) = components.system_data();
 
-    // let (positions, textures, sizes) = system_data;
+    let (positions, renders) = system_data;
 
-    // canvas.clear();
+    let data_iter = positions
+        .data()
+        .into_iter()
+        .zip(renders.data().into_iter());
 
-    // let data_iter = positions
-    //     .data()
-    //     .into_iter()
-    //     .zip(textures.data().into_iter())
-    //     .zip(sizes.data().into_iter());
-
-    // for ((pos, texture_id), size) in data_iter {
-    //     match (pos, texture_id, size) {
-    //         (Some(pos), Some(texture_id), Some(size)) => {
-    //             let texture = assets.get(&texture_id.value.0).unwrap();
-    //             canvas
-    //                 .copy(
-    //                     &texture,
-    //                     None,
-    //                     sdl2::rect::Rect::new(
-    //                         pos.value.0.x as i32,
-    //                         pos.value.0.y as i32,
-    //                         size.value.0 as u32,
-    //                         size.value.1 as u32,
-    //                     ),
-    //                 )
-    //                 .unwrap();
-    //         }
-    //         (_, _, _) => {}
-    //     }
-    // }
-
-    // canvas.present();
+    for (pos, render) in data_iter {
+       match (pos, render) {
+            (Some(pos), Some(render)) =>{
+                view.update_cube(render.value.cube_idx, [
+                    pos.value.0.x as f32,
+                    pos.value.0.y as f32,
+                    1.
+                ])
+            }
+            (_, _) => {}
+        }
+    }
 }
 
-pub fn physics_system(components: &mut World, dt: f64, time_scale: f64) {
+pub fn physics_system(components: &mut World, dt: f32, time_scale: f32) {
     let system_data: (
         Write<ComponentMap<PositionComponent>>,
         Write<ComponentMap<PhysicsComponent>>,
@@ -64,8 +50,8 @@ pub fn physics_system(components: &mut World, dt: f64, time_scale: f64) {
     for (pos, physics) in data_iter {
         match (pos, physics) {
             (Some(pos), Some(physics)) => {
-                physics.value.vel += physics.value.accel * dt;
-                pos.value.0 += physics.value.vel * dt;
+                physics.value.vel += physics.value.accel * dt as f64;
+                pos.value.0 += physics.value.vel * dt as f64;
             }
             (_, _) => {}
         }

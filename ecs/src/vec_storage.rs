@@ -2,6 +2,7 @@ use super::*;
 
 pub struct ArrayEntry<T> {
     pub value: T,
+    #[allow(dead_code)]
     generation: usize,
 }
 

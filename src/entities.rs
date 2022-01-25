@@ -1,5 +1,5 @@
-use super::components::*;
-use super::scene::GameScene;
+use world::components::*;
+use world::scene::GameScene;
 use ncollide2d::math::Vector;
 
 pub struct Cube;

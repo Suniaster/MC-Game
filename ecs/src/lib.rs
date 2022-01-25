@@ -1,8 +1,6 @@
 
 pub mod vec_storage;
 
-use vec_storage::*;
-
 #[derive(Debug)]
 pub struct GenerationalIndex {
     idx: usize,

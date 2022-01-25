@@ -32,7 +32,6 @@ impl ViewActions{
         let instance_index = self.state.instances.iter().position(|r| r.idx == idx).unwrap();
         let instance = &mut self.state.instances[instance_index];
         instance.position = cgmath::Vector3::from(position);
-
         self.state.queue.write_buffer(
             &self.state.instance_buffer, 
             size_raw * instance_index as wgpu::BufferAddress, 
@@ -82,13 +81,8 @@ pub fn main(controller: ViewController, game_scene: world::scene::GameScene) {
     let mut actions = ViewActions{state: pollster::block_on(State::new(&window))};
 
     let mut last_render_time = std::time::Instant::now();
-    let mut loop_dt = std::time::Instant::now();
     event_loop.run(move |event, _, control_flow| {
-        let now = std::time::Instant::now();
-        let dt = now - loop_dt;
-        loop_dt = now;
-        (controller.on_update)(&mut actions, &mut game_scene, dt);
-
+        
         *control_flow = ControlFlow::Poll;
         match event {
             Event::MainEventsCleared => window.request_redraw(),
@@ -119,11 +113,11 @@ pub fn main(controller: ViewController, game_scene: world::scene::GameScene) {
                     WindowEvent::CloseRequested
                     | WindowEvent::KeyboardInput {
                         input:
-                            KeyboardInput {
-                                state: ElementState::Pressed,
-                                virtual_keycode: Some(VirtualKeyCode::Escape),
-                                ..
-                            },
+                        KeyboardInput {
+                            state: ElementState::Pressed,
+                            virtual_keycode: Some(VirtualKeyCode::Escape),
+                            ..
+                        },
                         ..
                     } => *control_flow = ControlFlow::Exit,
                     WindowEvent::Resized(physical_size) => {
@@ -141,6 +135,7 @@ pub fn main(controller: ViewController, game_scene: world::scene::GameScene) {
                 let dt = now - last_render_time;
                 last_render_time = now;
                 actions.state.update(dt);
+                (controller.on_update)(&mut actions, &mut game_scene, dt);
                 match actions.state.render() {
                     Ok(_) => {}
                     // Reconfigure the surface if lost

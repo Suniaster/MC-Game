@@ -23,7 +23,7 @@ pub struct GameScene {
 
 impl GameScene {
     pub fn new(size: (f64, f64)) -> GameScene {
-        return GameScene {
+        let mut scene = GameScene {
             entity_allocator: ComponentVecAllocator::new(),
 
             components: World::empty(),
@@ -33,6 +33,8 @@ impl GameScene {
 
             cubes: vec![],
         };
+        scene.setup_components();
+        scene
     }
 
     pub fn setup_components(&mut self) {

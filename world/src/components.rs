@@ -20,7 +20,7 @@ impl PhysicsComponent {
     }
 
     pub fn new_random() -> PhysicsComponent {
-        return PhysicsComponent::new(Vector::new(0., 0.), Vector::new(0., 10.));
+        return PhysicsComponent::new(Vector::new(0., 0.), Vector::new(0., -1.));
     }
 }
 
