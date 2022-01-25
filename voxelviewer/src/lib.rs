@@ -8,6 +8,9 @@ mod voxel;
 mod camera;
 mod scene;
 use scene::*;
+
+use cgmath::prelude::*;
+use wgpu::util::DeviceExt;
 // use voxel::*;
 
 
@@ -15,9 +18,33 @@ pub struct ViewActions{
     state: State
 }
 
+impl ViewActions{
+    pub fn create_cube(&mut self, position: [f32;3], color: [f32;3]){
+        self.state.instances.push(voxel::Instance{
+            position: cgmath::Vector3::from(position),
+            color,
+            rotation: cgmath::Quaternion::from_axis_angle((cgmath::Vector3{x: 0., y: 1., z: 0.}).normalize(), cgmath::Deg(0.))
+        });
+        self.update_entire_cube_buffer();
+    }
+
+    #[inline(always)]
+    fn update_entire_cube_buffer(&mut self){
+        let instance_data = self.state.instances.iter().map(voxel::Instance::to_raw).collect::<Vec<_>>();
+        let instance_buffer = self.state.device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Instance Buffer"),
+                contents: bytemuck::cast_slice(&instance_data),
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+            }
+        ); 
+        self.state.instance_buffer = instance_buffer;   
+    }
+}
+
 pub struct ViewController{
-    pub on_update: fn(actions: &ViewActions, dt: std::time::Duration) -> (),
-    pub on_keybord_input: fn(actions: &ViewActions, key: VirtualKeyCode, state: ElementState) -> (),
+    pub on_update: fn(actions: &mut ViewActions, dt: std::time::Duration) -> (),
+    pub on_keybord_input: fn(actions: &mut ViewActions, key: VirtualKeyCode, state: ElementState) -> (),
 }
 
 impl ViewController{
@@ -46,7 +73,7 @@ pub fn main(controller: ViewController) {
         let now = std::time::Instant::now();
         let dt = now - loop_dt;
         loop_dt = now;
-        (controller.on_update)(&actions, dt);
+        (controller.on_update)(&mut actions, dt);
 
         *control_flow = ControlFlow::Poll;
         match event {
@@ -64,7 +91,7 @@ pub fn main(controller: ViewController) {
                             ..
                         }
                     ) => {
-                        (controller.on_keybord_input)(&actions, *key, *state);
+                        (controller.on_keybord_input)(&mut actions, *key, *state);
                     }
                     _ => {}
                 }

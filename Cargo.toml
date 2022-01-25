@@ -11,3 +11,4 @@ ecs = {path="./ecs"}
 voxelviewer = {path="./voxelviewer"}
 shred = "0.12.0"
 winit = "0.26"
+rand = "0.8.4"

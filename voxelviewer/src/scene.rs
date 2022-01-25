@@ -56,8 +56,8 @@ impl CameraUniform {
 
 pub struct State {
     surface: wgpu::Surface,
-    device: wgpu::Device,
-    queue: wgpu::Queue,
+    pub device: wgpu::Device,
+    pub queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
     pub size: winit::dpi::PhysicalSize<u32>,
     
@@ -75,8 +75,8 @@ pub struct State {
     projection: camera::Projection,
 
     // Instances
-    instances: Vec<Instance>,
-    instance_buffer: wgpu::Buffer,
+    pub instances: Vec<Instance>,
+    pub instance_buffer: wgpu::Buffer,
 
     // Light
     light_uniform: LightUniform,
