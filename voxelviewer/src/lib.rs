@@ -7,9 +7,9 @@ mod texture; // NEW!
 mod voxel;
 mod camera;
 mod scene;
+mod entity;
 use scene::*;
 
-use wgpu::util::DeviceExt;
 use world::scene::GameScene;
 
 pub struct ViewActions{
@@ -17,39 +17,19 @@ pub struct ViewActions{
 }
 
 impl ViewActions{
-    pub fn create_cube(&mut self, position: [f32;3], color: [f32;3])->u32{
-        self.state.instances.push(voxel::Instance::new(
-            cgmath::Vector3::from(position),
-            color
-        ));
-        self.update_entire_cube_buffer();
-        self.state.instances.last().unwrap().idx
+    pub fn create_cube(&mut self, position: [f32;3], _color: [f32;3])->u32{
+        let new_ent = entity::SceneEntity::new(
+            &self.state.device, 
+            cgmath::Vector3::from(position)
+        );
+        let id = new_ent.id;
+        self.state.entities.insert(id, new_ent);
+        id
     }
 
     pub fn update_cube(&mut self, idx: u32, position: [f32; 3]){
-        let size_raw = std::mem::size_of::<voxel::InstanceRaw>() as wgpu::BufferAddress;
-
-        let instance_index = self.state.instances.iter().position(|r| r.idx == idx).unwrap();
-        let instance = &mut self.state.instances[instance_index];
-        instance.position = cgmath::Vector3::from(position);
-        self.state.queue.write_buffer(
-            &self.state.instance_buffer, 
-            size_raw * instance_index as wgpu::BufferAddress, 
-            bytemuck::cast_slice(&[instance.to_raw()])
-        );
-    }
-
-    #[inline(always)]
-    fn update_entire_cube_buffer(&mut self){
-        let instance_data = self.state.instances.iter().map(voxel::Instance::to_raw).collect::<Vec<_>>();
-        let instance_buffer = self.state.device.create_buffer_init(
-            &wgpu::util::BufferInitDescriptor {
-                label: Some("Instance Buffer"),
-                contents: bytemuck::cast_slice(&instance_data),
-                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
-            }
-        ); 
-        self.state.instance_buffer = instance_buffer;   
+        let entity = self.state.entities.get_mut(&idx).unwrap();
+        entity.update_pos(&self.state.queue, cgmath::Vector3::from(position));
     }
 }
 

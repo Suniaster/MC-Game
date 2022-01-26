@@ -62,4 +62,8 @@ impl ComponentVecAllocator{
         if index.idx >= self.entries.len() {return false;}
         return self.entries[index.idx].generation == index.generation;
     }
+
+    pub fn size(&self) -> usize{
+        return self.entries.len();
+    }
 }

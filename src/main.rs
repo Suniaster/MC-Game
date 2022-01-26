@@ -14,12 +14,16 @@ mod entities;
 // - Fazer alguma parada massa
 
 fn main() {
-    let world_scene = world::scene::GameScene::new((800., 600.));
+    let world_scene = world::scene::GameScene::new((40., 20.));
     let mut controller = voxelviewer::ViewController::new();
-    // world.setup_assets(&texture_creator);
     
     controller.on_update = |actions,world, dt|{
-        print!("\r FPS: {}", 1./dt.as_secs_f32());
+        print!(
+            "\r FPS: {} \t\t\tCount: {}", 
+            1./dt.as_secs_f32(), 
+            world.entity_allocator.size()
+        );
+
         systems::physics_system(&mut world.components, dt.as_secs_f32(), 1.);
         systems::circular_world_system(&mut world.components, &world.scene_size);
         systems::render_system(&world.components, actions);
@@ -28,7 +32,9 @@ fn main() {
         match key{
             VirtualKeyCode::Z =>{
                 if state == ElementState::Pressed {
-                    entities::Cube::create(world, actions);
+                    for _ in 0..2_000{
+                        entities::Cube::create(world, actions);
+                    }
                 }
             }
             _ => {}

@@ -15,7 +15,9 @@ use crate::voxel;
 use crate::voxel::*;
 use crate::texture;
 use crate::camera;
+use std::collections::HashMap;
 
+use crate::entity::{SceneEntity, DrawModel};
 
 // main.rs
 #[repr(C)]
@@ -77,6 +79,7 @@ pub struct State {
     // Instances
     pub instances: Vec<Instance>,
     pub instance_buffer: wgpu::Buffer,
+    pub entities: HashMap<u32, SceneEntity>,
 
     // Light
     light_uniform: LightUniform,
@@ -340,6 +343,7 @@ impl State {
             camera_controller,
 
             instances, instance_buffer,
+            entities: HashMap::new(),
 
             light_uniform, light_buffer, light_bind_group,
 
@@ -453,6 +457,14 @@ impl State {
             render_pass.set_vertex_buffer(1, self.instance_buffer.slice(..));
 
             render_pass.draw(0..36, 0..self.instances.len() as _);
+
+            for (_, ent) in &self.entities{
+                render_pass.draw_entity(
+                    &ent,
+                    &self.camera_bind_group,
+                    &self.light_bind_group
+                );
+            }
         }
         self.queue.submit(iter::once(encoder.finish()));
         output.present();
