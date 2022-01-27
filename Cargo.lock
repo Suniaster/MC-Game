@@ -1690,6 +1690,7 @@ dependencies = [
  "image",
  "log",
  "pollster",
+ "rand 0.8.4",
  "tobj",
  "wgpu",
  "winit",

@@ -15,3 +15,4 @@ tobj = "3.0"
 wgpu = "0.12"
 winit = "0.26"
 world = {path="../world"}
+rand = "0.8.4"
