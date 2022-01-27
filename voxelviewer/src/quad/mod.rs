@@ -11,7 +11,8 @@ type VectorDir = Vector3<f32>;
 
 pub struct Quad{
     pub vertices: [VertPos; 4],
-    pub color: [f32; 3]
+    pub color: [f32; 3],
+    pub direction: face::QuadDirection
 }
 
 impl Quad{

@@ -18,7 +18,8 @@ impl QuadDirection{
             VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
             VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
             ],
-          color
+          color,
+          direction: QuadDirection::Front
         }
       }
       QuadDirection::Back => {
@@ -29,7 +30,8 @@ impl QuadDirection{
             VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             ],
-          color
+          color,
+          direction: QuadDirection::Back
         }
       }
       QuadDirection::Up => {
@@ -40,7 +42,8 @@ impl QuadDirection{
             VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
             VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
             ],
-          color
+          color,
+          direction: QuadDirection::Up
         }
       }
       QuadDirection::Down => {
@@ -51,7 +54,8 @@ impl QuadDirection{
             VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             ],
-          color
+          color,
+          direction: QuadDirection::Down
         }
       }
       QuadDirection::Left => {
@@ -62,7 +66,8 @@ impl QuadDirection{
             VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
             ],
-          color
+          color,
+          direction: QuadDirection::Left
         }
       }
       QuadDirection::Right => {
@@ -73,7 +78,8 @@ impl QuadDirection{
             VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
             VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             ],
-          color
+          color,
+          direction: QuadDirection::Right
         }
       }
     }

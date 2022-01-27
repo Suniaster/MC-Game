@@ -11,6 +11,7 @@ mod entity;
 mod cube;
 mod quad;
 mod vertex;
+mod grid;
 use scene::*;
 
 use world::scene::GameScene;
