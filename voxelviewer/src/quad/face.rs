@@ -1,6 +1,8 @@
 
 use super::{VertPos, VectorDir};
 use super::Quad;
+
+#[derive(PartialEq, Eq)]
 pub enum QuadDirection{
   Front, Back, Left, Right, Up, Down
 }

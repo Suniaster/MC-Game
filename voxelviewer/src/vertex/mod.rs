@@ -26,3 +26,8 @@ impl StaticVertexMesh {
     bytemuck::cast_slice::<StaticVertex, T>(&self.vertices)
   }
 }
+
+
+pub trait StaticVertexBuild {
+  fn build(&self) -> StaticVertexMesh;
+}
