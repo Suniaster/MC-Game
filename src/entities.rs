@@ -9,12 +9,16 @@ impl Cube {
 
         scene.add_component(&cube_idx, PositionComponent(Vector::new(10., 10.)));
 
-        // scene.add_component(&cube_idx, PhysicsComponent::new_random());
+        scene.add_component(&cube_idx, PhysicsComponent::new_random());
 
-        scene.add_component(&cube_idx, SizeComponent(40., 40.));
+        scene.add_component(&cube_idx, SizeComponent(0.2, 0.2));
 
         scene.add_component(&cube_idx, RenderComponent{
-            cube_idx: view_actions.create_cube([10., 10., 2.], [0.1, 0.1, 0.5])
+            cube_idx: view_actions.create_cube(
+                [10., 10., 2.], 
+                [0.1, 0.1, 0.5],
+                [0.2, 0.2, 0.2]
+            )
         });
 
         scene.cubes.push(cube_idx);

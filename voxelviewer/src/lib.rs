@@ -21,10 +21,15 @@ pub struct ViewActions{
 }
 
 impl ViewActions{
-    pub fn create_cube(&mut self, position: [f32;3], _color: [f32;3])->u32{
+    pub fn create_cube(&mut self, position: [f32;3], _color: [f32;3], size:[f32; 3])->u32{
+        let mesh = quad::hexagon::HexagonMesh::new(
+            cgmath::Vector3::from(position), 
+            cgmath::Vector3::from(size)/2., 
+        );
         let new_ent = entity::SceneEntity::new(
             &self.state.device, 
-            cgmath::Vector3::from(position)
+            cgmath::Vector3::from(position),
+            &mesh
         );
         let id = new_ent.id;
         self.state.entities.insert(id, new_ent);

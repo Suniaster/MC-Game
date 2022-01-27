@@ -18,9 +18,8 @@ unsafe fn gen_instance_id() -> u32{
 }
 
 impl SceneEntity{
-    pub fn new(device: &wgpu::Device, pos: cgmath::Vector3<f32>)->SceneEntity{
-        // let mut instance = new_cube(0.5);
-        let mut instance = grid::GridMesh::default_random().build();
+    pub fn new<T: StaticVertexBuild>(device: &wgpu::Device, pos: cgmath::Vector3<f32>, mesh: &T)->SceneEntity{
+        let mut instance = mesh.build();
         instance.update_pos(pos);
 
         let vertex_buffer = device.create_buffer_init(
