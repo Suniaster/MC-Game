@@ -1,10 +1,11 @@
 use wgpu::util::DeviceExt;
-use super::cube::cube_mesh::CubeMesh;
+use super::vertex::StaticVertexMesh;
+use super::cube::cube_mesh::{new_cube};
 
 pub struct SceneEntity{
   vertex_buffer: wgpu::Buffer,
   num_vertices: u32,
-  instance: CubeMesh,
+  instance: StaticVertexMesh,
   pub id: u32
 }
 
@@ -17,7 +18,7 @@ unsafe fn gen_instance_id() -> u32{
 
 impl SceneEntity{
     pub fn new(device: &wgpu::Device, pos: cgmath::Vector3<f32>)->SceneEntity{
-        let mut instance = CubeMesh::new(0.5);
+        let mut instance = new_cube(0.5);
         instance.update_pos(pos);
 
         let vertex_buffer = device.create_buffer_init(

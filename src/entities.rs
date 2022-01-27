@@ -9,7 +9,7 @@ impl Cube {
 
         scene.add_component(&cube_idx, PositionComponent(Vector::new(10., 10.)));
 
-        scene.add_component(&cube_idx, PhysicsComponent::new_random());
+        // scene.add_component(&cube_idx, PhysicsComponent::new_random());
 
         scene.add_component(&cube_idx, SizeComponent(40., 40.));
 
