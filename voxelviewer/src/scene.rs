@@ -68,6 +68,7 @@ pub struct State {
 
     depth_texture: texture::Texture,
 
+    static_cube_pipeline: wgpu::RenderPipeline,
     // Camera
     camera: camera::Camera,
     camera_uniform: CameraUniform,
@@ -325,6 +326,14 @@ impl State {
             }
         );
 
+        let static_cube_pipeline = super::cube::cube_pipeline::create_cube_render_pipeline(
+            &device, 
+            &[
+                &camera_bind_group_layout,
+                &light_bind_group_layout
+            ], 
+            &config
+        );
 
         Self {
             size,
@@ -341,7 +350,7 @@ impl State {
             camera_buffer,
             camera_bind_group,    
             camera_controller,
-
+            static_cube_pipeline,
             instances, instance_buffer,
             entities: HashMap::new(),
 
@@ -458,6 +467,7 @@ impl State {
 
             render_pass.draw(0..36, 0..self.instances.len() as _);
 
+            render_pass.set_pipeline(&self.static_cube_pipeline);
             for (_, ent) in &self.entities{
                 render_pass.draw_entity(
                     &ent,

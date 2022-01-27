@@ -8,6 +8,7 @@ mod voxel;
 mod camera;
 mod scene;
 mod entity;
+mod cube;
 use scene::*;
 
 use world::scene::GameScene;

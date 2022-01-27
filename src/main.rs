@@ -32,7 +32,7 @@ fn main() {
         match key{
             VirtualKeyCode::Z =>{
                 if state == ElementState::Pressed {
-                    for _ in 0..2_000{
+                    for _ in 0..1000{
                         entities::Cube::create(world, actions);
                     }
                 }
