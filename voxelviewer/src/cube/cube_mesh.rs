@@ -1,16 +1,16 @@
-use super::cube_vertex::VoxelVertex;
+use super::super::vertex::static_vertex::StaticVertex;
 use super::super::voxel;
 use cgmath::InnerSpace;
 
 pub struct CubeMesh{
-  pub vertices: Vec<VoxelVertex>,
+  pub vertices: Vec<StaticVertex>,
   position: cgmath::Vector3<f32>,
   half_size: f32
 }
 
 impl CubeMesh{
   pub fn to_buffer<T: bytemuck::Pod>(&self)->&[T]{
-    bytemuck::cast_slice::<VoxelVertex, T>(&self.vertices)
+    bytemuck::cast_slice::<StaticVertex, T>(&self.vertices)
   }
 
   pub fn new(half_size: f32) -> Self {
@@ -18,7 +18,7 @@ impl CubeMesh{
     let vertexes = quad.get_complete_vertexes();
 
     let vs = vertexes.iter().map(|v|{
-      VoxelVertex{
+      StaticVertex{
         color_diffuse: [0.1, 0.2, 0.5],
         position: v.position,
         normal: v.normal

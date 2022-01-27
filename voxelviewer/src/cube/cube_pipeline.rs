@@ -4,7 +4,8 @@
 //   texture,
 //   voxel_tools::rendering::voxel_vertex::VoxelVertex,
 // };
-use super::cube_vertex::VoxelVertex;
+// use super::cube_vertex::VoxelVertex;
+use super::super::vertex::static_vertex::StaticVertex;
 
 fn create_render_pipeline(
   device: &wgpu::Device,
@@ -71,7 +72,7 @@ pub fn create_cube_render_pipeline(
 )->wgpu::RenderPipeline{
     let shader = wgpu::ShaderModuleDescriptor {
         label: Some("Normal Shader"),
-        source: wgpu::ShaderSource::Wgsl(include_str!("cube.wgsl").into()),
+        source: wgpu::ShaderSource::Wgsl(include_str!("../vertex/static_vertex.wgsl").into()),
     };
     let render_pipeline_layout =
         device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -85,7 +86,7 @@ pub fn create_cube_render_pipeline(
         &render_pipeline_layout,
         config.format,
         Some( wgpu::TextureFormat::Depth32Float),
-        &[VoxelVertex::desc()],
+        &[StaticVertex::desc()],
         shader,
     )
 }

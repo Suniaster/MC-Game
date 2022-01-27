@@ -9,6 +9,8 @@ mod camera;
 mod scene;
 mod entity;
 mod cube;
+mod quad;
+mod vertex;
 use scene::*;
 
 use world::scene::GameScene;
