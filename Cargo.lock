@@ -1694,7 +1694,6 @@ dependencies = [
  "tobj",
  "wgpu",
  "winit",
- "world",
 ]
 
 [[package]]

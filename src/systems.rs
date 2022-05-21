@@ -21,11 +21,6 @@ pub fn render_system(
     for (pos, render) in data_iter {
        match (pos, render) {
             (Some(pos), Some(render)) =>{
-                view.update_cube(render.value.cube_idx, [
-                    pos.value.0.x as f32,
-                    pos.value.0.y as f32,
-                    1.
-                ])
             }
             (_, _) => {}
         }

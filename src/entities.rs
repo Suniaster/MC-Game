@@ -1,7 +1,7 @@
 use world::components::*;
 use world::scene::GameScene;
 use ncollide2d::math::Vector;
-
+use voxelviewer::ViewObjectInfo;
 pub struct Cube;
 impl Cube {
     pub fn create(scene: &mut GameScene, view_actions: &mut voxelviewer::ViewActions) {
@@ -13,11 +13,15 @@ impl Cube {
 
         scene.add_component(&cube_idx, SizeComponent(0.2, 0.2));
 
+
         scene.add_component(&cube_idx, RenderComponent{
             cube_idx: view_actions.create_cube(
-                [10., 10., 2.], 
-                [0.1, 0.1, 0.5],
-                [0.2, 0.2, 0.2]
+                &ViewObjectInfo{
+                    position: [10., 10., 2.], 
+                    color: [0.1, 0.1, 0.5],
+                    size: [0.2, 0.2, 0.2],
+                    id: 0
+                }
             )
         });
 
