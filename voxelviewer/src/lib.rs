@@ -13,6 +13,8 @@ mod quad;
 mod vertex;
 mod grid;
 use scene::*;
+use cgmath::Point3;
+use cgmath::Rad;
 
 pub struct ViewActions{
     state: State
@@ -45,6 +47,20 @@ impl ViewActions{
         let entity = self.state.entities.get_mut(&obj.id).unwrap();
         entity.update_pos(&self.state.queue, cgmath::Vector3::from(obj.position));
     }
+
+    pub fn set_camera_pos(&mut self, pos: Point3<f32>){
+        self.state.camera.position = pos;
+    }
+
+    pub fn set_camera_config(&mut self, speed: Option<f32>, sens: Option<f32>){
+        if let Some(value) = speed {
+            self.state.camera_controller.speed = value;
+        }
+        if let Some(value) = sens {
+            self.state.camera_controller.sensitivity = value;
+        }
+    }
+
 }
 
 pub trait ViewController{
@@ -88,12 +104,47 @@ pub fn main(controller: Box<dyn ViewController>){
                     _ => {}
                 }
             }
+            // UPDATED!
+            Event::WindowEvent {
+                ref event,
+                window_id,
+            } if window_id == window.id() => {
+                match event {
+                    WindowEvent::CloseRequested
+                    | WindowEvent::KeyboardInput {
+                        input:
+                        KeyboardInput {
+                            state: ElementState::Pressed,
+                            virtual_keycode: Some(VirtualKeyCode::Escape),
+                            ..
+                        },
+                        ..
+                    } => *control_flow = ControlFlow::Exit,
+                    WindowEvent::Resized(physical_size) => {
+                        actions.state.resize(*physical_size);
+                    }
+                    WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
+                        actions.state.resize(**new_inner_size);
+                    }
+                    _ => {}
+                }
+            }
+            // UPDATED!
             Event::RedrawRequested(window_id) if window_id == window.id() => {
                 let now = std::time::Instant::now();
                 let dt = now - last_render_time;
                 last_render_time = now;
                 actions.state.update(dt);
                 controller.on_update(&mut actions, dt);
+                match actions.state.render() {
+                    Ok(_) => {}
+                    // Reconfigure the surface if lost
+                    Err(wgpu::SurfaceError::Lost) => actions.state.resize(actions.state.size),
+                    // The system is out of memory, we should probably quit
+                    Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
+                    // All other errors (Outdated, Timeout) should be resolved by the next frame
+                    Err(e) => eprintln!("{:?}", e),
+                }
             }
             _ => {}
         }

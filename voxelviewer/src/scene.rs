@@ -70,11 +70,11 @@ pub struct State {
 
     static_cube_pipeline: wgpu::RenderPipeline,
     // Camera
-    camera: camera::Camera,
+    pub camera: camera::Camera,
+    pub camera_controller: camera::CameraController,
     camera_uniform: CameraUniform,
     camera_buffer: wgpu::Buffer,
     camera_bind_group: wgpu::BindGroup,
-    camera_controller: camera::CameraController,
     projection: camera::Projection,
 
     // Instances

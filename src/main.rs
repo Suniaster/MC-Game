@@ -5,6 +5,8 @@ use world;
 mod systems;
 mod entities;
 
+use cgmath::Point3;
+
 // Proximos Objetivos
 // - Adicionar Colisao
 // - Adicionar Input
@@ -15,6 +17,7 @@ mod entities;
 pub struct Control{
     world: world::scene::GameScene
 }
+
 impl voxelviewer::ViewController for Control{
     fn on_update(&mut self, actions: &mut voxelviewer::ViewActions, dt: std::time::Duration){
         print!(
@@ -24,7 +27,9 @@ impl voxelviewer::ViewController for Control{
     }
 
     fn on_keybord_input(&mut self, actions: &mut voxelviewer::ViewActions, b: VirtualKeyCode, c: ElementState){
-
+        if b == VirtualKeyCode::V{
+            actions.set_camera_pos(Point3::new(0.,0.,0.));
+        }
     }
 }
 
@@ -33,6 +38,6 @@ impl voxelviewer::ViewController for Control{
 fn main() {
     let world = world::scene::GameScene::new((40., 20.));
     // let mut controller = voxelviewer::ViewController::new();
-    let mut CONTROLLER = Control{world};
-    voxelviewer::main(Box::new(CONTROLLER));
+    let controller = Control{world};
+    voxelviewer::main(Box::new(controller));
 }

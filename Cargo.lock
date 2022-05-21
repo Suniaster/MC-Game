@@ -1588,6 +1588,7 @@ dependencies = [
 name = "teste"
 version = "0.1.0"
 dependencies = [
+ "cgmath",
  "ecs",
  "ncollide2d",
  "rand 0.8.4",
