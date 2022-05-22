@@ -6,6 +6,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ncollide2d = "0.22" # For 2D collision detection.
+cgmath = "0.18"
 ecs = {path="../ecs"}
 shred = "0.12.0"
+voxelviewer = {path="../voxelviewer"}

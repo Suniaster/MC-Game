@@ -3,33 +3,29 @@ use voxelviewer::ViewActions;
 use world::components::*;
 
 pub fn render_system(
-    components: &World,
+    components: &mut World,
     view: &mut ViewActions
 ) {
     let system_data: (
-        Read<ComponentMap<PositionComponent>>,
         Read<ComponentMap<RenderComponent>>,
     ) = components.system_data();
 
-    let (positions, renders) = system_data;
-
-    let data_iter = positions
-        .data()
-        .into_iter()
-        .zip(renders.data().into_iter());
-
-    for (pos, render) in data_iter {
-       match (pos, render) {
-            (Some(pos), Some(render)) =>{
-            }
-            (_, _) => {}
+    let renders = system_data;
+    
+    let data_iter = renders.0.data().into_iter();
+    for render in data_iter {
+        match render {
+            Some(render) =>{
+                view.update_cube(&render.value.obj);
+            },
+            _ => {}
         }
     }
 }
 
 pub fn physics_system(components: &mut World, dt: f32, time_scale: f32) {
     let system_data: (
-        Write<ComponentMap<PositionComponent>>,
+        Write<ComponentMap<RenderComponent>>,
         Write<ComponentMap<PhysicsComponent>>,
     ) = components.system_data();
     let mut positions = system_data.0;
@@ -45,15 +41,15 @@ pub fn physics_system(components: &mut World, dt: f32, time_scale: f32) {
     for (pos, physics) in data_iter {
         match (pos, physics) {
             (Some(pos), Some(physics)) => {
-                physics.value.vel += physics.value.accel * dt as f64;
-                pos.value.0 += physics.value.vel * dt as f64;
+                physics.value.vel += physics.value.accel * dt as f32;
+                pos.value.obj.position += physics.value.vel * dt as f32;
             }
             (_, _) => {}
         }
     }
 }
 
-pub fn circular_world_system(components: &mut World, scene_size: &(f64, f64)) {
+pub fn circular_world_system(components: &mut World, scene_size: &(f32, f32)) {
     let system_data: Write<ComponentMap<PositionComponent>> = components.system_data();
     let mut positions = system_data;
 

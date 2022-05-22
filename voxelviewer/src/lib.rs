@@ -13,34 +13,35 @@ mod quad;
 mod vertex;
 mod grid;
 use scene::*;
-use cgmath::Point3;
-use cgmath::Rad;
+use cgmath::{Vector3, Point3};
 
 pub struct ViewActions{
     state: State
 }
 
 pub struct ViewObjectInfo{
-    pub position: [f32; 3],
+    pub position: Vector3<f32>,
     pub color: [f32; 3],
     pub size: [f32; 3],
     pub id: u32
 }
 
 impl ViewActions{
-    pub fn create_cube(&mut self, obj: &ViewObjectInfo)-> u32{
+    pub fn create_cube(&mut self, obj: ViewObjectInfo)-> ViewObjectInfo{
         let mesh = quad::hexagon::HexagonMesh::new(
-            cgmath::Vector3::from(obj.position), 
+            obj.position,
             cgmath::Vector3::from(obj.size)/2., 
         );
         let new_ent = entity::SceneEntity::new(
             &self.state.device, 
-            cgmath::Vector3::from(obj.position),
+            obj.position,
             &mesh
         );
         let id = new_ent.id;
+        let mut obj = obj;
         self.state.entities.insert(id, new_ent);
-        return id;
+        obj.id = id;
+        return obj;
     }
 
     pub fn update_cube(&mut self, obj: &ViewObjectInfo){

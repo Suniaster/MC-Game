@@ -14,7 +14,7 @@ pub struct GameScene {
     pub components: World,
 
     // Resources
-    pub scene_size: (f64, f64), // Width, heigth
+    pub scene_size: (f32, f32), // Width, heigth
     pub time_scale: f64,
 
     // Entities
@@ -22,7 +22,7 @@ pub struct GameScene {
 }
 
 impl GameScene {
-    pub fn new(size: (f64, f64)) -> GameScene {
+    pub fn new(size: (f32, f32)) -> GameScene {
         let mut scene = GameScene {
             entity_allocator: ComponentVecAllocator::new(),
 
