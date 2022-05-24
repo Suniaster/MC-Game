@@ -57,8 +57,7 @@ pub trait DrawModel<'a> {
     fn draw_entity(
         &mut self,
         entity: &'a SceneEntity,
-        camera_bind_group: &'a wgpu::BindGroup,
-        light_bind_group: &'a wgpu::BindGroup,
+        camera_bind_group: &'a wgpu::BindGroup
     );
 }
 
@@ -69,14 +68,10 @@ where
     fn draw_entity(
         &mut self,
         entity: &'a SceneEntity,
-        camera_bind_group: &'a wgpu::BindGroup,
-        light_bind_group: &'a wgpu::BindGroup,
+        camera_bind_group: &'a wgpu::BindGroup
     ){
         self.set_bind_group(0, camera_bind_group, &[]);
-        self.set_bind_group(1, light_bind_group, &[]);
-        
         self.set_vertex_buffer(0, entity.vertex_buffer.slice(..));
-
         self.draw(0..entity.num_vertices, 0..1);
     }
 }

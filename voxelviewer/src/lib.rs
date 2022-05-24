@@ -16,7 +16,7 @@ use scene::*;
 use cgmath::{Vector3, Point3};
 
 pub struct ViewActions{
-    state: State
+    pub state: State
 }
 
 pub struct ViewObjectInfo{
@@ -27,11 +27,17 @@ pub struct ViewObjectInfo{
 }
 
 impl ViewActions{
+
+    pub fn create_chunk(&mut self, chunk: Vec<Vec<ViewObjectInfo>>){
+        
+    }
+
     pub fn create_cube(&mut self, obj: ViewObjectInfo)-> ViewObjectInfo{
         let mesh = quad::hexagon::HexagonMesh::new(
             obj.position,
             cgmath::Vector3::from(obj.size)/2., 
         );
+        let mesh = grid::GridMesh::default_random();
         let new_ent = entity::SceneEntity::new(
             &self.state.device, 
             obj.position,

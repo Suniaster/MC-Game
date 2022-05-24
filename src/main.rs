@@ -20,16 +20,16 @@ impl voxelviewer::ViewController for Control{
     fn on_update(&mut self, actions: &mut voxelviewer::ViewActions, dt: std::time::Duration){
         print!(
             "\r FPS: {}", 
-            1./dt.as_secs_f32(),
+            actions.state.entities.len()
         );
 
         systems::render_system(&mut self.world.components, actions);
-        systems::physics_system(&mut self.world.components, dt.as_secs_f32(), 1.);
-        systems::circular_world_system(&mut self.world.components, &self.world.scene_size);
+        // systems::physics_system(&mut self.world.components, dt.as_secs_f32(), 1.);
+        // systems::circular_world_system(&mut self.world.components, &self.world.scene_size);
     }
 
     fn on_keybord_input(&mut self, actions: &mut voxelviewer::ViewActions, b: VirtualKeyCode, _c: ElementState){
-        if b == VirtualKeyCode::C{
+        if b == VirtualKeyCode::C && _c == ElementState::Pressed {
             entities::Cube::create(&mut self.world, actions);
         }
     }

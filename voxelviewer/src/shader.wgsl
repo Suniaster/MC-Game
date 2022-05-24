@@ -6,13 +6,6 @@ struct CameraUniform {
 [[group(0), binding(0)]] // 2.
 var<uniform> camera: CameraUniform;
 
-struct Light {
-    position: vec3<f32>;
-    color: vec3<f32>;
-};
-[[group(1), binding(0)]]
-var<uniform> light: Light;
-
 struct InstanceInput {
     [[location(2)]] color: vec3<f32>;
     [[location(3)]] model_matrix_0: vec4<f32>;
@@ -74,22 +67,13 @@ fn fs_main(in: VertexOutput) -> [[location(0)]] vec4<f32> {
     let object_color: vec4<f32> =  vec4<f32>(in.color, 1.0);
     let ambient_strength = 0.1;
 
-        // We don't need (or want) much ambient light, so 0.1 is fine
-    let ambient_strength = 0.1;
-    let ambient_color = light.color * ambient_strength;
-
-    let light_dir = normalize(light.position - in.world_position);
-
-    let diffuse_strength = max(dot(in.world_normal, light_dir), 0.0);
-    let diffuse_color = light.color * diffuse_strength;
-    
     let view_dir = normalize(camera.view_pos.xyz - in.world_position);
-    let half_dir = normalize(view_dir + light_dir);
+    let half_dir = normalize(view_dir);
     
     let specular_strength = pow(max(dot(in.world_normal, half_dir), 0.0), 32.0);
-    let specular_color = specular_strength * light.color;
+    let specular_color = specular_strength;
 
-    let result = (ambient_color + diffuse_color + specular_color) * object_color.xyz;
+    let result = (specular_color) * object_color.xyz;
 
     return vec4<f32>(result, object_color.a);
 }

@@ -30,36 +30,21 @@ fn vs_main(
     return out;
 }
 
-
-struct LightUniform {
-    position: vec3<f32>;
-    color: vec3<f32>;
-};
-
-[[group(1), binding(0)]]
-var<uniform> u_light: LightUniform;
-
 [[stage(fragment), early_depth_test]]
 fn fs_main(
     in: VertexOutput,
 ) -> [[location(0)]] vec4<f32> {
-    let ambient_strength = 0.2;
-    let ambient_color = u_light.color * ambient_strength;
-
     let normal = normalize(in.normal);
-    let light_dir = normalize(u_light.position - in.position);
-    let diffuse_strength = max(dot(normal, light_dir), 0.0);
-    let diffuse_color = u_light.color * diffuse_strength;
 
     let view_dir = normalize(u_camera.position.xyz - in.position);
-    let half_dir = normalize(view_dir + light_dir);
+    let half_dir = normalize(view_dir);
 
-    let specular_strength = pow(max(dot(normal, half_dir), 0.0), 32.0);
-    let specular_color = specular_strength * u_light.color;
+    let specular_strength = pow(max(dot(normal, half_dir), 0.0), 1.0);
+    let specular_color = specular_strength;
 
     let surface_color = vec4<f32>(in.diffuse_color, 1.0);
 
-    let result = (diffuse_color + ambient_color + specular_color) * surface_color.xyz;
+    let result = (specular_color) * surface_color.xyz;
 
     return vec4<f32>(result, surface_color.a);
 }

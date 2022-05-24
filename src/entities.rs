@@ -14,8 +14,8 @@ impl Cube {
         scene.add_component(&cube_idx, RenderComponent{
             obj: view_actions.create_cube(
                 ViewObjectInfo{
-                    position: cgmath::Vector3::from([10., 10., 2.]), 
-                    color: [0.1, 0.1, 0.5],
+                    position: cgmath::Vector3::from([0., 0., 0.]), 
+                    color: [0.1, 1., 0.1],
                     size: [0.2, 0.2, 0.2],
                     id: 0
                 }
