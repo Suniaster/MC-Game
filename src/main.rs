@@ -6,12 +6,17 @@ mod systems;
 mod entities;
 
 // Proximos Objetivos
-// - Adicionar Colisao
-// - Adicionar Input
-// - Ajustar estrutura do loop principal
-// - Adicionar fixed dt
-// - Decidir como estruturar melhor sistemas em arquivos separados
-// - Fazer alguma parada massa
+// - Adicionar bordas (linhas) nos cubos
+// - Descobrir como botar texto na tela
+// - Escrever na tela fps e direção olhando
+// - Otmizar o uso de vertices no grid (remover repetidos)
+// - Ajustar cores (não tão sendo efetivamente usados)
+// - Adicionar geração de terreno
+// - Descobrir como fazer um tipo de animação de entrada
+// - Descobrir como rotacionar cubos e grids
+// - Tentar fazer algum modelo no MagicaVoxel
+// - Tentar importar modelo pelo back e passar para o front renderiza-lo
+// - 
 pub struct Control{
     world: world::scene::GameScene
 }
