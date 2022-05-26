@@ -29,7 +29,7 @@ pub struct ViewObjectInfo{
 
 impl ViewActions{
 
-    pub fn create_chunk(&mut self, chunk: Vec<Vec<ViewObjectInfo>>){
+    pub fn create_chunk(&mut self, _chunk: Vec<Vec<ViewObjectInfo>>){
         
     }
 
@@ -45,7 +45,7 @@ impl ViewActions{
         {
             let ent = entity::SceneEntity::new(
                 &self.state.device, obj.position,
-                &cube::HexagonMeshOutLine {
+                &cube::CuboidOutline {
                     hex: &mesh
                 }
             );

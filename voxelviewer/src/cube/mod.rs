@@ -58,12 +58,12 @@ impl Cuboid{
         result
     }
 
-    pub fn remove_face(&mut self, dir: QuadDirection){
+    pub fn _remove_face(&mut self, dir: QuadDirection){
         self.faces.retain(|quad| quad.direction != dir);
     }
 }
 
-pub struct HexagonMeshOutLine<'a>{
+pub struct CuboidOutline<'a>{
     pub hex: &'a Cuboid
 }
 
@@ -76,7 +76,7 @@ impl StaticVertexBuild for Cuboid{
     }
 }
 
-impl StaticVertexBuild for HexagonMeshOutLine<'_>{
+impl StaticVertexBuild for CuboidOutline<'_>{
     fn build(&self) -> StaticVertexMesh{
         StaticVertexMesh{
             vertices: self.hex.get_outline_vertices(),
