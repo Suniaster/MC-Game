@@ -4,14 +4,14 @@ use rand::prelude::*;
 
 const GRID_SIZE: usize = 32;
 
-pub struct GridMesh{
+pub struct Grid{
   position: cgmath::Vector3<f32>,
   cube_size: f32,
   cube_grid: [[[bool; GRID_SIZE]; GRID_SIZE]; GRID_SIZE]
 }
 
 
-impl GridMesh{
+impl Grid{
   pub fn default_empty() -> Self{
     Self{
       position: cgmath::Vector3::new(0., 0., 0.),
@@ -57,7 +57,7 @@ impl GridMesh{
 
 }
 
-impl StaticVertexBuild for GridMesh {
+impl StaticVertexBuild for Grid {
   fn build(&self)->StaticVertexMesh{
     let mut hexes:Vec<Cuboid> = vec![];
     let (max_x, max_y, max_z) = (
