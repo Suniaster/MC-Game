@@ -10,7 +10,7 @@ pub struct HexagonMesh{
 }
 
 impl HexagonMesh{
-    pub fn new(center_position: VertPos, half_sizes: VectorDir)-> Self{
+    pub fn new(center_position: VertPos, half_sizes: VectorDir, color:[f32;3])-> Self{
         let faces_dirs = vec![
             QuadDirection::Front,
             QuadDirection::Back,
@@ -21,7 +21,7 @@ impl HexagonMesh{
         ];
     
         let faces:Vec<Quad> = faces_dirs.iter().map( |f| {
-            QuadDirection::quad_from_dir(f, &center_position, &half_sizes)
+            QuadDirection::quad_from_dir(f, &center_position, &half_sizes, color)
         }).collect::<Vec<_>>();
         Self{
             faces, center_position, _half_sizes: half_sizes

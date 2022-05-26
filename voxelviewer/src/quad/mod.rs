@@ -57,12 +57,12 @@ impl Quad{
         let quad_dir = (v2 - v3).cross(v1 - v3);
         let quad_normal:[f32; 3] = quad_dir.normalize().into();
 
-        /*** 0        1  
+        /*** 0        3  
          *   * ------ *
          *   |        |
          *   |        |
          *   *--------*
-         *   3        2
+         *   1        2
          */           
         let vertices = [
             self.vertices[0], 
@@ -74,7 +74,7 @@ impl Quad{
 
         for v in vertices{
             result.push(StaticVertex{
-                color_diffuse: self.color,
+                color_diffuse: [0., 0., 0.],
                 position: v.into(),
                 normal: quad_normal
             });

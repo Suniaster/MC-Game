@@ -37,6 +37,7 @@ impl ViewActions{
         let mesh = quad::hexagon::HexagonMesh::new(
             obj.position,
             cgmath::Vector3::from(obj.size)/2., 
+            obj.color
         );
 
         // let mesh = grid::GridMesh::default_random();

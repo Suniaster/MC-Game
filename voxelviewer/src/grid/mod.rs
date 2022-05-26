@@ -48,7 +48,8 @@ impl GridMesh{
     pos.z += k as f32 * self.cube_size;
 
     let hex = HexagonMesh::new(pos,
-      cgmath::Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.)
+      cgmath::Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
+      [0.1, 1.0, 0.1]
     );
 
     return hex;
