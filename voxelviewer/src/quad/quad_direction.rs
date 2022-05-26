@@ -9,7 +9,7 @@ pub enum QuadDirection{
 
 
 impl QuadDirection{
-  pub fn from_dir(dir: &QuadDirection, center: &VertPos, half_sizes: &VectorDir)->Quad{
+  pub fn quad_from_dir(dir: &QuadDirection, center: &VertPos, half_sizes: &VectorDir)->Quad{
     let color = [0.1, 1.0, 0.1];
     match dir{
       QuadDirection::Front => {

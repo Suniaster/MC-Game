@@ -3,8 +3,10 @@ use cgmath::Vector3;
 use cgmath::InnerSpace;
 use super::vertex::static_vertex::StaticVertex;
 
-pub mod face;
+pub mod quad_direction;
 pub mod hexagon;
+
+use quad_direction::QuadDirection;
 
 type VertPos = Vector3<f32>;
 type VectorDir = Vector3<f32>;
@@ -12,7 +14,7 @@ type VectorDir = Vector3<f32>;
 pub struct Quad{
     pub vertices: [VertPos; 4],
     pub color: [f32; 3],
-    pub direction: face::QuadDirection
+    pub direction: QuadDirection
 }
 
 impl Quad{

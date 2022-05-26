@@ -1,6 +1,6 @@
 
 use super::{VertPos, VectorDir, Quad};
-use super::face::*;
+use super::quad_direction::*;
 use super::super::vertex::{static_vertex::StaticVertex, StaticVertexMesh, StaticVertexBuild};
 
 pub struct HexagonMesh{
@@ -21,7 +21,7 @@ impl HexagonMesh{
         ];
     
         let faces:Vec<Quad> = faces_dirs.iter().map( |f| {
-            QuadDirection::from_dir(f, &center_position, &half_sizes)
+            QuadDirection::quad_from_dir(f, &center_position, &half_sizes)
         }).collect::<Vec<_>>();
         Self{
             faces, center_position, _half_sizes: half_sizes
