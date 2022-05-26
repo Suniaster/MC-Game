@@ -1,5 +1,5 @@
 use super::vertex::{StaticVertexMesh, StaticVertexBuild};
-use super::quad::hexagon::HexagonMesh;
+use super::cube::HexagonMesh;
 use rand::prelude::*;
 
 const GRID_SIZE: usize = 32;

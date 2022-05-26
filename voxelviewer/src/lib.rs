@@ -34,7 +34,7 @@ impl ViewActions{
     }
 
     pub fn create_cube(&mut self, obj: ViewObjectInfo)-> ViewObjectInfo{
-        let mesh = quad::hexagon::HexagonMesh::new(
+        let mesh = cube::HexagonMesh::new(
             obj.position,
             cgmath::Vector3::from(obj.size)/2., 
             obj.color
@@ -45,7 +45,7 @@ impl ViewActions{
         {
             let ent = entity::SceneEntity::new(
                 &self.state.device, obj.position,
-                &quad::hexagon::HexagonMeshOutLine {
+                &cube::HexagonMeshOutLine {
                     hex: &mesh
                 }
             );

@@ -4,12 +4,11 @@ use cgmath::InnerSpace;
 use super::vertex::static_vertex::StaticVertex;
 
 pub mod quad_direction;
-pub mod hexagon;
 
 use quad_direction::QuadDirection;
 
-type VertPos = Vector3<f32>;
-type VectorDir = Vector3<f32>;
+pub type VertPos = Vector3<f32>;
+pub type VectorDir = Vector3<f32>;
 
 pub struct Quad{
     pub vertices: [VertPos; 4],
