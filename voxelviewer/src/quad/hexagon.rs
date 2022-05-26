@@ -50,17 +50,37 @@ impl HexagonMesh{
         result
     }
 
+    pub fn get_outline_vertices(&self) -> Vec<StaticVertex>{
+        let mut result = vec![];
+        for quad in &self.faces {
+            result.append(&mut quad.to_outline_vertex_list());
+        }
+        result
+    }
+
     pub fn remove_face(&mut self, dir: QuadDirection){
         self.faces.retain(|quad| quad.direction != dir);
     }
 }
 
+pub struct HexagonMeshOutLine<'a>{
+    pub hex: &'a HexagonMesh
+}
 
 impl StaticVertexBuild for HexagonMesh{
     fn build(&self) -> StaticVertexMesh{
         StaticVertexMesh{
             vertices: self.get_static_vertices(),
             position: self.center_position
+        }
+    }
+}
+
+impl StaticVertexBuild for HexagonMeshOutLine<'_>{
+    fn build(&self) -> StaticVertexMesh{
+        StaticVertexMesh{
+            vertices: self.hex.get_outline_vertices(),
+            position: self.hex.center_position
         }
     }
 }

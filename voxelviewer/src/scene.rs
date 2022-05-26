@@ -64,6 +64,7 @@ pub struct State {
 
     // Instances
     pub entities: HashMap<u32, SceneEntity>,
+    pub entities_outlines: HashMap<u32, SceneEntity>,
 
     // Input: bool
     mouse_pressed: bool,
@@ -183,7 +184,8 @@ impl State {
             camera_bind_group,    
             camera_controller,
             entities: HashMap::new(),
-            
+            entities_outlines: HashMap::new(),
+
             static_cube_pipeline,
             static_lines_pipeline,
 
@@ -286,6 +288,13 @@ impl State {
                     &ent,
                     &self.camera_bind_group
                 );
+            }
+
+            render_pass.set_pipeline(&self.static_lines_pipeline);
+            for(_, ent) in &self.entities_outlines{
+                render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
+                render_pass.set_vertex_buffer(0, ent.vertex_buffer.slice(..));
+                render_pass.draw(0..ent.num_vertices, 0..1);
             }
         }
         self.queue.submit(iter::once(encoder.finish()));
