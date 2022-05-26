@@ -1,5 +1,5 @@
 use super::vertex::{StaticVertexMesh, StaticVertexBuild};
-use super::cube::HexagonMesh;
+use super::cube::Cuboid;
 use rand::prelude::*;
 
 const GRID_SIZE: usize = 32;
@@ -41,13 +41,13 @@ impl GridMesh{
     return grid;
   }
 
-  fn create_hex_in_pos(&self, i:usize, j:usize, k:usize)->HexagonMesh{
+  fn create_hex_in_pos(&self, i:usize, j:usize, k:usize)->Cuboid{
     let mut pos = self.position;
     pos.x += i as f32 * self.cube_size;
     pos.y += j as f32 * self.cube_size;
     pos.z += k as f32 * self.cube_size;
 
-    let hex = HexagonMesh::new(pos,
+    let hex = Cuboid::new(pos,
       cgmath::Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
       [0.1, 1.0, 0.1]
     );
@@ -59,7 +59,7 @@ impl GridMesh{
 
 impl StaticVertexBuild for GridMesh {
   fn build(&self)->StaticVertexMesh{
-    let mut hexes:Vec<HexagonMesh> = vec![];
+    let mut hexes:Vec<Cuboid> = vec![];
     let (max_x, max_y, max_z) = (
       self.cube_grid[0].len(), 
       self.cube_grid[1].len(),
@@ -75,6 +75,6 @@ impl StaticVertexBuild for GridMesh {
         }
       }
     }
-    HexagonMesh::build_from_array(self.position, &hexes)
+    Cuboid::build_from_array(self.position, &hexes)
   }
 }

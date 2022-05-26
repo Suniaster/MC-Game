@@ -34,7 +34,7 @@ impl ViewActions{
     }
 
     pub fn create_cube(&mut self, obj: ViewObjectInfo)-> ViewObjectInfo{
-        let mesh = cube::HexagonMesh::new(
+        let mesh = cube::Cuboid::new(
             obj.position,
             cgmath::Vector3::from(obj.size)/2., 
             obj.color

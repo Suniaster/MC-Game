@@ -3,13 +3,13 @@ use super::vertex::{
 };
 use super::quad::{Quad, quad_direction::*, VectorDir, VertPos};
 
-pub struct HexagonMesh{
+pub struct Cuboid{
     pub center_position: VertPos,
     _half_sizes: VectorDir,
     faces: Vec<Quad>
 }
 
-impl HexagonMesh{
+impl Cuboid{
     pub fn new(center_position: VertPos, half_sizes: VectorDir, color:[f32;3])-> Self{
         let faces_dirs = vec![
             QuadDirection::Front,
@@ -28,7 +28,7 @@ impl HexagonMesh{
         }
     }
     
-    pub fn build_from_array(position:VertPos, arr: &Vec<HexagonMesh>) -> StaticVertexMesh{
+    pub fn build_from_array(position:VertPos, arr: &Vec<Cuboid>) -> StaticVertexMesh{
         let mut vertices = vec![];
         for hex in arr{
             for quad in &hex.faces {
@@ -64,10 +64,10 @@ impl HexagonMesh{
 }
 
 pub struct HexagonMeshOutLine<'a>{
-    pub hex: &'a HexagonMesh
+    pub hex: &'a Cuboid
 }
 
-impl StaticVertexBuild for HexagonMesh{
+impl StaticVertexBuild for Cuboid{
     fn build(&self) -> StaticVertexMesh{
         StaticVertexMesh{
             vertices: self.get_static_vertices(),
@@ -87,7 +87,7 @@ impl StaticVertexBuild for HexagonMeshOutLine<'_>{
 
 
 pub fn _new_cube(half_size: f32) -> StaticVertexMesh {
-  let cube = HexagonMesh::new(
+  let cube = Cuboid::new(
     cgmath::Vector3::new(0.,0.,0.), 
     cgmath::Vector3::new(half_size,half_size,half_size),
     [0.1, 1.0, 0.1]
