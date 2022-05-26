@@ -14,6 +14,7 @@ fn create_render_pipeline(
   depth_format: Option<wgpu::TextureFormat>,
   vertex_layouts: &[wgpu::VertexBufferLayout],
   shader: wgpu::ShaderModuleDescriptor,
+  topology: wgpu::PrimitiveTopology
 ) -> wgpu::RenderPipeline {
   let shader = device.create_shader_module(&shader);
 
@@ -35,7 +36,7 @@ fn create_render_pipeline(
           }],
       }),
       primitive: wgpu::PrimitiveState {
-          topology: wgpu::PrimitiveTopology::TriangleList,
+          topology,
           strip_index_format: None,
           front_face: wgpu::FrontFace::Ccw,
           cull_mode: Some(wgpu::Face::Back),
@@ -68,11 +69,12 @@ fn create_render_pipeline(
 pub fn create_cube_render_pipeline(
   device: &wgpu::Device,
   binds: &[&wgpu::BindGroupLayout],
-  config: &wgpu::SurfaceConfiguration
+  config: &wgpu::SurfaceConfiguration,
+  topology: wgpu::PrimitiveTopology
 )->wgpu::RenderPipeline{
     let shader = wgpu::ShaderModuleDescriptor {
         label: Some("Normal Shader"),
-        source: wgpu::ShaderSource::Wgsl(include_str!("../vertex/static_vertex.wgsl").into()),
+        source: wgpu::ShaderSource::Wgsl(include_str!("./static_vertex.wgsl").into()),
     };
     let render_pipeline_layout =
         device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
@@ -88,5 +90,6 @@ pub fn create_cube_render_pipeline(
         Some( wgpu::TextureFormat::Depth32Float),
         &[StaticVertex::desc()],
         shader,
+        topology
     )
 }

@@ -52,6 +52,8 @@ pub struct State {
     depth_texture: texture::Texture,
 
     static_cube_pipeline: wgpu::RenderPipeline,
+    static_lines_pipeline: wgpu::RenderPipeline,
+
     // Camera
     pub camera: camera::Camera,
     pub camera_controller: camera::CameraController,
@@ -148,13 +150,24 @@ impl State {
         });
 
 
-        let static_cube_pipeline = super::cube::cube_pipeline::create_cube_render_pipeline(
+        let static_cube_pipeline = super::pipelines::static_vertex_pipeline::create_cube_render_pipeline(
             &device, 
             &[
                 &camera_bind_group_layout,
             ], 
-            &config
+            &config,
+            wgpu::PrimitiveTopology::TriangleList
         );
+
+        let static_lines_pipeline =  super::pipelines::static_vertex_pipeline::create_cube_render_pipeline(
+            &device, 
+            &[
+                &camera_bind_group_layout,
+            ], 
+            &config,
+            wgpu::PrimitiveTopology::LineList
+        );
+
 
         Self {
             size,
@@ -169,8 +182,10 @@ impl State {
             camera_buffer,
             camera_bind_group,    
             camera_controller,
-            static_cube_pipeline,
             entities: HashMap::new(),
+            
+            static_cube_pipeline,
+            static_lines_pipeline,
 
             mouse_pressed: false, 
         }

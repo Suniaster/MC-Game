@@ -12,6 +12,7 @@ mod cube;
 mod quad;
 mod vertex;
 mod grid;
+mod pipelines;
 use scene::*;
 use cgmath::{Vector3, Point3};
 

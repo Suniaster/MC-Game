@@ -6,8 +6,8 @@ mod systems;
 mod entities;
 
 // Proximos Objetivos
-// - Adicionar bordas (linhas) nos cubos
-// - Descobrir como botar texto na tela
+// - Adicionar bordas (linhas) nos cubos - LineStrip = 2,
+// - Descobrir como botar texto na tela - https://github.com/hecrj/wgpu_glyph
 // - Escrever na tela fps e direção olhando
 // - Otmizar o uso de vertices no grid (remover repetidos)
 // - Ajustar cores (não tão sendo efetivamente usados)
