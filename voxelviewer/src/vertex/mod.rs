@@ -25,9 +25,15 @@ impl StaticVertexMesh {
   pub fn to_buffer<T: bytemuck::Pod>(&self)->&[T]{
     bytemuck::cast_slice::<StaticVertex, T>(&self.vertices)
   }
+  pub fn new_empty() -> Self{
+    Self{
+      vertices: vec![], position: VertPos::from([0.,0.,0.])
+    }
+  }
 }
 
 
 pub trait StaticVertexBuild {
   fn build(&self) -> StaticVertexMesh;
+  fn build_outline(&self) ->StaticVertexMesh;
 }

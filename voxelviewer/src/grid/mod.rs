@@ -77,4 +77,8 @@ impl StaticVertexBuild for Grid {
     }
     Cuboid::build_from_array(self.position, &hexes)
   }
+
+  fn build_outline(&self) -> StaticVertexMesh{
+    StaticVertexMesh::new_empty()
+  }
 }

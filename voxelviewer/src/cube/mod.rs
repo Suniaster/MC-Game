@@ -63,10 +63,6 @@ impl Cuboid{
     }
 }
 
-pub struct CuboidOutline<'a>{
-    pub hex: &'a Cuboid
-}
-
 impl StaticVertexBuild for Cuboid{
     fn build(&self) -> StaticVertexMesh{
         StaticVertexMesh{
@@ -74,13 +70,10 @@ impl StaticVertexBuild for Cuboid{
             position: self.center_position
         }
     }
-}
-
-impl StaticVertexBuild for CuboidOutline<'_>{
-    fn build(&self) -> StaticVertexMesh{
+    fn build_outline(&self) -> StaticVertexMesh{
         StaticVertexMesh{
-            vertices: self.hex.get_outline_vertices(),
-            position: self.hex.center_position
+            vertices: self.get_outline_vertices(),
+            position: self.center_position
         }
     }
 }

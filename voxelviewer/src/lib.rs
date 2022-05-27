@@ -1,3 +1,4 @@
+use vertex::StaticVertexBuild;
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -40,27 +41,22 @@ impl ViewActions{
             obj.color
         );
 
-        // let mesh = grid::GridMesh::default_random();
+        let mesh = grid::Grid::default_random();
         // Create outline for mesh
         {
             let ent = entity::SceneEntity::new(
                 &self.state.device, obj.position,
-                &cube::CuboidOutline {
-                    hex: &mesh
-                }
+                mesh.build_outline()
             );
             self.state.entities_outlines.insert(ent.id, ent);
         }
         let new_ent = entity::SceneEntity::new(
             &self.state.device, 
             obj.position,
-            &mesh
+            mesh.build()
         );
-
-        
         let id = new_ent.id;
         let mut obj = obj;
-        
         self.state.entities.insert(id, new_ent);
 
         obj.id = id;

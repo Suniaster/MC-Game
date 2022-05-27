@@ -16,15 +16,16 @@ unsafe fn gen_instance_id() -> u32{
 }
 
 impl SceneEntity{
-    pub fn new<T: StaticVertexBuild>(device: &wgpu::Device, pos: cgmath::Vector3<f32>, mesh: &T)->SceneEntity{
-        let mut instance = mesh.build();
-        instance.update_pos(pos);
+    pub fn new(device: &wgpu::Device, pos: cgmath::Vector3<f32>, mesh: StaticVertexMesh)->SceneEntity{
+        // let mut instance = mesh.build();
+        let mut mesh = mesh;
+        mesh.update_pos(pos);
 
         let vertex_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Vertex Buffer"),
                 usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
-                contents: instance.to_buffer()
+                contents: mesh.to_buffer()
             }
         );
 
@@ -34,8 +35,8 @@ impl SceneEntity{
         }
         SceneEntity{
             id, 
-            num_vertices: instance.vertices.len() as u32,
-            instance,
+            num_vertices: mesh.vertices.len() as u32,
+            instance: mesh,
             vertex_buffer,
         }
     }
