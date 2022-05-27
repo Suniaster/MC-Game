@@ -1,5 +1,8 @@
+use crate::cube;
+
 use super::vertex::{StaticVertexMesh};
 use super::cube::Cuboid;
+use cgmath::Vector3;
 use rand::prelude::*;
 
 const GRID_SIZE: usize = 32;
@@ -47,7 +50,8 @@ impl Grid{
     pos.y += j as f32 * self.cube_size;
     pos.z += k as f32 * self.cube_size;
 
-    let hex = Cuboid::new(pos,
+    let hex = Cuboid::new(
+      pos,
       cgmath::Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
       [0.1, 1.0, 0.1]
     );
@@ -75,10 +79,19 @@ impl Grid {
         }
       }
     }
-    Cuboid::build_from_array(self.position, &hexes)
+    let mut mesh = Cuboid::build_from_array(self.position, &hexes);
+    mesh.update_pos(self.position - Vector3::from([32., 32., 32.]));
+    return mesh;
   }
 
   pub fn build_outline(&self) -> StaticVertexMesh{
-    StaticVertexMesh::new_empty()
+    let half_grid_size = (GRID_SIZE as f32) / 2.;
+    let half_size = self.cube_size * half_grid_size;
+    let overall_cuboid = cube::Cuboid::new(
+      self.position, 
+      Vector3::from([half_grid_size, half_grid_size, half_grid_size]),
+      [0., 0., 0.]
+    );
+    overall_cuboid.build_outline()
   }
 }
