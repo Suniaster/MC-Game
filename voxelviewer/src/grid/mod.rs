@@ -1,4 +1,4 @@
-use super::vertex::{StaticVertexMesh, StaticVertexBuild};
+use super::vertex::{StaticVertexMesh};
 use super::cube::Cuboid;
 use rand::prelude::*;
 
@@ -57,8 +57,8 @@ impl Grid{
 
 }
 
-impl StaticVertexBuild for Grid {
-  fn build(&self)->StaticVertexMesh{
+impl Grid {
+  pub fn build(&self)->StaticVertexMesh{
     let mut hexes:Vec<Cuboid> = vec![];
     let (max_x, max_y, max_z) = (
       self.cube_grid[0].len(), 
@@ -78,7 +78,7 @@ impl StaticVertexBuild for Grid {
     Cuboid::build_from_array(self.position, &hexes)
   }
 
-  fn build_outline(&self) -> StaticVertexMesh{
+  pub fn build_outline(&self) -> StaticVertexMesh{
     StaticVertexMesh::new_empty()
   }
 }

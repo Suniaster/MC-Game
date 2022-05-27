@@ -1,5 +1,5 @@
 use super::vertex::{
-  static_vertex::StaticVertex, StaticVertexMesh, StaticVertexBuild
+  static_vertex::StaticVertex, StaticVertexMesh
 };
 use super::quad::{Quad, quad_direction::*, VectorDir, VertPos};
 
@@ -63,14 +63,14 @@ impl Cuboid{
     }
 }
 
-impl StaticVertexBuild for Cuboid{
-    fn build(&self) -> StaticVertexMesh{
+impl Cuboid{
+    pub fn build(&self) -> StaticVertexMesh{
         StaticVertexMesh{
             vertices: self.get_static_vertices(),
             position: self.center_position
         }
     }
-    fn build_outline(&self) -> StaticVertexMesh{
+    pub fn build_outline(&self) -> StaticVertexMesh{
         StaticVertexMesh{
             vertices: self.get_outline_vertices(),
             position: self.center_position

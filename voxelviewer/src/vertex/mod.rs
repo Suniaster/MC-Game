@@ -31,9 +31,3 @@ impl StaticVertexMesh {
     }
   }
 }
-
-
-pub trait StaticVertexBuild {
-  fn build(&self) -> StaticVertexMesh;
-  fn build_outline(&self) ->StaticVertexMesh;
-}

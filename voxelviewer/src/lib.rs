@@ -1,4 +1,3 @@
-use vertex::StaticVertexBuild;
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
