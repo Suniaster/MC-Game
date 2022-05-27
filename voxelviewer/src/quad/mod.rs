@@ -55,18 +55,17 @@ impl Quad{
         
         let quad_dir = (v2 - v3).cross(v1 - v3);
         let quad_normal:[f32; 3] = quad_dir.normalize().into();
-
-        /*** 0        3  
-         *   * ------ *
-         *   |        |
-         *   |        |
-         *   *--------*
-         *   1        2
-         */           
+         
         let vertices = [
             self.vertices[0], 
             self.vertices[1],
+            
+            self.vertices[1],
             self.vertices[2],
+            
+            self.vertices[2],
+            self.vertices[3],
+
             self.vertices[3],
             self.vertices[0],
         ];
