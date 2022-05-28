@@ -10,13 +10,13 @@ use cube_face_direction::CubeFaceDirection;
 pub type VertPos = Vector3<f32>;
 pub type VectorDir = Vector3<f32>;
 
-pub struct Quad{
+pub struct CubeFace{
     pub vertices: [VertPos; 4],
     pub color: [f32; 3],
     pub direction: CubeFaceDirection
 }
 
-impl Quad{
+impl CubeFace{
     pub fn to_static_vertex_list(&self) -> Vec<StaticVertex>{
         let mut result:Vec<StaticVertex> = vec![];
         let v1 = self.vertices[0];

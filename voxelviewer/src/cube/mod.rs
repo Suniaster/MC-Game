@@ -1,12 +1,12 @@
 use super::vertex::{
   static_vertex::StaticVertex, StaticVertexMesh
 };
-use super::quad::{Quad, cube_face_direction::*, VectorDir, VertPos};
+use super::quad::{CubeFace, cube_face_direction::*, VectorDir, VertPos};
 
 pub struct Cuboid{
     pub center_position: VertPos,
     _half_sizes: VectorDir,
-    faces: Vec<Quad>
+    faces: Vec<CubeFace>
 }
 
 impl Cuboid{
@@ -20,8 +20,8 @@ impl Cuboid{
             CubeFaceDirection::Right,
         ];
     
-        let faces:Vec<Quad> = faces_dirs.iter().map( |f| {
-            CubeFaceDirection::quad_from_dir(f, &center_position, &half_sizes, color)
+        let faces:Vec<CubeFace> = faces_dirs.iter().map( |f| {
+            CubeFaceDirection::cube_face_from_dir(f, &center_position, &half_sizes, color)
         }).collect::<Vec<_>>();
         Self{
             faces, center_position, _half_sizes: half_sizes

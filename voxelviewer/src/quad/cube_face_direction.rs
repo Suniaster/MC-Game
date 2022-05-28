@@ -1,6 +1,6 @@
 
 use super::{VertPos, VectorDir};
-use super::Quad;
+use super::CubeFace;
 
 #[derive(PartialEq, Eq)]
 pub enum CubeFaceDirection{
@@ -9,7 +9,7 @@ pub enum CubeFaceDirection{
 
 
 impl CubeFaceDirection{
-  pub fn quad_from_dir(dir: &CubeFaceDirection, center: &VertPos, half_sizes: &VectorDir, color: [f32; 3])->Quad{
+  pub fn cube_face_from_dir(dir: &CubeFaceDirection, center: &VertPos, half_sizes: &VectorDir, color: [f32; 3])->CubeFace{
     // let color = [0.1, 1.0, 0.1];
     /*** 1        0  
      *   * ------ *
@@ -20,7 +20,7 @@ impl CubeFaceDirection{
      */  
     match dir{
       CubeFaceDirection::Front => {
-        Quad{
+        CubeFace{
           vertices: [
             VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
             VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
@@ -32,7 +32,7 @@ impl CubeFaceDirection{
         }
       }
       CubeFaceDirection::Back => {
-        Quad{
+        CubeFace{
           vertices: [
             VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
             VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
@@ -44,7 +44,7 @@ impl CubeFaceDirection{
         }
       }
       CubeFaceDirection::Up => {
-        Quad{
+        CubeFace{
           vertices: [
             VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
             VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
@@ -56,7 +56,7 @@ impl CubeFaceDirection{
         }
       }
       CubeFaceDirection::Down => {
-        Quad{
+        CubeFace{
           vertices: [
             VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
             VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
@@ -68,7 +68,7 @@ impl CubeFaceDirection{
         }
       }
       CubeFaceDirection::Left => {
-        Quad{
+        CubeFace{
           vertices: [
             VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
             VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
@@ -80,7 +80,7 @@ impl CubeFaceDirection{
         }
       }
       CubeFaceDirection::Right => {
-        Quad{
+        CubeFace{
           vertices: [
             VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
             VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
