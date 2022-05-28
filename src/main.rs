@@ -49,7 +49,7 @@ impl voxelviewer::ViewController for Control{
         self.texts_ids.insert(String::from("position"), position_id);
 
         let id = a.create_text();
-        self.texts_ids.insert(String::from("objects"), id);
+        self.texts_ids.insert(String::from("vertices"), id);
     }
 }
 

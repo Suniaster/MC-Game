@@ -25,6 +25,11 @@ pub fn render_fps_system(
         let text = format!("Position XYZ: ({:.0}, {:.0}, {:.0})", pos[0], pos[1], pos[2]);
         let id = world.texts_ids.get("position").unwrap();
         actions.update_text(*id, text);
+
+        let count = actions.get_vertex_count();
+        let text = format!("Vextex count: {}", count);
+        let id = world.texts_ids.get("vertices").unwrap();
+        actions.update_text(*id, text);
     }
 }
 

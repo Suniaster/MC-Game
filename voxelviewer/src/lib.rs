@@ -95,6 +95,13 @@ impl ViewActions{
         return self.state.screen_texts.len()-1;
     }
 
+    pub fn get_vertex_count(&self) -> u32{
+        let mut count = 0;
+        for (_, entity) in self.state.entities.iter(){
+            count += entity.instance.vertices.len() as u32;
+        }
+        return count;
+    }
 }
 
 pub trait ViewController{

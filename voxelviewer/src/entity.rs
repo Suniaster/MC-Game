@@ -4,7 +4,7 @@ use super::vertex::{StaticVertexMesh};
 pub struct SceneEntity{
   pub vertex_buffer: wgpu::Buffer,
   pub num_vertices: u32,
-  instance: StaticVertexMesh,
+  pub instance: StaticVertexMesh,
   pub id: u32
 }
 

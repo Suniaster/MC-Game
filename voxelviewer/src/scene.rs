@@ -201,7 +201,7 @@ impl State {
             camera_controller,
             entities: HashMap::new(),
             entities_outlines: HashMap::new(),
-
+            
             static_cube_pipeline,
             static_lines_pipeline,
 
