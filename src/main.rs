@@ -45,6 +45,11 @@ impl voxelviewer::ViewController for Control{
         let looking_id = a.create_text();
         self.texts_ids.insert(String::from("looking"), looking_id);
 
+        let position_id = a.create_text();
+        self.texts_ids.insert(String::from("position"), position_id);
+
+        let id = a.create_text();
+        self.texts_ids.insert(String::from("objects"), id);
     }
 }
 

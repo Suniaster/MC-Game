@@ -57,6 +57,11 @@ impl Camera {
         dir[1] = yaw.sin();
         dir
     }
+
+    pub fn get_position(&self) -> Point3<f32>{
+        self.position
+    }
+
 }
 
 pub struct Projection {

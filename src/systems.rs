@@ -20,6 +20,11 @@ pub fn render_fps_system(
         let looking_text = format!("Looking XZ: ({}, {})", looking_dir[0], looking_dir[1]);
         let looking_id = world.texts_ids.get("looking").unwrap();
         actions.update_text(*looking_id, looking_text);
+
+        let pos = actions.state.camera.get_position();
+        let text = format!("Position XYZ: ({:.0}, {:.0}, {:.0})", pos[0], pos[1], pos[2]);
+        let id = world.texts_ids.get("position").unwrap();
+        actions.update_text(*id, text);
     }
 }
 
