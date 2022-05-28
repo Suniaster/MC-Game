@@ -1,7 +1,7 @@
 use super::vertex::{
   static_vertex::StaticVertex, StaticVertexMesh
 };
-use super::quad::{CubeFace, cube_face_direction::*, VectorDir, VertPos};
+use super::cube_face::{CubeFace, cube_face_direction::*, VectorDir, VertPos};
 
 pub struct Cuboid{
     pub center_position: VertPos,

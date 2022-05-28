@@ -9,7 +9,7 @@ mod camera;
 mod scene;
 mod entity;
 mod cube;
-mod quad;
+mod cube_face;
 mod vertex;
 mod grid;
 mod pipelines;
