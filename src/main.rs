@@ -1,4 +1,4 @@
-use std::time::Duration;
+use std::{time::Duration, collections::HashMap};
 
 use winit::event::{VirtualKeyCode, ElementState};
 
@@ -11,7 +11,7 @@ mod entities;
 // x - Adicionar bordas (linhas) nos cubos - LineStrip = 2,
 // X - Descobrir como botar texto na tela - https://github.com/hecrj/wgpu_glyph
 // X - Escrever na tela fps 
-// - e direção olhando
+// X - e direção olhando
 // - Otmizar o uso de vertices no grid (remover repetidos)
 // - Ajustar cores (não tão sendo efetivamente usados)
 // - Adicionar geração de terreno
@@ -22,7 +22,7 @@ mod entities;
 // - 
 pub struct Control{
     world: world::scene::GameScene,
-    pub fps_text_id: usize,
+    pub texts_ids: HashMap<String, usize>,
     pub total_time: Duration
 }
 
@@ -39,11 +39,12 @@ impl voxelviewer::ViewController for Control{
     }
 
     fn before_start(&mut self, a:&mut voxelviewer::ViewActions) -> () {
-        self.fps_text_id = a.create_text(
-            String::from("FPS: XX"),
-             50., 50., 
-             [0., 0., 0., 1.]
-        );
+        let fps_id = a.create_text();
+        self.texts_ids.insert(String::from("fps"), fps_id);
+
+        let looking_id = a.create_text();
+        self.texts_ids.insert(String::from("looking"), looking_id);
+
     }
 }
 
@@ -51,7 +52,7 @@ fn main() {
     let world = world::scene::GameScene::new((40., 20.));
     let controller = Control{
         world, 
-        fps_text_id: 0,
+        texts_ids: HashMap::new(),
         total_time: Duration::new(0, 0)
     };
     voxelviewer::main(Box::new(controller));

@@ -24,7 +24,7 @@ impl ScreenText{
             bounds: (width, heigth),
             text: vec![Text::new(self.text.as_str())
                 .with_color([0.0, 0.0, 0.0, 1.0])
-                .with_scale(40.0)],
+                .with_scale(20.0)],
             ..Section::default()
         });
     }

@@ -85,8 +85,12 @@ impl ViewActions{
         self.state.screen_texts[id as usize].text = text;
     }
 
-    pub fn create_text(&mut self, text: String, x: f32, y: f32, color: [f32; 4])-> usize{
-        let new_text = screen_text::ScreenText::new(text, x, y, color);
+    pub fn create_text(&mut self)-> usize{
+        let new_text = screen_text::ScreenText::new(
+            String::from(""), 
+            10., 
+            20. * self.state.screen_texts.len() as f32, 
+        [0., 0., 0., 1.]);
         self.state.screen_texts.push(new_text);
         return self.state.screen_texts.len()-1;
     }

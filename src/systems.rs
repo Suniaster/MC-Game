@@ -13,7 +13,13 @@ pub fn render_fps_system(
     if world.total_time.as_secs_f32() > 0.10{
         world.total_time = Duration::new(0, 0);
         let fps_text = format!("FPS: {}", 1./dt.as_secs_f32());
-        actions.update_text(world.fps_text_id, fps_text);
+        let fps_id = world.texts_ids.get("fps").unwrap();
+        actions.update_text(*fps_id, fps_text);
+
+        let looking_dir = actions.state.camera.get_looking_dir();
+        let looking_text = format!("Looking XZ: ({}, {})", looking_dir[0], looking_dir[1]);
+        let looking_id = world.texts_ids.get("looking").unwrap();
+        actions.update_text(*looking_id, looking_text);
     }
 }
 

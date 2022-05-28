@@ -49,6 +49,14 @@ impl Camera {
             Vector3::unit_y(),
         )
     }
+
+    pub fn get_looking_dir(&self) -> [f32;2]{
+        let mut dir = [0.0, 0.0];
+        let mut yaw = self.yaw.0;
+        dir[0] = yaw.cos();
+        dir[1] = yaw.sin();
+        dir
+    }
 }
 
 pub struct Projection {
