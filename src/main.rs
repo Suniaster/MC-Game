@@ -12,9 +12,9 @@ mod entities;
 // X - Descobrir como botar texto na tela - https://github.com/hecrj/wgpu_glyph
 // X - Escrever na tela fps 
 // X - e direção olhando
-// - Otmizar o uso de vertices no grid (remover repetidos)
-// - Ajustar cores (não tão sendo efetivamente usados)
+// X - Otmizar o uso de vertices no grid (remover repetidos)
 // - Adicionar geração de terreno
+// - Ajustar cores (não tão sendo efetivamente usados)
 // - Descobrir como fazer um tipo de animação de entrada
 // - Descobrir como rotacionar cubos e grids
 // - Tentar fazer algum modelo no MagicaVoxel

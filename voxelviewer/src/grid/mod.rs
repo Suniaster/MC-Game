@@ -5,6 +5,8 @@ use super::cube::Cuboid;
 use cgmath::Vector3;
 use rand::prelude::*;
 
+use super::cube_face::cube_face_direction::CubeFaceDirection;
+
 const GRID_SIZE: usize = 32;
 
 pub struct Grid{
@@ -36,7 +38,7 @@ impl Grid{
       for j in 0..max_y{
         for k in 0..max_z{
           let r:f32 = rng.gen();
-          grid.cube_grid[i][j][k] = r > 0.5;
+          grid.cube_grid[i][j][k] = r > 0.;
         }
       }
     }
@@ -60,8 +62,46 @@ impl Grid{
     return hex;
   }
 
+  pub fn filter_cube(&self, cube: &mut Cuboid, grid_pos: [usize; 3]){
+ 
+    if grid_pos[1] < GRID_SIZE - 1{
+      if self.cube_grid[grid_pos[0]][grid_pos[1] + 1][grid_pos[2]]{
+        cube.remove_face(CubeFaceDirection::Up);
+      }
+    }
+    if grid_pos[1] > 0{
+      if self.cube_grid[grid_pos[0]][grid_pos[1] - 1][grid_pos[2]]{
+        cube.remove_face(CubeFaceDirection::Down);
+      }
+    }
+
+    if grid_pos[2] < GRID_SIZE - 1{
+      if self.cube_grid[grid_pos[0]][grid_pos[1]][grid_pos[2] + 1]{
+        cube.remove_face(CubeFaceDirection::Back);
+      }
+    }
+    if grid_pos[2] > 0{
+      if self.cube_grid[grid_pos[0]][grid_pos[1]][grid_pos[2] - 1]{
+        cube.remove_face(CubeFaceDirection::Front);
+      }
+    }
+
+    if grid_pos[0] < GRID_SIZE - 1{
+      if self.cube_grid[grid_pos[0] + 1][grid_pos[1]][grid_pos[2]]{
+        cube.remove_face(CubeFaceDirection::Right);
+      }
+    }
+
+    if grid_pos[0] > 0{
+      if self.cube_grid[grid_pos[0] - 1][grid_pos[1]][grid_pos[2]]{
+        cube.remove_face(CubeFaceDirection::Left);
+      }
+    }
+  }
+
+
   pub fn build(&self)->StaticVertexMesh{
-    let mut hexes:Vec<Cuboid> = vec![];
+    let mut hexes:Vec<Vec<Vec<Cuboid>>> = vec![];
     let (max_x, max_y, max_z) = (
       self.cube_grid[0].len(), 
       self.cube_grid[1].len(),
@@ -69,15 +109,21 @@ impl Grid{
     );
 
     for x_idx in 0..max_x{
+      hexes.push(vec![]);
       for y_idx in 0..max_y{
+        hexes[x_idx].push(vec![]);
         for z_idx in 0..max_z{
           if self.cube_grid[x_idx][y_idx][z_idx] {
-            hexes.push(self.create_hex_in_pos(x_idx, y_idx, z_idx));
+            let mut cube = self.create_hex_in_pos(x_idx, y_idx, z_idx);
+            self.filter_cube(&mut cube, [x_idx, y_idx, z_idx]);
+            hexes[x_idx][y_idx].push(cube);
           }
         }
       }
     }
-    let mut mesh = Cuboid::build_from_array(self.position, &hexes);
+
+
+    let mut mesh = Cuboid::build_from_grid(self.position, &hexes);
     mesh.update_pos(self.position);
     return mesh;
   }

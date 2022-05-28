@@ -42,6 +42,23 @@ impl Cuboid{
         }
     }
 
+    pub fn build_from_grid(position:VertPos, grid: &Vec<Vec<Vec<Cuboid>>>) -> StaticVertexMesh{
+        let mut vertices = vec![];
+        for row in grid{
+            for col in row{
+                for hex in col{
+                    for quad in &hex.faces {
+                        vertices.append(&mut quad.to_static_vertex_list());
+                    }
+                }
+            }
+        }
+
+        StaticVertexMesh{
+            vertices,
+            position
+        }
+    }
     pub fn get_static_vertices(&self) -> Vec<StaticVertex>{
         let mut result = vec![];
         for quad in &self.faces {
@@ -58,7 +75,7 @@ impl Cuboid{
         result
     }
 
-    pub fn _remove_face(&mut self, dir: CubeFaceDirection){
+    pub fn remove_face(&mut self, dir: CubeFaceDirection){
         self.faces.retain(|quad| quad.direction != dir);
     }
 }
