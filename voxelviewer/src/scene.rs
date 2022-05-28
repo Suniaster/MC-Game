@@ -5,6 +5,7 @@ use std::iter;
 
 use cgmath::prelude::*;
 use wgpu::util::DeviceExt;
+use wgpu_glyph::GlyphBrush;
 use winit::{
     event::*,
     // event_loop::{ControlFlow, EventLoop},
@@ -16,6 +17,7 @@ use crate::camera;
 use std::collections::HashMap;
 
 use crate::entity::{SceneEntity, DrawModel};
+use wgpu_glyph::{ab_glyph, GlyphBrushBuilder, Section, Text};
 
 // We need this for Rust to store our data correctly for the shaders
 #[repr(C)]
@@ -53,6 +55,10 @@ pub struct State {
 
     static_cube_pipeline: wgpu::RenderPipeline,
     static_lines_pipeline: wgpu::RenderPipeline,
+
+    //Glyph
+    glyph_brush: GlyphBrush<()>,
+    staging_belt:  wgpu::util::StagingBelt,
 
     // Camera
     pub camera: camera::Camera,
@@ -169,7 +175,15 @@ impl State {
             wgpu::PrimitiveTopology::LineList
         );
 
-
+        // Prepare glyph_brush
+        let render_format = wgpu::TextureFormat::Bgra8UnormSrgb;
+        let inconsolata = ab_glyph::FontArc::try_from_slice(include_bytes!(
+            "Inconsolata-Regular.ttf"
+        )).expect("Failed to load font");
+    
+        let mut glyph_brush = GlyphBrushBuilder::using_font(inconsolata)
+            .build(&device, render_format);
+        let mut staging_belt = wgpu::util::StagingBelt::new(1024);
         Self {
             size,
             surface,
@@ -189,7 +203,10 @@ impl State {
             static_cube_pipeline,
             static_lines_pipeline,
 
-            mouse_pressed: false, 
+            mouse_pressed: false,
+
+            glyph_brush, 
+            staging_belt
         }
     }
 
@@ -297,6 +314,27 @@ impl State {
                 render_pass.draw(0..ent.num_vertices, 0..1);
             }
         }
+
+        self.glyph_brush.queue(Section {
+            screen_position: (30.0, 30.0),
+            bounds: (self.size.width as f32, self.size.height as f32),
+            text: vec![Text::new("Hello wgpu_glyph!")
+                .with_color([0.0, 0.0, 0.0, 1.0])
+                .with_scale(40.0)],
+            ..Section::default()
+        });
+
+        self.glyph_brush
+            .draw_queued(
+                &self.device,
+                &mut self.staging_belt,
+                &mut encoder,
+                &view,
+                self.size.width,
+                self.size.height,
+            )
+            .expect("Draw queued");
+        self.staging_belt.finish();
         self.queue.submit(iter::once(encoder.finish()));
         output.present();
 
