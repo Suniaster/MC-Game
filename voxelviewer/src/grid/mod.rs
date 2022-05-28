@@ -8,7 +8,7 @@ use rand::prelude::*;
 use super::cube_face::cube_face_direction::CubeFaceDirection;
 
 const GRID_SIZE: usize = 32;
-
+use perlin2d::PerlinNoise2D;
 pub struct Grid{
   position: cgmath::Vector3<f32>,
   cube_size: f32,
@@ -34,16 +34,43 @@ impl Grid{
       grid.cube_grid[2].len()
     );
 
-    for i in 0..max_x{
-      for j in 0..max_y{
-        for k in 0..max_z{
-          let r:f32 = rng.gen();
-          grid.cube_grid[i][j][k] = r > 0.;
+    let perlin = PerlinNoise2D::new(
+      8, 
+      1.0, 
+      1.0, 
+      0.5, 
+      2.0, 
+      (1.0, 1.0), 
+      0., 
+      101);
+
+    for x in 0..max_x{
+      for z in 0..max_z{
+        let actual_pos = grid.get_cube_actual_position(x, 0, z);
+
+        let mut val = perlin.get_noise(actual_pos.x as f64, actual_pos.z as f64);
+        println!("{}", val);
+        val += 1.;
+        val /= 2.;
+        val *= 7.;
+
+        for y in 0..max_y{
+          let actual_pos = grid.get_cube_actual_position(x, y, z);
+          if val > actual_pos[1] as f64 {
+            grid.cube_grid[x][y][z] = true;
+          }
         }
       }
     }
 
     return grid;
+  }
+
+  fn get_cube_actual_position(&self, i: usize, j: usize, k: usize) -> cgmath::Vector3<f32>{
+    let x_pos = self.position.x + (i as f32) * self.cube_size;
+    let y_pos = self.position.y + (j as f32) * self.cube_size;
+    let z_pos = self.position.z + (k as f32) * self.cube_size;
+    cgmath::Vector3::new(x_pos, y_pos, z_pos)
   }
 
   fn create_hex_in_pos(&self, i:usize, j:usize, k:usize)->Cuboid{
