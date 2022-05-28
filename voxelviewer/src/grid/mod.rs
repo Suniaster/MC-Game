@@ -45,13 +45,14 @@ impl Grid{
   }
 
   fn create_hex_in_pos(&self, i:usize, j:usize, k:usize)->Cuboid{
-    let mut pos = self.position;
+    let grid_half_size = GRID_SIZE as f32*self.cube_size  / 2.;
+    let mut pos = self.position - Vector3::from([grid_half_size, grid_half_size, grid_half_size]);
     pos.x += i as f32 * self.cube_size;
     pos.y += j as f32 * self.cube_size;
     pos.z += k as f32 * self.cube_size;
 
     let hex = Cuboid::new(
-      pos,
+      pos + cgmath::Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
       cgmath::Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
       [0.1, 1.0, 0.1]
     );
@@ -59,9 +60,6 @@ impl Grid{
     return hex;
   }
 
-}
-
-impl Grid {
   pub fn build(&self)->StaticVertexMesh{
     let mut hexes:Vec<Cuboid> = vec![];
     let (max_x, max_y, max_z) = (
@@ -80,7 +78,7 @@ impl Grid {
       }
     }
     let mut mesh = Cuboid::build_from_array(self.position, &hexes);
-    mesh.update_pos(self.position - Vector3::from([32., 32., 32.]));
+    mesh.update_pos(self.position);
     return mesh;
   }
 
@@ -89,7 +87,7 @@ impl Grid {
     let half_size = self.cube_size * half_grid_size;
     let overall_cuboid = cube::Cuboid::new(
       self.position, 
-      Vector3::from([half_grid_size, half_grid_size, half_grid_size]),
+      Vector3::from([half_size, half_size, half_size]),
       [0., 0., 0.]
     );
     overall_cuboid.build_outline()
