@@ -16,6 +16,7 @@ use crate::texture;
 use crate::camera;
 use std::collections::HashMap;
 
+use super::screen_text::ScreenText;
 use crate::entity::{SceneEntity, DrawModel};
 use wgpu_glyph::{ab_glyph, GlyphBrushBuilder, Section, Text};
 
@@ -59,6 +60,7 @@ pub struct State {
     //Glyph
     glyph_brush: GlyphBrush<()>,
     staging_belt:  wgpu::util::StagingBelt,
+    pub screen_texts: Vec<ScreenText>,
 
     // Camera
     pub camera: camera::Camera,
@@ -106,7 +108,7 @@ impl State {
             format: surface.get_preferred_format(&adapter).unwrap(),
             width: size.width,
             height: size.height,
-            present_mode: wgpu::PresentMode::Fifo,
+            present_mode: wgpu::PresentMode::Immediate,
         };
         surface.configure(&device, &config);
         let depth_texture =
@@ -206,7 +208,8 @@ impl State {
             mouse_pressed: false,
 
             glyph_brush, 
-            staging_belt
+            staging_belt,
+            screen_texts: vec![]
         }
     }
 
@@ -314,15 +317,14 @@ impl State {
                 render_pass.draw(0..ent.num_vertices, 0..1);
             }
         }
-
-        self.glyph_brush.queue(Section {
-            screen_position: (30.0, 30.0),
-            bounds: (self.size.width as f32, self.size.height as f32),
-            text: vec![Text::new("Hello wgpu_glyph!")
-                .with_color([0.0, 0.0, 0.0, 1.0])
-                .with_scale(40.0)],
-            ..Section::default()
-        });
+        
+        for text in self.screen_texts.iter(){
+            text.draw(
+                &mut self.glyph_brush, 
+                self.size.width as f32, 
+                self.size.height as f32
+            )
+        }
 
         self.glyph_brush
             .draw_queued(

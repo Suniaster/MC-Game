@@ -1,6 +1,22 @@
 use shred::{Read, World, Write};
 use voxelviewer::ViewActions;
 use world::components::*;
+use std::time::Duration;
+use super::Control;
+
+pub fn render_fps_system(
+    world: &mut Control,
+    actions: &mut ViewActions,
+    dt: Duration,
+) {
+    world.total_time += dt;
+    if world.total_time.as_secs_f32() > 0.10{
+        world.total_time = Duration::new(0, 0);
+        let fps_text = format!("FPS: {}", 1./dt.as_secs_f32());
+        actions.update_text(world.fps_text_id, fps_text);
+    }
+}
+
 
 pub fn render_system(
     components: &mut World,

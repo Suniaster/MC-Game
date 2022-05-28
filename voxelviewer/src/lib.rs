@@ -13,6 +13,7 @@ mod cube_face;
 mod vertex;
 mod grid;
 mod pipelines;
+mod screen_text;
 use scene::*;
 use cgmath::{Vector3, Point3};
 
@@ -80,11 +81,22 @@ impl ViewActions{
         }
     }
 
+    pub fn update_text(&mut self, id: usize, text: String){
+        self.state.screen_texts[id as usize].text = text;
+    }
+
+    pub fn create_text(&mut self, text: String, x: f32, y: f32, color: [f32; 4])-> usize{
+        let new_text = screen_text::ScreenText::new(text, x, y, color);
+        self.state.screen_texts.push(new_text);
+        return self.state.screen_texts.len()-1;
+    }
+
 }
 
 pub trait ViewController{
     fn on_update(&mut self, a:&mut ViewActions, b:std::time::Duration) -> ();
     fn on_keybord_input(&mut self, a: &mut ViewActions, b:VirtualKeyCode, c:ElementState) -> ();
+    fn before_start(&mut self, a:&mut ViewActions) -> ();
 }
 
 pub fn main(controller: Box<dyn ViewController>){
@@ -100,6 +112,8 @@ pub fn main(controller: Box<dyn ViewController>){
     let mut actions = ViewActions{state: pollster::block_on(State::new(&window))};
     let mut last_render_time = std::time::Instant::now();
     let mut controller = controller;
+
+    controller.before_start(&mut actions);
     event_loop.run(move |event, _, control_flow| {
         
         *control_flow = ControlFlow::Poll;
