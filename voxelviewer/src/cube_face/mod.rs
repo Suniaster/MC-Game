@@ -27,13 +27,10 @@ impl CubeFace{
         let quad_normal:[f32; 3] = quad_dir.normalize().into();
 
         let vertices = [
-            self.vertices[2],
+            self.vertices[0],
             self.vertices[1],
-            self.vertices[0],
-
-            self.vertices[3],
             self.vertices[2],
-            self.vertices[0],
+            self.vertices[3],
         ];
 
         for v in vertices{

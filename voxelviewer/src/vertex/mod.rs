@@ -25,6 +25,23 @@ impl StaticVertexMesh {
   pub fn to_buffer<T: bytemuck::Pod>(&self)->&[T]{
     bytemuck::cast_slice::<StaticVertex, T>(&self.vertices)
   }
+
+  pub fn get_indices_for_square_mesh(&self)->Vec<u32>{
+    let mut indices:Vec<u32> = vec![];
+    let num_faces = self.vertices.len() / 4;
+    for i in 0..(num_faces){
+      let disloc = (i*4) as u32;
+      indices.push(2 + disloc as u32);
+      indices.push(1 + disloc as u32);
+      indices.push(0 + disloc as u32);
+
+      indices.push(3 + disloc as u32);
+      indices.push(2 + disloc as u32);
+      indices.push(0 + disloc as u32);
+    }
+    indices
+  }
+
   pub fn new_empty() -> Self{
     Self{
       vertices: vec![], position: VertPos::from([0.,0.,0.])

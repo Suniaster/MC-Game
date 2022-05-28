@@ -3,6 +3,8 @@ use super::vertex::{StaticVertexMesh};
 
 pub struct SceneEntity{
   pub vertex_buffer: wgpu::Buffer,
+  pub index_buffer: wgpu::Buffer,
+  pub num_indices: u32,
   pub num_vertices: u32,
   pub instance: StaticVertexMesh,
   pub id: u32
@@ -29,12 +31,23 @@ impl SceneEntity{
             }
         );
 
+        let indices = mesh.get_indices_for_square_mesh();
+        let index_buffer = device.create_buffer_init(
+            &wgpu::util::BufferInitDescriptor {
+                label: Some("Vertex Buffer"),
+                usage: wgpu::BufferUsages::INDEX,
+                contents: bytemuck::cast_slice(&indices)
+            }
+        );
+
         let id: u32;
         unsafe{
             id = gen_instance_id();
         }
         SceneEntity{
             id, 
+            index_buffer,
+            num_indices: indices.len() as u32,
             num_vertices: mesh.vertices.len() as u32,
             instance: mesh,
             vertex_buffer,
@@ -71,6 +84,8 @@ where
     ){
         self.set_bind_group(0, camera_bind_group, &[]);
         self.set_vertex_buffer(0, entity.vertex_buffer.slice(..));
-        self.draw(0..entity.num_vertices, 0..1);
+
+        self.set_index_buffer(entity.index_buffer.slice(..), wgpu::IndexFormat::Uint32); // 1.
+        self.draw_indexed(0..entity.num_indices, 0, 0..1); // 2.
     }
 }
