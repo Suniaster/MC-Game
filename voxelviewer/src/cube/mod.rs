@@ -1,7 +1,7 @@
 use super::vertex::{
   static_vertex::StaticVertex, StaticVertexMesh
 };
-use super::quad::{Quad, quad_direction::*, VectorDir, VertPos};
+use super::quad::{Quad, cube_face_direction::*, VectorDir, VertPos};
 
 pub struct Cuboid{
     pub center_position: VertPos,
@@ -12,16 +12,16 @@ pub struct Cuboid{
 impl Cuboid{
     pub fn new(center_position: VertPos, half_sizes: VectorDir, color:[f32;3])-> Self{
         let faces_dirs = vec![
-            QuadDirection::Front,
-            QuadDirection::Back,
-            QuadDirection::Up,
-            QuadDirection::Down,
-            QuadDirection::Left,
-            QuadDirection::Right,
+            CubeFaceDirection::Front,
+            CubeFaceDirection::Back,
+            CubeFaceDirection::Up,
+            CubeFaceDirection::Down,
+            CubeFaceDirection::Left,
+            CubeFaceDirection::Right,
         ];
     
         let faces:Vec<Quad> = faces_dirs.iter().map( |f| {
-            QuadDirection::quad_from_dir(f, &center_position, &half_sizes, color)
+            CubeFaceDirection::quad_from_dir(f, &center_position, &half_sizes, color)
         }).collect::<Vec<_>>();
         Self{
             faces, center_position, _half_sizes: half_sizes
@@ -58,7 +58,7 @@ impl Cuboid{
         result
     }
 
-    pub fn _remove_face(&mut self, dir: QuadDirection){
+    pub fn _remove_face(&mut self, dir: CubeFaceDirection){
         self.faces.retain(|quad| quad.direction != dir);
     }
 }
