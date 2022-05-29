@@ -30,8 +30,36 @@ pub struct ViewObjectInfo{
 
 impl ViewActions{
 
-    pub fn create_chunk(&mut self, _chunk: Vec<Vec<ViewObjectInfo>>){
-        
+    pub fn create_grid(&mut self, position: [f32; 3], cube_size: f32, grid_mat: grid::GridMatrix) -> ViewObjectInfo{
+        let position_vec = Vector3::from(position);
+        let mesh = grid::Grid::create_from(
+            position, 
+            cube_size,
+            grid_mat
+        );
+
+        // Create outline for mesh
+        {
+            let ent = entity::SceneEntity::new(
+                &self.state.device, position_vec,
+                mesh.build_outline()
+            );
+            self.state.entities_outlines.insert(ent.id, ent);
+        }
+        let new_ent = entity::SceneEntity::new(
+            &self.state.device, 
+            position_vec,
+            mesh.build()
+        );
+        let id = new_ent.id;
+        self.state.entities.insert(id, new_ent);
+
+        return ViewObjectInfo{
+            position: mesh.position,
+            color: [0., 0., 0.],
+            size: [0., 0., 0.],
+            id
+        };
     }
 
     pub fn create_cube(&mut self, obj: ViewObjectInfo)-> ViewObjectInfo{
@@ -41,15 +69,6 @@ impl ViewActions{
             obj.color
         );
 
-        let mesh = grid::Grid::default_random();
-        // Create outline for mesh
-        {
-            let ent = entity::SceneEntity::new(
-                &self.state.device, obj.position,
-                mesh.build_outline()
-            );
-            self.state.entities_outlines.insert(ent.id, ent);
-        }
         let new_ent = entity::SceneEntity::new(
             &self.state.device, 
             obj.position,

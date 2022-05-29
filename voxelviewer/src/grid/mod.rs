@@ -3,74 +3,54 @@ use crate::cube;
 use super::vertex::{StaticVertexMesh};
 use super::cube::Cuboid;
 use cgmath::Vector3;
-use rand::prelude::*;
 
 use super::cube_face::cube_face_direction::CubeFaceDirection;
 
-const GRID_SIZE: usize = 32;
-use perlin2d::PerlinNoise2D;
+const GRID_SIZE: usize = 16;
+
+pub type GridMatrix =  Vec<Vec<Vec<bool>>>;
 pub struct Grid{
-  position: cgmath::Vector3<f32>,
-  cube_size: f32,
-  cube_grid: [[[bool; GRID_SIZE]; GRID_SIZE]; GRID_SIZE]
+  pub position: cgmath::Vector3<f32>,
+  pub cube_size: f32,
+  pub cube_grid: GridMatrix
 }
 
 
 impl Grid{
-  pub fn default_empty() -> Self{
-    Self{
-      position: cgmath::Vector3::new(0., 0., 0.),
-      cube_size: 0.2,
-      cube_grid: [[[false; GRID_SIZE]; GRID_SIZE]; GRID_SIZE]
-    }
-  }
-
-  pub fn default_random() -> Self{
-    let mut grid = Self::default_empty();
-    let mut rng = rand::thread_rng();
-    let (max_x, max_y, max_z) = (
-      grid.cube_grid[0].len(), 
-      grid.cube_grid[1].len(),
-      grid.cube_grid[2].len()
-    );
-
-    let perlin = PerlinNoise2D::new(
-      8, 
-      1.0, 
-      1.0, 
-      0.5, 
-      2.0, 
-      (1.0, 1.0), 
-      0., 
-      101);
-
-    for x in 0..max_x{
-      for z in 0..max_z{
-        let actual_pos = grid.get_cube_actual_position(x, 0, z);
-
-        let mut val = perlin.get_noise(actual_pos.x as f64, actual_pos.z as f64);
-        println!("{}", val);
-        val += 1.;
-        val /= 2.;
-        val *= 7.;
-
-        for y in 0..max_y{
-          let actual_pos = grid.get_cube_actual_position(x, y, z);
-          if val > actual_pos[1] as f64 {
-            grid.cube_grid[x][y][z] = true;
-          }
+  pub fn _create_empty(position: [f32;3], cube_size: f32, grid_size: [usize;3]) -> Self{
+    let mut cube_grid: GridMatrix = vec![];
+    for i in 0..grid_size[0]{
+      cube_grid.push(vec![]);
+      for j in 0..grid_size[1]{
+        cube_grid[i].push(vec![]);
+        for _ in 0..grid_size[2]{
+          cube_grid[i][j].push(false);
         }
       }
     }
-
-    return grid;
+    Self { 
+      position: Vector3::from(position), 
+      cube_size, 
+      cube_grid
+    }
   }
 
-  fn get_cube_actual_position(&self, i: usize, j: usize, k: usize) -> cgmath::Vector3<f32>{
-    let x_pos = self.position.x + (i as f32) * self.cube_size;
-    let y_pos = self.position.y + (j as f32) * self.cube_size;
-    let z_pos = self.position.z + (k as f32) * self.cube_size;
-    cgmath::Vector3::new(x_pos, y_pos, z_pos)
+  pub fn create_from(position: [f32;3], cube_size: f32, grid_matrix: GridMatrix) -> Self{
+    Self { 
+      position: Vector3::from(position), 
+      cube_size, 
+      cube_grid: grid_matrix
+    }
+  }
+
+  pub fn _map_grid(&mut self, func: fn(&mut GridMatrix, usize, usize, usize)){
+    for i in 0..self.cube_grid.len(){
+      for j in 0..self.cube_grid[i].len(){
+        for k in 0..self.cube_grid[i][j].len(){
+          func(&mut self.cube_grid, i, j, k);
+        }
+      }
+    }
   }
 
   fn create_hex_in_pos(&self, i:usize, j:usize, k:usize)->Cuboid{

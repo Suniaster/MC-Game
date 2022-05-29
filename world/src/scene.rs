@@ -19,6 +19,7 @@ pub struct GameScene {
 
     // Entities
     pub cubes: Vec<EntityIdx>,
+    pub terrain_chunk: Vec<EntityIdx>
 }
 
 impl GameScene {
@@ -32,6 +33,7 @@ impl GameScene {
             time_scale: 5.,
 
             cubes: vec![],
+            terrain_chunk: vec![]
         };
         scene.setup_components();
         scene

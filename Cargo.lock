@@ -1691,6 +1691,7 @@ dependencies = [
  "cgmath",
  "ecs",
  "ncollide2d",
+ "perlin2d",
  "rand 0.8.4",
  "shred",
  "voxelviewer",

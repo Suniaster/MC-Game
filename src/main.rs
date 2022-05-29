@@ -6,14 +6,20 @@ use voxelviewer;
 use world;
 mod systems;
 mod entities;
-
+mod terrain;
 // Proximos Objetivos
 // x - Adicionar bordas (linhas) nos cubos - LineStrip = 2,
 // X - Descobrir como botar texto na tela - https://github.com/hecrj/wgpu_glyph
 // X - Escrever na tela fps 
 // X - e direção olhando
 // X - Otmizar o uso de vertices no grid (remover repetidos)
-// - Adicionar geração de terreno
+// X - Adicionar geração de terreno
+// - Melhorar geração de terreno
+// - Deixar padronizado chunk size no back e no front
+// - Melhorar uso de entidades na GameScene
+// - Melhorar iteração por componentes no GameScene
+// - Melhorar interface de comunicação entre back e front
+
 // - Ajustar cores (não tão sendo efetivamente usados)
 // - Descobrir como fazer um tipo de animação de entrada
 // - Descobrir como rotacionar cubos e grids
@@ -30,6 +36,7 @@ impl voxelviewer::ViewController for Control{
     fn on_update(&mut self, actions: &mut voxelviewer::ViewActions, dt: std::time::Duration){
         systems::render_fps_system(self, actions, dt);
         systems::render_system(&mut self.world.components, actions);
+        terrain::terrain_system(self, actions);
     }
 
     fn on_keybord_input(&mut self, actions: &mut voxelviewer::ViewActions, b: VirtualKeyCode, _c: ElementState){
