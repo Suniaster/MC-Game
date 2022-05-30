@@ -14,9 +14,9 @@ mod terrain;
 // X - e direção olhando
 // X - Otmizar o uso de vertices no grid (remover repetidos)
 // X - Adicionar geração de terreno
+// - Melhorar uso de entidades na GameScene
 // - Melhorar geração de terreno
 // - Deixar padronizado chunk size no back e no front
-// - Melhorar uso de entidades na GameScene
 // - Melhorar iteração por componentes no GameScene
 // - Melhorar interface de comunicação entre back e front
 

@@ -4,7 +4,6 @@ use voxelviewer::ViewObjectInfo;
 
 use cgmath::Vector3;
 pub struct Cube;
-use perlin2d::PerlinNoise2D;
 
 impl Cube {
     pub fn create(scene: &mut GameScene, view_actions: &mut voxelviewer::ViewActions) {
@@ -47,42 +46,5 @@ impl Chunk {
         });
         scene.add_component(&chunk_idx, PositionComponent(position));
         scene.terrain_chunk.push(chunk_idx);
-    }
-
-
-    pub fn create_chunk_mat_at(postion: Vector3<f32>) -> Mat3{
-        let mut mat:Mat3 = vec![];
-        let perlin = PerlinNoise2D::new(
-            8, 
-            1.0, 
-            1.0, 
-            0.5, 
-            2.0, 
-            (1.0, 1.0), 
-            0., 
-            101
-        );
-      
-        for i in 0..GRID_SIZE{
-            mat.push(vec![]);
-            for j in 0..GRID_SIZE{
-                mat[i].push(vec![]);
-                for k in 0..GRID_SIZE{
-
-                    let pos_x = postion.x + i as f32 * CUBE_SIZE - CHUNK_SIZE/2.;
-                    let pos_y = postion.y + j as f32 * CUBE_SIZE - CHUNK_SIZE/2.;
-                    let pos_z = postion.z + k as f32 * CUBE_SIZE - CHUNK_SIZE/2.;
-
-                    let mut val = perlin.get_noise(pos_x as f64, pos_z as f64);
-                    val += 1.;
-                    val /= 2.;
-                    val *= 7.;
-            
-                    mat[i][j].push(val > pos_y.into());
-                }
-            }
-        }
-
-        return mat;
     }
 }
