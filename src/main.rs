@@ -14,8 +14,13 @@ mod terrain;
 // X - e direção olhando
 // X - Otmizar o uso de vertices no grid (remover repetidos)
 // X - Adicionar geração de terreno
+// X - Melhorar geração de terreno
+// X - Descobrir porque as paradas que tão longe somem
+// X - Concertar o treco de cima
+// - Mudar no front uso de cgmath para nalgebra
+// - Melhorar interface com front
+// - Adicionar luz no céu
 // - Melhorar uso de entidades na GameScene
-// - Melhorar geração de terreno
 // - Deixar padronizado chunk size no back e no front
 // - Melhorar iteração por componentes no GameScene
 // - Melhorar interface de comunicação entre back e front
@@ -25,7 +30,7 @@ mod terrain;
 // - Descobrir como rotacionar cubos e grids
 // - Tentar fazer algum modelo no MagicaVoxel
 // - Tentar importar modelo pelo back e passar para o front renderiza-lo
-// - 
+// - Adicionar menu para mudanças de propriedades da camera
 pub struct Control{
     world: world::scene::GameScene,
     pub texts_ids: HashMap<String, usize>,

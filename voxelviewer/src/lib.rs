@@ -39,13 +39,13 @@ impl ViewActions{
         );
 
         // Create outline for mesh
-        {
-            let ent = entity::SceneEntity::new(
-                &self.state.device, position_vec,
-                mesh.build_outline()
-            );
-            self.state.entities_outlines.insert(ent.id, ent);
-        }
+        // {
+        //     let ent = entity::SceneEntity::new(
+        //         &self.state.device, position_vec,
+        //         mesh.build_outline()
+        //     );
+        //     self.state.entities_outlines.insert(ent.id, ent);
+        // }
         let new_ent = entity::SceneEntity::new(
             &self.state.device, 
             position_vec,
