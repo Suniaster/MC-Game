@@ -7,13 +7,13 @@ use winit::{
 mod texture; 
 mod camera;
 mod scene;
-mod entity;
 mod cube;
 mod cube_face;
 mod vertex;
 mod grid;
 mod pipelines;
 mod screen_text;
+mod scene_entity;
 use scene::*;
 
 pub struct ViewActions{
@@ -45,7 +45,7 @@ impl ViewActions{
         //     );
         //     self.state.entities_outlines.insert(ent.id, ent);
         // }
-        let new_ent = entity::SceneEntity::new(
+        let new_ent = scene_entity::SceneEntity::new(
             &self.state.device, 
             position_vec,
             mesh.build()
@@ -68,7 +68,7 @@ impl ViewActions{
             obj.color
         );
 
-        let new_ent = entity::SceneEntity::new(
+        let new_ent = scene_entity::SceneEntity::new(
             &self.state.device, 
             obj.position,
             mesh.build()

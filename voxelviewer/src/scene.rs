@@ -16,7 +16,7 @@ use crate::camera;
 use std::collections::HashMap;
 
 use super::screen_text::ScreenText;
-use crate::entity::{SceneEntity, DrawModel};
+use crate::scene_entity::{SceneEntity, DrawModel};
 use wgpu_glyph::{ab_glyph, GlyphBrushBuilder};
 
 use nalgebra::Matrix4;

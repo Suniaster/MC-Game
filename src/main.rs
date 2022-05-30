@@ -17,7 +17,7 @@ mod terrain;
 // X - Melhorar geração de terreno
 // X - Descobrir porque as paradas que tão longe somem
 // X - Concertar o treco de cima
-// - Mudar no front uso de cgmath para nalgebra
+// X - Mudar no front uso de cgmath para nalgebra
 // - Melhorar interface com front
 // - Adicionar luz no céu
 // - Melhorar uso de entidades na GameScene
