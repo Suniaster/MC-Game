@@ -3,6 +3,7 @@ use std::{time::Duration, collections::HashMap};
 use winit::event::{VirtualKeyCode, ElementState};
 
 use voxelviewer;
+use voxelviewer::view_actions::*;
 use world;
 mod systems;
 mod entities;
@@ -38,19 +39,19 @@ pub struct Control{
 }
 
 impl voxelviewer::ViewController for Control{
-    fn on_update(&mut self, actions: &mut voxelviewer::ViewActions, dt: std::time::Duration){
+    fn on_update(&mut self, actions: &mut ViewActions, dt: std::time::Duration){
         systems::render_fps_system(self, actions, dt);
         systems::render_system(&mut self.world.components, actions);
         terrain::terrain_system(self, actions);
     }
 
-    fn on_keybord_input(&mut self, actions: &mut voxelviewer::ViewActions, b: VirtualKeyCode, _c: ElementState){
+    fn on_keybord_input(&mut self, actions: &mut ViewActions, b: VirtualKeyCode, _c: ElementState){
         if b == VirtualKeyCode::C && _c == ElementState::Pressed {
             entities::Cube::create(&mut self.world, actions);
         }
     }
 
-    fn before_start(&mut self, a:&mut voxelviewer::ViewActions) -> () {
+    fn before_start(&mut self, a:&mut ViewActions) -> () {
         let fps_id = a.create_text();
         self.texts_ids.insert(String::from("fps"), fps_id);
 

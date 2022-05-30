@@ -1,5 +1,5 @@
 use shred::{Read, World};
-use voxelviewer::ViewActions;
+use voxelviewer::view_actions::ViewActions;
 use world::components::*;
 use std::time::Duration;
 use super::Control;

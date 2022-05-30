@@ -1,7 +1,7 @@
 use ecs::vec_storage::GenerationalIndexArray;
 use ecs::GenerationalIndex;
 
-use voxelviewer::ViewObjectInfo;
+use voxelviewer::view_actions::ViewObjectInfo;
 
 use cgmath::Vector3;
 

@@ -1,7 +1,7 @@
 
 
 use super::Control;
-use super::voxelviewer::ViewActions;
+use super::voxelviewer::view_actions::ViewActions;
 use world::{scene::GameScene};
 use super::entities;
 use nalgebra::{Point3};

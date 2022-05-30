@@ -18,16 +18,7 @@ pub struct Grid{
 
 impl Grid{
   pub fn _create_empty(position: [f32;3], cube_size: f32, grid_size: [usize;3]) -> Self{
-    let mut cube_grid: GridMatrix = vec![];
-    for i in 0..grid_size[0]{
-      cube_grid.push(vec![]);
-      for j in 0..grid_size[1]{
-        cube_grid[i].push(vec![]);
-        for _ in 0..grid_size[2]{
-          cube_grid[i][j].push(false);
-        }
-      }
-    }
+    let cube_grid: GridMatrix = vec![vec![vec![false;grid_size[2]];grid_size[1]];grid_size[0]];
     Self { 
       position: Point3::from(position), 
       cube_size, 
@@ -135,7 +126,7 @@ impl Grid{
     return mesh;
   }
 
-  pub fn build_outline(&self) -> StaticVertexMesh{
+  pub fn _build_outline(&self) -> StaticVertexMesh{
     let half_grid_size = (GRID_SIZE as f32) / 2.;
     let half_size = self.cube_size * half_grid_size;
     let overall_cuboid = cube::Cuboid::new(

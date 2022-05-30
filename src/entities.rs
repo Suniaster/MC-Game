@@ -1,12 +1,12 @@
 use world::components::*;
 use world::scene::GameScene;
-use voxelviewer::ViewObjectInfo;
+use voxelviewer::view_actions::{ViewObjectInfo, ViewActions};
 
 use nalgebra::Point3;
 pub struct Cube;
 
 impl Cube {
-    pub fn create(scene: &mut GameScene, view_actions: &mut voxelviewer::ViewActions) {
+    pub fn create(scene: &mut GameScene, view_actions: &mut ViewActions) {
         let cube_idx = scene.entity_allocator.allocate();
 
         scene.add_component(&cube_idx, PhysicsComponent::new_random());
@@ -34,7 +34,7 @@ pub const GRID_SIZE:usize = 16;
 pub const CUBE_SIZE:f32 = 1.;
 pub const CHUNK_SIZE:f32 = GRID_SIZE as f32 * CUBE_SIZE;
 impl Chunk {
-    pub fn create(scene: &mut GameScene, view: &mut voxelviewer::ViewActions, position: Point3<f32>, grid: Mat3) {
+    pub fn create(scene: &mut GameScene, view: &mut ViewActions, position: Point3<f32>, grid: Mat3) {
         let chunk_idx = scene.entity_allocator.allocate();
         let new_chunk = view.create_grid(
             [position.x, position.y, position.z],
