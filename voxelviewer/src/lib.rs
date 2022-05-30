@@ -28,26 +28,17 @@ pub struct ViewObjectInfo{
 impl ViewActions{
 
     pub fn create_grid(&mut self, position: [f32; 3], cube_size: f32, grid_mat: grid::GridMatrix) -> ViewObjectInfo{
-        let position_vec = Point3::from(position);
         let mesh = grid::Grid::create_from(
             position, 
             cube_size,
             grid_mat
         );
 
-        // Create outline for mesh
-        // {
-        //     let ent = entity::SceneEntity::new(
-        //         &self.state.device, position_vec,
-        //         mesh.build_outline()
-        //     );
-        //     self.state.entities_outlines.insert(ent.id, ent);
-        // }
         let new_ent = scene_entity::SceneEntity::new(
-            &self.state.device, 
-            position_vec,
+            &self.state.device,
             mesh.build()
         );
+
         let id = new_ent.id;
         self.state.entities.insert(id, new_ent);
 
@@ -68,9 +59,9 @@ impl ViewActions{
 
         let new_ent = scene_entity::SceneEntity::new(
             &self.state.device, 
-            obj.position,
             mesh.build()
         );
+
         let id = new_ent.id;
         let mut obj = obj;
         self.state.entities.insert(id, new_ent);
@@ -114,7 +105,7 @@ impl ViewActions{
     pub fn get_vertex_count(&self) -> u32{
         let mut count = 0;
         for (_, entity) in self.state.entities.iter(){
-            count += entity.instance.vertices.len() as u32;
+            count += entity.mesh.vertices.len() as u32;
         }
         return count;
     }

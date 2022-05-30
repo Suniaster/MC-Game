@@ -16,7 +16,8 @@ use crate::camera;
 use std::collections::HashMap;
 
 use super::screen_text::ScreenText;
-use crate::scene_entity::{SceneEntity, draw_entity};
+use crate::scene_entity::{SceneEntity};
+use crate::scene_entity::scene_entity_renderer::draw_entity;
 use wgpu_glyph::{ab_glyph, GlyphBrushBuilder};
 
 use nalgebra::Matrix4;
@@ -311,10 +312,9 @@ impl State {
 
             render_pass.set_pipeline(&self.static_cube_pipeline);
             for (_, ent) in &self.entities{
-                
                 draw_entity(
                     &mut render_pass,
-                    &ent,
+                    &ent.renderer,
                     &self.camera_bind_group
                 );
             }
@@ -322,8 +322,8 @@ impl State {
             render_pass.set_pipeline(&self.static_lines_pipeline);
             for(_, ent) in &self.entities_outlines{
                 render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
-                render_pass.set_vertex_buffer(0, ent.vertex_buffer.slice(..));
-                render_pass.draw(0..ent.num_vertices, 0..1);
+                render_pass.set_vertex_buffer(0, ent.renderer.vertex_buffer.slice(..));
+                render_pass.draw(0..ent.renderer.num_vertices, 0..1);
             }
         }
         
