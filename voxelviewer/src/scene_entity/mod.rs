@@ -66,27 +66,16 @@ impl SceneEntity{
     }
 }
 
-pub trait DrawModel<'a> {
-    fn draw_entity(
-        &mut self,
-        entity: &'a SceneEntity,
-        camera_bind_group: &'a wgpu::BindGroup
-    );
-}
 
-impl<'a, 'b> DrawModel<'b> for wgpu::RenderPass<'a>
-where
-    'b: 'a,
-{
-    fn draw_entity(
-        &mut self,
-        entity: &'a SceneEntity,
-        camera_bind_group: &'a wgpu::BindGroup
-    ){
-        self.set_bind_group(0, camera_bind_group, &[]);
-        self.set_vertex_buffer(0, entity.vertex_buffer.slice(..));
 
-        self.set_index_buffer(entity.index_buffer.slice(..), wgpu::IndexFormat::Uint32); // 1.
-        self.draw_indexed(0..entity.num_indices, 0, 0..1); // 2.
-    }
+pub fn draw_entity<'a, 'b>(
+    render_pas: &mut wgpu::RenderPass<'a>,
+    entity: &'a SceneEntity,
+    camera_bind_group: &'a wgpu::BindGroup
+){
+    render_pas.set_bind_group(0, camera_bind_group, &[]);
+    render_pas.set_vertex_buffer(0, entity.vertex_buffer.slice(..));
+
+    render_pas.set_index_buffer(entity.index_buffer.slice(..), wgpu::IndexFormat::Uint32); // 1.
+    render_pas.draw_indexed(0..entity.num_indices, 0, 0..1); // 2.
 }
