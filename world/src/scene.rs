@@ -1,6 +1,4 @@
 use std::collections::HashMap;
-use std::collections::btree_map::IterMut;
-use shred::{Read, Write};
 
 use super::components;
 
@@ -21,6 +19,7 @@ pub struct GameScene {
     // Resources
     pub scene_size: (f32, f32), // Width, heigth
     pub time_scale: f64,
+    pub loaded_terrain: HashMap<isize, bool>,
 
     // Entities
     pub entities: HashMap<String, Vec<EntityIdx>>,
@@ -37,6 +36,7 @@ impl GameScene {
 
             scene_size: size,
             time_scale: 5.,
+            loaded_terrain: HashMap::new(),
 
             entities: HashMap::new(),
             cubes: vec![],
@@ -73,13 +73,6 @@ impl GameScene {
             .unwrap()
             .push(idx);
     }
-
-    // pub fn get_iter<T: shred::Resource>(&self, name: &str) -> &ComponentMap<T> {
-    //     let system_data: (
-    //         Read<ComponentMap<T>>,
-    //     ) = self.components.system_data();
-    //     return system_data.0.data();
-    // }
     pub fn get_iter<T: shred::Resource>(&mut self) -> Iter<Option<ArrayEntry<T>>> {
         return self.components
             .get_mut::<ComponentMap<T>>()
@@ -87,14 +80,4 @@ impl GameScene {
             .data()
             .iter();
     }
-
-
-
-
-    // pub fn get_iter_mut<T: shred::Resource>(&mut self, name: &str) -> Iter<ComponentMap<T>> {
-    //     let system_data: (
-    //         Write<ComponentMap<T>>,
-    //     ) = self.components.system_data();
-    //     return system_data.0.data_mut().into_iter();
-    // }
 }

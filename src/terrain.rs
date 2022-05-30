@@ -2,18 +2,50 @@
 
 use super::Control;
 use super::voxelviewer::ViewActions;
-use world::{components::*, scene::GameScene};
+use world::{scene::GameScene};
 use super::entities;
 use cgmath::{Vector3, Point3};
 
 pub fn terrain_system(control: &mut Control, actions: &mut ViewActions){
     let camera_pos = actions.state.camera.position;
-    let chunk_already_loaded = chunk_is_loaded(&mut control.world, camera_pos);
-    
-    if !chunk_already_loaded{
-        let chunk_idx = position_to_chunk_idx(camera_pos);
-        load_chunk(&mut control.world, actions, chunk_idx);
+    let camera_chunk = position_to_chunk_idx(camera_pos);
+
+    // Olhar todos os id's de chunks ao redor da camera
+    let ids_surround = get_chunks_ids_surround_id(camera_chunk);
+
+    // Ver quais chunks não foram carregados
+    let unloaded_ids = get_unloaded_chunks(&control.world, ids_surround);
+
+    // Carregar chunks
+    for id in unloaded_ids {
+        load_chunk(&mut control.world, actions, id);
     }
+
+    // Descarregar chunks que não estão ao redor da camera 
+    // TODO:
+}
+
+fn get_unloaded_chunks(world: &GameScene, ids: Vec<[isize;2]>) -> Vec<[isize;2]>{
+    let mut unloaded_chunks = vec![];
+    for id in ids{
+        let key = id[0] * GRID_SIZE as isize + id[1];
+        let res = world.loaded_terrain.get(&key);
+        if res.is_none(){
+            unloaded_chunks.push(id);
+        }
+    }
+    unloaded_chunks
+}
+
+fn get_chunks_ids_surround_id(id: [isize;2]) -> Vec<[isize;2]>{
+    let mut chunks_ids = Vec::new();
+    const VIEW_RANGE:isize = 8;
+    for x in -VIEW_RANGE..VIEW_RANGE{
+        for y in -VIEW_RANGE..VIEW_RANGE{
+            chunks_ids.push([id[0] + x, id[1] + y]);
+        }
+    }
+    chunks_ids
 }
 
 fn position_to_chunk_idx(position: Point3<f32>) -> [isize;2]{
@@ -27,28 +59,10 @@ fn load_chunk(world: &mut GameScene, actions: &mut ViewActions, chunk_id: [isize
     let chunk_z = chunk_id[1] as f32 * entities::CHUNK_SIZE;
     let chunk_pos = Vector3::from([chunk_x, 0., chunk_z]);
     let grid = create_chunk_mat_at(chunk_pos);
+
+    // Insert 
+    world.loaded_terrain.insert(chunk_id[0] * GRID_SIZE as isize + chunk_id[1], true);
     entities::Chunk::create(world, actions, chunk_pos, grid);
-}
-
-fn chunk_is_loaded(world: &mut GameScene, position: Point3<f32>) -> bool{
-    let mut chunk_already_loaded = false;
-
-    let pos_iter = world.get_iter::<PositionComponent>();
-    for pos in pos_iter{
-        if let Some(chunk_pos) = pos {
-            let x = position.x;
-            let z = position.z;
-            let x1 = chunk_pos.value.0.x - entities::CHUNK_SIZE/2.;
-            let x2 = chunk_pos.value.0.x + entities::CHUNK_SIZE/2.;
-            let z1 = chunk_pos.value.0.z - entities::CHUNK_SIZE/2.;
-            let z2 = chunk_pos.value.0.z + entities::CHUNK_SIZE/2.;
-            if x > x1 && x < x2 && z > z1 && z < z2 {
-                chunk_already_loaded = true;
-            }
-        }
-    }
-
-    return chunk_already_loaded;
 }
 
 type Mat3 = Vec<Vec<Vec<bool>>>;
