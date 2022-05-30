@@ -28,13 +28,13 @@ pub struct GameScene {
 }
 
 impl GameScene {
-    pub fn new(size: (f32, f32)) -> GameScene {
+    pub fn new() -> GameScene {
         let mut scene = GameScene {
             entity_allocator: ComponentVecAllocator::new(),
 
             components: World::empty(),
 
-            scene_size: size,
+            scene_size: (32.,32.),
             time_scale: 5.,
             loaded_terrain: HashMap::new(),
 

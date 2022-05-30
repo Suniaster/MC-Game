@@ -87,7 +87,7 @@ impl ViewActions{
         entity.update_pos(&self.state.queue, cgmath::Vector3::from(obj.position));
     }
 
-    pub fn set_camera_pos(&mut self, pos: Point3<f32>){
+    pub fn set_camera_pos(&mut self, pos: nalgebra::Point3<f32>){
         self.state.camera.position = pos;
     }
 

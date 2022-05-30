@@ -8,7 +8,9 @@ use cgmath::{Vector3, Point3};
 
 pub fn terrain_system(control: &mut Control, actions: &mut ViewActions){
     let camera_pos = actions.state.camera.position;
-    let camera_chunk = position_to_chunk_idx(camera_pos);
+    let camera_chunk = position_to_chunk_idx(
+        Point3::new(camera_pos.x, camera_pos.y, camera_pos.z)    
+    );
 
     // Olhar todos os id's de chunks ao redor da camera
     let ids_surround = get_chunks_ids_surround_id(camera_chunk);

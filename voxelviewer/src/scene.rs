@@ -115,8 +115,18 @@ impl State {
             texture::Texture::create_depth_texture(&device, &config, "depth_texture");
 
         // ********** CAMERA
-        let camera = camera::Camera::new((0.0, 5.0, 10.0), cgmath::Deg(-90.0), cgmath::Deg(-20.0));
-        let projection = camera::Projection::new(config.width, config.height, cgmath::Deg(45.0), 0.1, 1000.0);
+        let camera = camera::Camera::new(
+            nalgebra::Point3::new(0.0, 5.0, 10.0), 
+            nalgebra::UnitComplex::new(-1.), 
+            nalgebra::UnitComplex::new(-0.342)
+        );
+        let projection = camera::Projection::new(
+            config.width, 
+            config.height, 
+            nalgebra::UnitComplex::new(std::f32::consts::FRAC_PI_4), 
+            0.1, 
+            1000.0
+        );
         let camera_controller = camera::CameraController::new(4.0, 0.4);
 
         // in new() after creating `camera`

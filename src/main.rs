@@ -66,7 +66,7 @@ impl voxelviewer::ViewController for Control{
 }
 
 fn main() {
-    let world = world::scene::GameScene::new((40., 20.));
+    let world = world::scene::GameScene::new();
     let controller = Control{
         world, 
         texts_ids: HashMap::new(),
