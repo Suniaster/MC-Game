@@ -2,7 +2,7 @@ use world::components::*;
 use world::scene::GameScene;
 use voxelviewer::ViewObjectInfo;
 
-use cgmath::Vector3;
+use nalgebra::Point3;
 pub struct Cube;
 
 impl Cube {
@@ -16,7 +16,7 @@ impl Cube {
         scene.add_component(&cube_idx, RenderComponent{
             obj: view_actions.create_cube(
                 ViewObjectInfo{
-                    position: cgmath::Vector3::from([0., 0., 0.]), 
+                    position: Point3::origin(),
                     color: [0.1, 1., 0.1],
                     size: [0.2, 0.2, 0.2],
                     id: 0
@@ -34,7 +34,7 @@ pub const GRID_SIZE:usize = 16;
 pub const CUBE_SIZE:f32 = 1.;
 pub const CHUNK_SIZE:f32 = GRID_SIZE as f32 * CUBE_SIZE;
 impl Chunk {
-    pub fn create(scene: &mut GameScene, view: &mut voxelviewer::ViewActions, position: Vector3<f32>, grid: Mat3) {
+    pub fn create(scene: &mut GameScene, view: &mut voxelviewer::ViewActions, position: Point3<f32>, grid: Mat3) {
         let chunk_idx = scene.entity_allocator.allocate();
         let new_chunk = view.create_grid(
             [position.x, position.y, position.z],
@@ -44,7 +44,7 @@ impl Chunk {
         scene.add_component(&chunk_idx, RenderComponent{
             obj: new_chunk
         });
-        scene.add_component(&chunk_idx, PositionComponent(position));
+        // scene.add_component(&chunk_idx, PositionComponent(position));
         scene.terrain_chunk.push(chunk_idx);
     }
 }

@@ -2,7 +2,7 @@ use crate::cube;
 
 use super::vertex::{StaticVertexMesh};
 use super::cube::Cuboid;
-use cgmath::Vector3;
+use nalgebra::{Point3, Vector3};
 
 use super::cube_face::cube_face_direction::CubeFaceDirection;
 
@@ -10,7 +10,7 @@ const GRID_SIZE: usize = 16;
 
 pub type GridMatrix =  Vec<Vec<Vec<bool>>>;
 pub struct Grid{
-  pub position: cgmath::Vector3<f32>,
+  pub position: Point3<f32>,
   pub cube_size: f32,
   pub cube_grid: GridMatrix
 }
@@ -29,7 +29,7 @@ impl Grid{
       }
     }
     Self { 
-      position: Vector3::from(position), 
+      position: Point3::from(position), 
       cube_size, 
       cube_grid
     }
@@ -37,7 +37,7 @@ impl Grid{
 
   pub fn create_from(position: [f32;3], cube_size: f32, grid_matrix: GridMatrix) -> Self{
     Self { 
-      position: Vector3::from(position), 
+      position: Point3::from(position), 
       cube_size, 
       cube_grid: grid_matrix
     }
@@ -61,8 +61,8 @@ impl Grid{
     pos.z += k as f32 * self.cube_size;
 
     let hex = Cuboid::new(
-      pos + cgmath::Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
-      cgmath::Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
+      pos + Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
+      Vector3::new(self.cube_size/2., self.cube_size/2., self.cube_size/2.),
       [0.1, 1.0, 0.1]
     );
 

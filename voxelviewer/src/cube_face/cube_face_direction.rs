@@ -1,5 +1,5 @@
+use nalgebra::{Point3, Vector3};
 
-use super::{VertPos, VectorDir};
 use super::CubeFace;
 
 #[derive(PartialEq, Eq)]
@@ -7,9 +7,8 @@ pub enum CubeFaceDirection{
   Front, Back, Left, Right, Up, Down
 }
 
-
 impl CubeFaceDirection{
-  pub fn cube_face_from_dir(dir: &CubeFaceDirection, center: &VertPos, half_sizes: &VectorDir, color: [f32; 3])->CubeFace{
+  pub fn cube_face_from_dir(dir: &CubeFaceDirection, center: &Point3<f32>, half_sizes: &Vector3<f32>, color: [f32; 3])->CubeFace{
     // let color = [0.1, 1.0, 0.1];
     /*** 1        0  
      *   * ------ *
@@ -22,10 +21,10 @@ impl CubeFaceDirection{
       CubeFaceDirection::Front => {
         CubeFace{
           vertices: [
-            VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
             ],
           color,
           direction: CubeFaceDirection::Front
@@ -34,10 +33,10 @@ impl CubeFaceDirection{
       CubeFaceDirection::Back => {
         CubeFace{
           vertices: [
-            VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             ],
           color,
           direction: CubeFaceDirection::Back
@@ -46,10 +45,10 @@ impl CubeFaceDirection{
       CubeFaceDirection::Up => {
         CubeFace{
           vertices: [
-            VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
             ],
           color,
           direction: CubeFaceDirection::Up
@@ -58,10 +57,10 @@ impl CubeFaceDirection{
       CubeFaceDirection::Down => {
         CubeFace{
           vertices: [
-            VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             ],
           color,
           direction: CubeFaceDirection::Down
@@ -70,10 +69,10 @@ impl CubeFaceDirection{
       CubeFaceDirection::Left => {
         CubeFace{
           vertices: [
-            VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x - half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
             ],
           color,
           direction: CubeFaceDirection::Left
@@ -82,10 +81,10 @@ impl CubeFaceDirection{
       CubeFaceDirection::Right => {
         CubeFace{
           vertices: [
-            VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
-            VertPos::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
-            VertPos::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z + half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y + half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z - half_sizes.z),
+            Point3::new(center.x + half_sizes.x, center.y - half_sizes.y, center.z + half_sizes.z),
             ],
           color,
           direction: CubeFaceDirection::Right

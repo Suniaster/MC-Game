@@ -1,16 +1,19 @@
+use nalgebra::Vector3;
+use nalgebra::Point3;
+
 use super::vertex::{
   static_vertex::StaticVertex, StaticVertexMesh
 };
-use super::cube_face::{CubeFace, cube_face_direction::*, VectorDir, VertPos};
+use super::cube_face::{CubeFace, cube_face_direction::*};
 
 pub struct Cuboid{
-    pub center_position: VertPos,
-    _half_sizes: VectorDir,
+    pub center_position: Point3<f32>,
+    _half_sizes: Vector3<f32>,
     faces: Vec<CubeFace>
 }
 
 impl Cuboid{
-    pub fn new(center_position: VertPos, half_sizes: VectorDir, color:[f32;3])-> Self{
+    pub fn new(center_position: Point3<f32>, half_sizes: Vector3<f32>, color:[f32;3])-> Self{
         let faces_dirs = vec![
             CubeFaceDirection::Front,
             CubeFaceDirection::Back,
@@ -28,7 +31,7 @@ impl Cuboid{
         }
     }
     
-    pub fn build_from_array(position:VertPos, arr: &Vec<Cuboid>) -> StaticVertexMesh{
+    pub fn build_from_array(position:Point3<f32>, arr: &Vec<Cuboid>) -> StaticVertexMesh{
         let mut vertices = vec![];
         for hex in arr{
             for quad in &hex.faces {
@@ -42,7 +45,7 @@ impl Cuboid{
         }
     }
 
-    pub fn build_from_grid(position:VertPos, grid: &Vec<Vec<Vec<Cuboid>>>) -> StaticVertexMesh{
+    pub fn build_from_grid(position:Point3<f32>, grid: &Vec<Vec<Vec<Cuboid>>>) -> StaticVertexMesh{
         let mut vertices = vec![];
         for row in grid{
             for col in row{
@@ -98,8 +101,8 @@ impl Cuboid{
 
 pub fn _new_cube(half_size: f32) -> StaticVertexMesh {
   let cube = Cuboid::new(
-    cgmath::Vector3::new(0.,0.,0.), 
-    cgmath::Vector3::new(half_size,half_size,half_size),
+    Point3::origin(), 
+    Vector3::new(half_size,half_size,half_size),
     [0.1, 1.0, 0.1]
   );
   cube.build()

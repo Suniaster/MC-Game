@@ -1,10 +1,10 @@
+use nalgebra::{Point3, Vector3};
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
 };
 
-mod texture; // NEW!
-mod voxel;
+mod texture; 
 mod camera;
 mod scene;
 mod entity;
@@ -15,14 +15,13 @@ mod grid;
 mod pipelines;
 mod screen_text;
 use scene::*;
-use cgmath::{Vector3, Point3};
 
 pub struct ViewActions{
     pub state: State
 }
 
 pub struct ViewObjectInfo{
-    pub position: Vector3<f32>,
+    pub position: Point3<f32>,
     pub color: [f32; 3],
     pub size: [f32; 3],
     pub id: u32
@@ -31,7 +30,7 @@ pub struct ViewObjectInfo{
 impl ViewActions{
 
     pub fn create_grid(&mut self, position: [f32; 3], cube_size: f32, grid_mat: grid::GridMatrix) -> ViewObjectInfo{
-        let position_vec = Vector3::from(position);
+        let position_vec = Point3::from(position);
         let mesh = grid::Grid::create_from(
             position, 
             cube_size,
@@ -65,7 +64,7 @@ impl ViewActions{
     pub fn create_cube(&mut self, obj: ViewObjectInfo)-> ViewObjectInfo{
         let mesh = cube::Cuboid::new(
             obj.position,
-            cgmath::Vector3::from(obj.size)/2., 
+            Vector3::from(obj.size)/2., 
             obj.color
         );
 
@@ -84,7 +83,7 @@ impl ViewActions{
 
     pub fn update_cube(&mut self, obj: &ViewObjectInfo){
         let entity = self.state.entities.get_mut(&obj.id).unwrap();
-        entity.update_pos(&self.state.queue, cgmath::Vector3::from(obj.position));
+        entity.update_pos(&self.state.queue, obj.position);
     }
 
     pub fn set_camera_pos(&mut self, pos: nalgebra::Point3<f32>){

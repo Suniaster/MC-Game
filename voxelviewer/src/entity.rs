@@ -1,3 +1,4 @@
+use nalgebra::Point3;
 use wgpu::util::DeviceExt;
 use super::vertex::{StaticVertexMesh};
 
@@ -18,7 +19,7 @@ unsafe fn gen_instance_id() -> u32{
 }
 
 impl SceneEntity{
-    pub fn new(device: &wgpu::Device, pos: cgmath::Vector3<f32>, mesh: StaticVertexMesh)->SceneEntity{
+    pub fn new(device: &wgpu::Device, pos: Point3<f32>, mesh: StaticVertexMesh)->SceneEntity{
         // let mut instance = mesh.build();
         let mut mesh = mesh;
         mesh.update_pos(pos);
@@ -54,7 +55,7 @@ impl SceneEntity{
         }
     }
 
-    pub fn update_pos(&mut self, queue: &wgpu::Queue, new_pos: cgmath::Vector3<f32>){
+    pub fn update_pos(&mut self, queue: &wgpu::Queue, new_pos: Point3<f32>){
         if self.instance.update_pos(new_pos) {
             queue.write_buffer(
                 &self.vertex_buffer, 

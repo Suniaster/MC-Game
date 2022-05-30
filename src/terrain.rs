@@ -4,7 +4,7 @@ use super::Control;
 use super::voxelviewer::ViewActions;
 use world::{scene::GameScene};
 use super::entities;
-use cgmath::{Vector3, Point3};
+use nalgebra::{Point3};
 
 pub fn terrain_system(control: &mut Control, actions: &mut ViewActions){
     let camera_pos = actions.state.camera.position;
@@ -59,7 +59,7 @@ fn position_to_chunk_idx(position: Point3<f32>) -> [isize;2]{
 fn load_chunk(world: &mut GameScene, actions: &mut ViewActions, chunk_id: [isize;2]){
     let chunk_x = chunk_id[0] as f32 * entities::CHUNK_SIZE;
     let chunk_z = chunk_id[1] as f32 * entities::CHUNK_SIZE;
-    let chunk_pos = Vector3::from([chunk_x, 0., chunk_z]);
+    let chunk_pos = Point3::from([chunk_x, 0., chunk_z]);
     let grid = create_chunk_mat_at(chunk_pos);
 
     // Insert 
@@ -70,7 +70,7 @@ fn load_chunk(world: &mut GameScene, actions: &mut ViewActions, chunk_id: [isize
 type Mat3 = Vec<Vec<Vec<bool>>>;
 use super::entities::{CHUNK_SIZE, GRID_SIZE, CUBE_SIZE};
 use perlin2d::PerlinNoise2D;
-pub fn create_chunk_mat_at(postion: Vector3<f32>) -> Mat3{
+pub fn create_chunk_mat_at(postion: Point3<f32>) -> Mat3{
     let mut mat:Mat3 = vec![];
     let perlin = PerlinNoise2D::new(
         1, 
