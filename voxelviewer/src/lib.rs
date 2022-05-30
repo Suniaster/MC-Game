@@ -7,15 +7,13 @@ use winit::{
 mod texture; 
 mod camera;
 mod scene;
-mod cube;
-mod cube_face;
-mod vertex;
-mod grid;
+mod geometry;
 mod pipelines;
 mod screen_text;
 mod scene_entity;
+mod vertex;
 use scene::*;
-
+use geometry::*;
 pub struct ViewActions{
     pub state: State
 }

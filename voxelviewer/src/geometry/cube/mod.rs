@@ -1,7 +1,7 @@
 use nalgebra::Vector3;
 use nalgebra::Point3;
 
-use super::vertex::{
+use super::super::vertex::{
   static_vertex::StaticVertex, StaticVertexMesh
 };
 use super::cube_face::{CubeFace, cube_face_direction::*};

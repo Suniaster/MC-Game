@@ -1,5 +1,5 @@
 
-use super::vertex::static_vertex::StaticVertex;
+use super::super::vertex::static_vertex::StaticVertex;
 
 pub mod cube_face_direction;
 
