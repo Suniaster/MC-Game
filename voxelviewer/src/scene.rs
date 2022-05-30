@@ -3,7 +3,6 @@
 
 use std::iter;
 
-use cgmath::prelude::*;
 use wgpu::util::DeviceExt;
 use wgpu_glyph::GlyphBrush;
 use winit::{
@@ -18,15 +17,13 @@ use std::collections::HashMap;
 
 use super::screen_text::ScreenText;
 use crate::entity::{SceneEntity, DrawModel};
-use wgpu_glyph::{ab_glyph, GlyphBrushBuilder, Section, Text};
+use wgpu_glyph::{ab_glyph, GlyphBrushBuilder};
 
-// We need this for Rust to store our data correctly for the shaders
+use nalgebra::Matrix4;
+
 #[repr(C)]
-// This is so we can store this in a buffer
 #[derive(Debug, Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 struct CameraUniform {
-    // We can't use cgmath with bytemuck directly so we'll have
-    // to convert the Matrix4 into a 4x4 f32 array
     view_proj: [[f32; 4]; 4],
     view_position: [f32; 4],
 }
@@ -35,7 +32,7 @@ impl CameraUniform {
     fn new() -> Self {
         Self {
             view_position: [0.0; 4],
-            view_proj: cgmath::Matrix4::identity().into(),
+            view_proj: Matrix4::identity().into(),
         }
     }
 
@@ -193,9 +190,9 @@ impl State {
             "Inconsolata-Regular.ttf"
         )).expect("Failed to load font");
     
-        let mut glyph_brush = GlyphBrushBuilder::using_font(inconsolata)
+        let glyph_brush = GlyphBrushBuilder::using_font(inconsolata)
             .build(&device, render_format);
-        let mut staging_belt = wgpu::util::StagingBelt::new(1024);
+        let staging_belt = wgpu::util::StagingBelt::new(1024);
         Self {
             size,
             surface,
