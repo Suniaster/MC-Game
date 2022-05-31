@@ -88,8 +88,8 @@ impl Projection {
 
   pub fn calc_matrix(&self) -> Matrix4<f32> {
         let mat = nalgebra::Perspective3::new(
-          self.fovy.angle(),
-          self.aspect,
+            self.aspect,
+            self.fovy.angle(),
           self.znear,
           self.zfar,
       );
