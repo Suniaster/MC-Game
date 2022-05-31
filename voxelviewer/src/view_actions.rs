@@ -17,23 +17,31 @@ pub struct ViewObjectInfo{
 
 impl ViewActions{
 
-  pub fn create_grid(&mut self, position: [f32; 3], cube_size: f32, grid_mat: grid::GridMatrix) -> ViewObjectInfo{
-      let mesh = grid::Grid::create_from(
-          position, 
+    pub fn create_grid(&mut self, position: [f32; 3], cube_size: f32, grid_mat: grid::GridMatrix) -> ViewObjectInfo{
+      let mut grid = grid::Grid::create_from(
           cube_size,
           grid_mat
       );
+      grid.move_origin(Point3::from(position));
+        // Create outline for mesh
+        {
+            let ent = scene_entity::SceneEntity::new(
+                &self.state.device,
+                grid._build_outline()
+            );
+            self.state.entities_outlines.insert(ent.id, ent);
+        }
 
       let new_ent = scene_entity::SceneEntity::new(
           &self.state.device,
-          mesh.build()
+          grid.build()
       );
 
       let id = new_ent.id;
       self.state.entities.insert(id, new_ent);
 
       return ViewObjectInfo{
-          position: mesh.position,
+          position: grid.origin,
           color: [0., 0., 0.],
           size: [0., 0., 0.],
           id
@@ -41,11 +49,11 @@ impl ViewActions{
   }
 
   pub fn create_cube(&mut self, obj: ViewObjectInfo)-> ViewObjectInfo{
-      let mesh = cube::Cuboid::new(
-          obj.position,
+      let mut mesh = cube::Cuboid::new(
           Vector3::from(obj.size), 
           obj.color
       );
+      mesh.move_center_to(obj.position);
 
       let new_ent = scene_entity::SceneEntity::new(
           &self.state.device, 

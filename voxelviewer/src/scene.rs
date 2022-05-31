@@ -323,6 +323,7 @@ impl State {
             for(_, ent) in &self.entities_outlines{
                 render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
                 render_pass.set_vertex_buffer(0, ent.renderer.vertex_buffer.slice(..));
+                render_pass.set_vertex_buffer(1, ent.renderer.instance_buffer.slice(..));
                 render_pass.draw(0..ent.renderer.num_vertices, 0..1);
             }
         }

@@ -4,7 +4,7 @@ use super::super::vertex::static_vertex::StaticVertex;
 pub mod cube_face_direction;
 
 use cube_face_direction::CubeFaceDirection;
-use nalgebra::Point3;
+use nalgebra::{Point3, Vector3};
 
 pub struct CubeFace{
     pub vertices: [Point3<f32>; 4],
@@ -13,6 +13,13 @@ pub struct CubeFace{
 }
 
 impl CubeFace{
+
+    pub fn move_vertices(&mut self, disloc: &Vector3<f32>){
+        for i in 0..4{
+            self.vertices[i] += disloc;
+        }
+    }
+
     pub fn to_static_vertex_list(&self) -> Vec<StaticVertex>{
         let mut result:Vec<StaticVertex> = vec![];
         let v1 = self.vertices[0];
