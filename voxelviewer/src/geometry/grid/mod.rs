@@ -122,7 +122,7 @@ impl Grid{
 
 
     let mut mesh = Cuboid::build_from_grid(self.position, &hexes);
-    mesh.update_pos(self.position);
+    mesh.update_pos(self.position.into());
     return mesh;
   }
 

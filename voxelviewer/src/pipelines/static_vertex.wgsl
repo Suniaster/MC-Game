@@ -7,6 +7,16 @@ struct CameraUniform {
 [[group(0), binding(0)]]
 var<uniform> u_camera: CameraUniform;
 
+struct VertexInput {
+    [[location(0)]] position: vec3<f32>;
+    [[location(1)]] normal: vec3<f32>;
+    [[location(2)]] diffuse_color: vec3<f32>;
+};
+
+struct InstanceInput {
+    [[location(3)]] position: vec3<f32>;
+};
+
 struct VertexOutput {
     [[builtin(position)]] builtin_position: vec4<f32>;
     [[location(1)]] diffuse_color: vec3<f32>;
@@ -16,15 +26,16 @@ struct VertexOutput {
 
 [[stage(vertex)]]
 fn vs_main(
-    [[location(0)]] position: vec3<f32>,
-    [[location(1)]] normal: vec3<f32>,
-    [[location(2)]] diffuse_color: vec3<f32>,
+    model: VertexInput,
+    instance: InstanceInput,
 ) -> VertexOutput {
     var out: VertexOutput;
-    out.normal = normal;
-    let model_space = vec4<f32>(position, 1.0);
+    out.normal = model.normal;
+    let final_pos = model.position.xyz + instance.position.xyz;
+    let model_space = vec4<f32>(final_pos, 1.0);
+
     out.position = model_space.xyz;
-    out.diffuse_color = diffuse_color;
+    out.diffuse_color = model.diffuse_color;
 
     out.builtin_position = u_camera.projection_view * model_space;
     return out;

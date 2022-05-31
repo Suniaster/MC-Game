@@ -1,27 +1,36 @@
 pub mod static_vertex;
+pub mod mesh_instance;
 use static_vertex::StaticVertex;
-
-use nalgebra::Vector3;
-use nalgebra::Point3;
+use mesh_instance::MeshInstance;
 
 pub struct StaticVertexMesh{
   pub vertices: Vec<StaticVertex>,
-  pub position: Point3<f32>,
+  pub mesh_instance: [MeshInstance; 1],
+
 }
 
 impl StaticVertexMesh {
-  pub fn update_pos(&mut self, new_pos: Point3<f32>)->bool{
-    let disloc = new_pos - self.position;
-    self.position = new_pos;
-    if disloc.magnitude() == 0.{return false}
-    for v in self.vertices.iter_mut(){
-      v.position = (Vector3::from(v.position) + disloc).into();
+  pub fn new(vertices: Vec<StaticVertex>, position: [f32;3]) -> Self {
+    Self {
+      vertices,
+      mesh_instance: [MeshInstance { position }]
     }
+  }
+
+  pub fn update_pos(&mut self, new_pos: [f32;3])->bool{
+    if self.mesh_instance[0].position == new_pos{
+      return false;
+    }
+    self.mesh_instance[0].position = new_pos;
     true
   }
 
-  pub fn to_buffer<T: bytemuck::Pod>(&self)->&[T]{
+  pub fn to_vertex_buffer<T: bytemuck::Pod>(&self)->&[T]{
     bytemuck::cast_slice::<StaticVertex, T>(&self.vertices)
+  }
+
+  pub fn to_instance_buffer<T: bytemuck::Pod>(&self)->&[T]{
+    bytemuck::cast_slice::<MeshInstance, T>(&self.mesh_instance)
   }
 
   pub fn get_indices_for_square_mesh(&self)->Vec<u32>{
@@ -41,8 +50,6 @@ impl StaticVertexMesh {
   }
 
   pub fn new_empty() -> Self{
-    Self{
-      vertices: vec![], position: Point3::origin()
-    }
+    return Self::new(vec![], [0.,0.,0.]);
   }
 }

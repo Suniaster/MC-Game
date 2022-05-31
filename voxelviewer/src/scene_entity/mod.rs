@@ -22,7 +22,7 @@ pub struct SceneEntity{
 impl SceneEntity{
     pub fn new(device: &wgpu::Device, mesh: StaticVertexMesh) -> SceneEntity{
         let mut mesh = mesh;
-        let renderer = SceneEntityRenderer::new(device, Point3::origin(), &mut mesh);
+        let renderer = SceneEntityRenderer::new(device, &mut mesh);
         let id: u32;
         unsafe{
             id = gen_instance_id();
@@ -35,11 +35,11 @@ impl SceneEntity{
     }
 
     pub fn update_pos(&mut self, queue: &wgpu::Queue, new_pos: Point3<f32>){
-        if self.mesh.update_pos(new_pos) {
+        if self.mesh.update_pos(new_pos.into()) {
             queue.write_buffer(
-                &self.renderer.vertex_buffer, 
+                &self.renderer.instance_buffer, 
                 0, 
-                self.mesh.to_buffer()
+                self.mesh.to_instance_buffer()
             );
         }
     }

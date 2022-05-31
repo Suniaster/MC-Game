@@ -17,9 +17,9 @@ impl Cube {
             &cube_idx,
             RenderComponent {
                 obj: view_actions.create_cube(ViewObjectInfo {
-                    position: Point3::origin(),
+                    position: Point3::from([10., 0., 10.]),
                     color: [0.1, 1., 0.1],
-                    size: [0.2, 0.2, 0.2],
+                    size: [1., 1., 1.],
                     id: 0,
                 }),
             },

@@ -6,7 +6,7 @@
 // };
 // use super::cube_vertex::VoxelVertex;
 use super::super::vertex::static_vertex::StaticVertex;
-
+use super::super::vertex::mesh_instance::MeshInstance;
 fn create_render_pipeline(
   device: &wgpu::Device,
   layout: &wgpu::PipelineLayout,
@@ -88,7 +88,7 @@ pub fn create_cube_render_pipeline(
         &render_pipeline_layout,
         config.format,
         Some( wgpu::TextureFormat::Depth32Float),
-        &[StaticVertex::desc()],
+        &[StaticVertex::desc(), MeshInstance::desc()],
         shader,
         topology
     )

@@ -8,7 +8,8 @@ pub enum CubeFaceDirection{
 }
 
 impl CubeFaceDirection{
-  pub fn cube_face_from_dir(dir: &CubeFaceDirection, center: &Point3<f32>, half_sizes: &Vector3<f32>, color: [f32; 3])->CubeFace{
+  pub fn cube_face_from_dir(dir: &CubeFaceDirection, half_sizes: &Vector3<f32>, color: [f32; 3])->CubeFace{
+    let center = Point3::<f32>::origin();
     // let color = [0.1, 1.0, 0.1];
     /*** 1        0  
      *   * ------ *

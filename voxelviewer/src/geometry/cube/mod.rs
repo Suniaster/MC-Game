@@ -24,7 +24,7 @@ impl Cuboid{
         ];
     
         let faces:Vec<CubeFace> = faces_dirs.iter().map( |f| {
-            CubeFaceDirection::cube_face_from_dir(f, &center_position, &half_sizes, color)
+            CubeFaceDirection::cube_face_from_dir(f, &half_sizes, color)
         }).collect::<Vec<_>>();
         Self{
             faces, center_position, _half_sizes: half_sizes
@@ -39,10 +39,10 @@ impl Cuboid{
             }
         }
 
-        StaticVertexMesh{
-            vertices,
-            position
-        }
+        return StaticVertexMesh::new(
+            vertices, 
+            position.into()
+        );
     }
 
     pub fn build_from_grid(position:Point3<f32>, grid: &Vec<Vec<Vec<Cuboid>>>) -> StaticVertexMesh{
@@ -56,15 +56,16 @@ impl Cuboid{
                 }
             }
         }
-
-        StaticVertexMesh{
-            vertices,
-            position
-        }
+        return StaticVertexMesh::new(
+            vertices, 
+            position.into()
+        );
     }
     pub fn get_static_vertices(&self) -> Vec<StaticVertex>{
         let mut result = vec![];
+        println!("{:?}", self.center_position);
         for quad in &self.faces {
+            println!("{:?}", quad.vertices);
             result.append(&mut quad.to_static_vertex_list());
         }
         result
@@ -85,26 +86,15 @@ impl Cuboid{
 
 impl Cuboid{
     pub fn build(&self) -> StaticVertexMesh{
-        StaticVertexMesh{
-            vertices: self.get_static_vertices(),
-            position: self.center_position
-        }
+        return StaticVertexMesh::new(
+            self.get_static_vertices(), 
+            self.center_position.into()
+        );
     }
     pub fn build_outline(&self) -> StaticVertexMesh{
-        StaticVertexMesh{
-            vertices: self.get_outline_vertices(),
-            position: self.center_position
-        }
+        return StaticVertexMesh::new(
+            self.get_outline_vertices(), 
+            self.center_position.into()
+        );
     }
 }
-
-
-pub fn _new_cube(half_size: f32) -> StaticVertexMesh {
-  let cube = Cuboid::new(
-    Point3::origin(), 
-    Vector3::new(half_size,half_size,half_size),
-    [0.1, 1.0, 0.1]
-  );
-  cube.build()
-}
-

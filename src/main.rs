@@ -42,7 +42,7 @@ impl voxelviewer::ViewController for Control {
     fn on_update(&mut self, actions: &mut ViewActions, dt: std::time::Duration) {
         systems::render_fps_system(self, actions, dt);
         systems::render_system(&mut self.world.components, actions);
-        terrain::terrain_system(self, actions);
+        // terrain::terrain_system(self, actions);
     }
 
     fn on_keybord_input(&mut self, actions: &mut ViewActions, b: VirtualKeyCode, _c: ElementState) {

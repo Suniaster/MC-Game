@@ -43,7 +43,7 @@ impl ViewActions{
   pub fn create_cube(&mut self, obj: ViewObjectInfo)-> ViewObjectInfo{
       let mesh = cube::Cuboid::new(
           obj.position,
-          Vector3::from(obj.size)/2., 
+          Vector3::from(obj.size), 
           obj.color
       );
 
