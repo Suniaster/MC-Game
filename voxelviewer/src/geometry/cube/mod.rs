@@ -7,7 +7,7 @@ use super::super::vertex::{
 use super::cube_face::{CubeFace, cube_face_direction::*};
 
 pub struct Cuboid{
-    pub center_position: Point3<f32>,
+    pub origin: Point3<f32>,
     pub faces: Vec<CubeFace>,
     _half_sizes: Vector3<f32>
 }
@@ -27,7 +27,7 @@ impl Cuboid{
             CubeFaceDirection::cube_face_from_dir(f, &half_sizes, color)
         }).collect::<Vec<_>>();
         Self{
-            faces, center_position: Point3::<f32>::origin(), _half_sizes: half_sizes
+            faces, origin: Point3::<f32>::origin(), _half_sizes: half_sizes
         }
     }
 
@@ -41,8 +41,8 @@ impl Cuboid{
         }
     }
 
-    pub fn move_center_to(&mut self, position: Point3<f32>){
-        self.center_position = position;
+    pub fn move_origin_to(&mut self, position: Point3<f32>){
+        self.origin = position;
     }
 
     pub fn get_static_vertices(&self) -> Vec<StaticVertex>{
@@ -70,13 +70,13 @@ impl Cuboid{
     pub fn build(&self) -> StaticVertexMesh{
         return StaticVertexMesh::new(
             self.get_static_vertices(), 
-            self.center_position.into()
+            self.origin.into()
         );
     }
     pub fn build_outline(&self) -> StaticVertexMesh{
         return StaticVertexMesh::new(
             self.get_outline_vertices(), 
-            self.center_position.into()
+            self.origin.into()
         );
     }
 }

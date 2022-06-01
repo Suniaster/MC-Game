@@ -6,22 +6,21 @@ use mesh_instance::MeshInstance;
 pub struct StaticVertexMesh{
   pub vertices: Vec<StaticVertex>,
   pub mesh_instance: [MeshInstance; 1],
-
 }
 
 impl StaticVertexMesh {
-  pub fn new(vertices: Vec<StaticVertex>, position: [f32;3]) -> Self {
+  pub fn new(vertices: Vec<StaticVertex>, origin: [f32;3]) -> Self {
     Self {
       vertices,
-      mesh_instance: [MeshInstance { position }]
+      mesh_instance: [MeshInstance { origin }]
     }
   }
 
-  pub fn update_pos(&mut self, new_pos: [f32;3])->bool{
-    if self.mesh_instance[0].position == new_pos{
+  pub fn update_origin(&mut self, new_origin: [f32;3])->bool{
+    if self.mesh_instance[0].origin == new_origin{
       return false;
     }
-    self.mesh_instance[0].position = new_pos;
+    self.mesh_instance[0].origin = new_origin;
     true
   }
 

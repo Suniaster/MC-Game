@@ -34,8 +34,8 @@ impl SceneEntity{
         }
     }
 
-    pub fn update_pos(&mut self, queue: &wgpu::Queue, new_pos: Point3<f32>){
-        if self.mesh.update_pos(new_pos.into()) {
+    pub fn update_origin(&mut self, queue: &wgpu::Queue, new_pos: Point3<f32>){
+        if self.mesh.update_origin(new_pos.into()) {
             queue.write_buffer(
                 &self.renderer.instance_buffer, 
                 0, 

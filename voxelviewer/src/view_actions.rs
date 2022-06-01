@@ -53,7 +53,7 @@ impl ViewActions{
           Vector3::from(obj.size), 
           obj.color
       );
-      mesh.move_center_to(obj.position);
+      mesh.move_origin_to(obj.position);
 
       let new_ent = scene_entity::SceneEntity::new(
           &self.state.device, 
@@ -70,7 +70,7 @@ impl ViewActions{
 
   pub fn update_cube(&mut self, obj: &ViewObjectInfo){
       let entity = self.state.entities.get_mut(&obj.id).unwrap();
-      entity.update_pos(&self.state.queue, obj.position);
+      entity.update_origin(&self.state.queue, obj.position);
   }
 
   pub fn set_camera_pos(&mut self, pos: nalgebra::Point3<f32>){

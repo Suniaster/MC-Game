@@ -135,7 +135,7 @@ impl Grid{
       self.half_grid_sizes,
       [0., 0., 0.]
     );
-    overall_cuboid.move_center_to(self.origin);
+    overall_cuboid.move_origin_to(self.origin);
     overall_cuboid.build_outline()
   }
 }
