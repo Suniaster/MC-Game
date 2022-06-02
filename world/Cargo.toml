@@ -9,4 +9,6 @@ edition = "2018"
 cgmath = "0.18"
 ecs = {path="../ecs"}
 shred = "0.12.0"
+anymap = "0.12.1"
+slotmap = "1.0.6"
 voxelviewer = {path="../voxelviewer"}
