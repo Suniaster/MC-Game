@@ -68,10 +68,34 @@ impl voxelviewer::ViewController for Control {
 
 fn main() {
     let world = world::scene::GameScene::new();
+
+    let mut test = world::World::new();
+    test
+        .add_component_storage::<i32>()
+        .add_component_storage::<f64>()
+    ;
+
+    test.build_entity()
+        .with_component(1)
+        .with_component(3.14)
+        .finish();
+    
+    test.build_entity()
+        .with_component(2)
+        .with_component(2.63)
+        .finish();
+
+    let iter1 = test.iter_comp::<i32>();
+    let iter2 = test.iter_comp::<f64>();
+    let f_iter = iter1.zip(iter2);
+    for i in f_iter{
+        println!("{:?}", i);
+    }
+    
     let controller = Control {
         world,
         texts_ids: HashMap::new(),
         total_time: Duration::new(0, 0),
     };
-    voxelviewer::main(Box::new(controller));
+    // voxelviewer::main(Box::new(controller));
 }

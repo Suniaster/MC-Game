@@ -73,13 +73,65 @@ impl World {
             .unwrap().map.remove(entity);
     }
 
-    fn component_iter_mut<T: Any>(&mut self) -> Option<impl Iterator<Item = (ComponentKey, &mut T)>>{
-        self.component_storage_mut::<T>().map(|storage| storage.map.iter_mut())
+    pub fn component_iter_mut<T: Any>(&mut self) -> impl Iterator<Item = (ComponentKey, &mut T)>{
+        self.component_storage_mut::<T>().map(|storage| storage.map.iter_mut()).unwrap()
     }
-    fn component_iter_ref<T: Any>(&self) -> Option<impl Iterator<Item = (ComponentKey, &T)>>{
-        self.component_storage_ref::<T>().map(|storage| storage.map.iter())
+    pub fn component_iter_ref<T: Any>(&self) -> impl Iterator<Item = (ComponentKey, &T)>{
+        self.component_storage_ref::<T>().map(|storage| storage.map.iter()).unwrap()
+    }
+
+    pub fn iter_comp<T: Any>(&self) -> impl Iterator<Item = (ComponentKey, &T)>{
+        let a = self.component_storage_ref::<T>().unwrap();
+        return ComponentMapIter {
+            map: a,
+            keys_iter: Box::new(self.entity_allocator.allocator.iter())
+        };
     }
 }
+
+struct ComponentMapIter<'a, T>{ 
+    map: &'a ComponentMap<T>,
+    keys_iter: Box<dyn Iterator<Item = (ComponentKey, &'a ())> + 'a>,
+}
+
+impl <'a, T> Iterator for ComponentMapIter<'a, T> {
+    type Item = (ComponentKey, &'a T);
+    fn next(&mut self) -> Option<Self::Item> {
+        let next_key = self.keys_iter.next();
+        if let Some(key) = next_key {
+            return Some( (key.0, self.map.map.get(key.0).unwrap()) );
+        }
+        None
+    }
+}
+
+impl <'a, T> ComponentMapIter<'a, T>{
+    fn zip<U>(&'a mut self, other: ComponentMapIter<'a, U>) -> impl Iterator<Item = (ComponentKey, &'a T, &'a U)> {
+        ComponentMapIterZip{
+            a: self,
+            b: other
+        }
+    }
+}
+
+pub struct ComponentMapIterZip<'a, T, U> {
+    a: &'a mut ComponentMapIter<'a, T>,
+    b: ComponentMapIter<'a, U>,
+}
+
+impl <'a, T, U> Iterator for ComponentMapIterZip<'a, T, U> {
+    type Item = (ComponentKey, &'a T, &'a U);
+    fn next(&mut self) -> Option<Self::Item> {
+        let next_key = self.a.next();
+        if let Some(obja) = next_key {
+            let key = obja.0;
+            let objb = self.b.map.map.get(key).unwrap();
+            return Some( (key, obja.1, objb) );
+        }
+        None
+    }
+}
+
 
 pub struct BuildComponentMessage<'a>{
     world: &'a mut World,
@@ -91,7 +143,7 @@ impl<'a> BuildComponentMessage<'a>{
         self.world.add_component_to_entity(self.entity, component);
         self
     }
-    pub fn finish(self) -> ComponentKey{
+    pub fn finish(&self) -> ComponentKey{
         self.entity
     }
 }
@@ -106,41 +158,24 @@ impl<'a> DestroyEntityMessage<'a>{
         self.world.remove_component_from_entity::<T>(self.entity);
         self
     }
-    pub fn finish(self) -> &'a mut World{
+    pub fn finish(&self) -> &World{
         self.world
     }
 }
 
-pub struct ReadComponentStorageMessage<'a>{
-    world: &'a World,
-    // final_iter: dyn Iterator
-}
-
-impl <'a> ReadComponentStorageMessage<'a>{
-    pub fn read_storage<T: Any>(&self) -> & Self{
-        self
-    }
-}
-
-
-
 pub struct EntityAllocator {
-    pub allocator: SlotMap<DefaultKey, u32>,
-    next_entity_id: u32
+    pub allocator: SlotMap<DefaultKey, ()>
 }
 
 impl EntityAllocator{
     pub fn new() -> Self {
         Self {
-            allocator: SlotMap::new(),
-            next_entity_id: 0
+            allocator: SlotMap::new()
         }
     }
 
     pub fn allocate(&mut self) -> DefaultKey {
-        let id = self.next_entity_id;
-        self.next_entity_id += 1;
-        self.allocator.insert(id)
+        self.allocator.insert(())
     }
 
     pub fn deallocate(&mut self, key: DefaultKey) {
