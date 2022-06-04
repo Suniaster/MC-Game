@@ -25,7 +25,7 @@ impl World {
     }
 
     pub fn add_component_storage<T: Any>(&mut self) -> &mut Self{
-        self.components.insert(ComponentMap::<T>::new());
+        self.components.insert(ComponentStorage::<T>::new());
         self
     }
     
@@ -34,12 +34,12 @@ impl World {
         self
     }
     
-    pub fn component_storage_ref<T: Any>(&self) -> Option<& ComponentMap<T>>{
-        self.components.get::<ComponentMap<T>>()
+    pub fn component_storage_ref<T: Any>(&self) -> Option<& ComponentStorage<T>>{
+        self.components.get::<ComponentStorage<T>>()
     }
 
-    pub fn component_storage_mut<T: Any>(&mut self) -> Option<&mut ComponentMap<T>>{
-        self.components.get_mut::<ComponentMap<T>>()
+    pub fn component_storage_mut<T: Any>(&mut self) -> Option<&mut ComponentStorage<T>>{
+        self.components.get_mut::<ComponentStorage<T>>()
     }
 
     pub fn resource_ref<T: Any>(&self) -> Option<& T>{
@@ -82,19 +82,19 @@ impl World {
 
     pub fn iter_comp<T: Any>(&self) -> impl Iterator<Item = (ComponentKey, &T)>{
         let a = self.component_storage_ref::<T>().unwrap();
-        return ComponentMapIter {
+        return ComponentStorageIter {
             map: a,
             keys_iter: Box::new(self.entity_allocator.allocator.iter())
         };
     }
 }
 
-struct ComponentMapIter<'a, T>{ 
-    map: &'a ComponentMap<T>,
+struct ComponentStorageIter<'a, T>{ 
+    map: &'a ComponentStorage<T>,
     keys_iter: Box<dyn Iterator<Item = (ComponentKey, &'a ())> + 'a>,
 }
 
-impl <'a, T> Iterator for ComponentMapIter<'a, T> {
+impl <'a, T> Iterator for ComponentStorageIter<'a, T> {
     type Item = (ComponentKey, &'a T);
     fn next(&mut self) -> Option<Self::Item> {
         let next_key = self.keys_iter.next();
@@ -105,21 +105,21 @@ impl <'a, T> Iterator for ComponentMapIter<'a, T> {
     }
 }
 
-impl <'a, T> ComponentMapIter<'a, T>{
-    fn zip<U>(&'a mut self, other: ComponentMapIter<'a, U>) -> impl Iterator<Item = (ComponentKey, &'a T, &'a U)> {
-        ComponentMapIterZip{
+impl <'a, T> ComponentStorageIter<'a, T>{
+    fn zip<U>(&'a mut self, other: ComponentStorageIter<'a, U>) -> impl Iterator<Item = (ComponentKey, &'a T, &'a U)> {
+        ComponentStorageIterZip{
             a: self,
             b: other
         }
     }
 }
 
-pub struct ComponentMapIterZip<'a, T, U> {
-    a: &'a mut ComponentMapIter<'a, T>,
-    b: ComponentMapIter<'a, U>,
+pub struct ComponentStorageIterZip<'a, T, U> {
+    a: &'a mut ComponentStorageIter<'a, T>,
+    b: ComponentStorageIter<'a, U>,
 }
 
-impl <'a, T, U> Iterator for ComponentMapIterZip<'a, T, U> {
+impl <'a, T, U> Iterator for ComponentStorageIterZip<'a, T, U> {
     type Item = (ComponentKey, &'a T, &'a U);
     fn next(&mut self) -> Option<Self::Item> {
         let next_key = self.a.next();
@@ -183,11 +183,11 @@ impl EntityAllocator{
     }
 }
 
-pub struct ComponentMap<T>{
+pub struct ComponentStorage<T>{
     pub map: SecondaryMap<DefaultKey, T>
 }
 
-impl <T> ComponentMap<T>{
+impl <T> ComponentStorage<T>{
     pub fn new() -> Self {
         Self {
             map: SecondaryMap::new()
