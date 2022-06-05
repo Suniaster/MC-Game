@@ -1,13 +1,13 @@
-use std::{collections::HashMap, time::Duration};
+use std::sync::{Arc, Mutex};
 
-use winit::event::{ElementState, VirtualKeyCode};
+use voxelviewer::{ScreenView};
+use specs::prelude::*;
 
-use voxelviewer;
-use voxelviewer::view_actions::*;
-use world;
 mod entities;
 mod systems;
 mod terrain;
+mod components;
+
 // Proximos Objetivos
 // x - Adicionar bordas (linhas) nos cubos - LineStrip = 2,
 // X - Descobrir como botar texto na tela - https://github.com/hecrj/wgpu_glyph
@@ -32,70 +32,49 @@ mod terrain;
 // - Tentar fazer algum modelo no MagicaVoxel
 // - Tentar importar modelo pelo back e passar para o front renderiza-lo
 // - Adicionar menu para mudanças de propriedades da camera
-pub struct Control {
-    world: world::scene::GameScene,
-    pub texts_ids: HashMap<String, usize>,
-    pub total_time: Duration,
-}
 
-impl voxelviewer::ViewController for Control {
-    fn on_update(&mut self, actions: &mut ViewActions, dt: std::time::Duration) {
-        systems::render_fps_system(self, actions, dt);
-        systems::render_system(&mut self.world.components, actions);
-        terrain::terrain_system(self, actions);
+use specs::DispatcherBuilder;
+
+struct RenderTextInfoSystem;
+impl<'a> System<'a> for RenderTextInfoSystem {
+    type SystemData = ReadExpect<'a, Arc<Mutex<ScreenView>>>;
+
+    fn run(&mut self, scren_mutex: Self::SystemData){
+        let text = format!("Vextex count: 12");
+        let mut screen = scren_mutex.lock().unwrap();
+        screen.actions.update_text(1, text);
     }
 
-    fn on_keybord_input(&mut self, actions: &mut ViewActions, b: VirtualKeyCode, _c: ElementState) {
-        if b == VirtualKeyCode::C && _c == ElementState::Pressed {
-            entities::Cube::create(&mut self.world, actions);
-        }
-    }
+    fn setup(&mut self, world: &mut World) {
+        Self::SystemData::setup(world);
+        let screen_mutex = world.read_resource::<Arc<Mutex<ScreenView>>>();
+        let mut screen = screen_mutex.lock().unwrap();
 
-    fn before_start(&mut self, a: &mut ViewActions) -> () {
-        let fps_id = a.create_text();
-        self.texts_ids.insert(String::from("fps"), fps_id);
-
-        let looking_id = a.create_text();
-        self.texts_ids.insert(String::from("looking"), looking_id);
-
-        let position_id = a.create_text();
-        self.texts_ids.insert(String::from("position"), position_id);
-
-        let id = a.create_text();
-        self.texts_ids.insert(String::from("vertices"), id);
+        screen.actions.create_text();
+        screen.actions.create_text();
+        screen.actions.create_text();
+        screen.actions.create_text();
     }
 }
 
 fn main() {
-    let world = world::scene::GameScene::new();
+    let mut world = World::new();
 
-    let mut test = world::World::new();
-    test
-        .add_component_storage::<i32>()
-        .add_component_storage::<f64>()
-    ;
+    world.register::<components::RenderComponent>();
+    world.register::<components::PositionComponent>();
+    world.register::<components::GridDescriptorComponent>();
 
-    test.build_entity()
-        .with_component(1)
-        .with_component(3.14)
-        .finish();
-    
-    test.build_entity()
-        .with_component(2)
-        .with_component(2.63)
-        .finish();
+    let (screen, evloop) = voxelviewer::create_screen();
+    let arc_screen = Arc::new(Mutex::new(screen));
 
-    let iter1 = test.iter_comp::<i32>();
-    let iter2 = test.iter_comp::<f64>();
-    let f_iter = iter1.zip(iter2);
-    for i in f_iter{
-        println!("{:?}", i);
-    }
-    
-    let controller = Control {
-        world,
-        texts_ids: HashMap::new(),
-        total_time: Duration::new(0, 0),
-    };
-    // voxelviewer::main(Box::new(controller));
+    let mut dispatcher = DispatcherBuilder::new()
+        .with_thread_local(
+            RenderTextInfoSystem
+        )
+        .build();
+
+    world.insert(arc_screen.clone());
+
+    dispatcher.setup(&mut world);
+    voxelviewer::start(world, dispatcher, arc_screen, evloop);
 }

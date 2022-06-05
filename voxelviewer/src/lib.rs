@@ -1,3 +1,5 @@
+use std::{sync::{Mutex, Arc}};
+
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -18,13 +20,12 @@ use view_actions::*;
 
 pub mod view_actions;
 
-pub trait ViewController{
-    fn on_update(&mut self, a:&mut ViewActions, b:std::time::Duration) -> ();
-    fn on_keybord_input(&mut self, a: &mut ViewActions, b:VirtualKeyCode, c:ElementState) -> ();
-    fn before_start(&mut self, a:&mut ViewActions) -> ();
+pub struct ScreenView {
+    pub actions: ViewActions,
+    window: winit::window::Window,
 }
 
-pub fn main(controller: Box<dyn ViewController>){
+pub fn create_screen() -> (ScreenView, EventLoop<()>) {
     env_logger::init();
     let event_loop = EventLoop::new();
     let title = env!("CARGO_PKG_NAME");
@@ -33,40 +34,39 @@ pub fn main(controller: Box<dyn ViewController>){
         .build(&event_loop)
         .unwrap();
 
+    let actions = ViewActions{state: pollster::block_on(State::new(&window))};
 
-    let mut actions = ViewActions{state: pollster::block_on(State::new(&window))};
+    let screen = ScreenView {
+        actions,
+        window,
+    };
+
+    (screen, event_loop)
+}
+
+pub fn start(
+    mut world: specs::World, 
+    mut dispatcher: specs::Dispatcher<'static, 'static>, 
+    screen_arc: Arc<Mutex<ScreenView>>, 
+    event_loop: EventLoop<()>
+) {
     let mut last_render_time = std::time::Instant::now();
-    let mut controller = controller;
-
-    controller.before_start(&mut actions);
     event_loop.run(move |event, _, control_flow| {
-        
+        let mut screen = screen_arc.lock().unwrap();
+
         *control_flow = ControlFlow::Poll;
         match event {
-            Event::MainEventsCleared => window.request_redraw(),
+            Event::MainEventsCleared =>  screen.window.request_redraw(),
             Event::DeviceEvent {
                 ref event,
                 .. // We're not using device_id currently
             } => {
-                actions.state.input(event);
-                match event{
-                    DeviceEvent::Key(
-                        KeyboardInput {
-                            virtual_keycode: Some(key),
-                            state,
-                            ..
-                        }
-                    ) => {
-                        controller.on_keybord_input(&mut actions, *key, *state);
-                    }
-                    _ => {}
-                }
+                screen.actions.state.input(event);
             }
-            // UPDATED!
             Event::WindowEvent {
                 ref event,
                 window_id,
-            } if window_id == window.id() => {
+            } if window_id == screen.window.id() => {
                 match event {
                     WindowEvent::CloseRequested
                     | WindowEvent::KeyboardInput {
@@ -79,30 +79,31 @@ pub fn main(controller: Box<dyn ViewController>){
                         ..
                     } => *control_flow = ControlFlow::Exit,
                     WindowEvent::Resized(physical_size) => {
-                        actions.state.resize(*physical_size);
+                        screen.actions.state.resize(*physical_size);
                     }
                     WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
-                        actions.state.resize(**new_inner_size);
+                        screen.actions.state.resize(**new_inner_size);
                     }
                     _ => {}
                 }
             }
-            // UPDATED!
-            Event::RedrawRequested(window_id) if window_id == window.id() => {
+            Event::RedrawRequested(window_id) if window_id == screen.window.id() => {
                 let now = std::time::Instant::now();
                 let dt = now - last_render_time;
                 last_render_time = now;
-                actions.state.update(dt);
-                controller.on_update(&mut actions, dt);
-                match actions.state.render() {
+                screen.actions.state.update(dt);
+                match screen.actions.state.render() {
                     Ok(_) => {}
-                    // Reconfigure the surface if lost
-                    Err(wgpu::SurfaceError::Lost) => actions.state.resize(actions.state.size),
-                    // The system is out of memory, we should probably quit
+                    Err(wgpu::SurfaceError::Lost) => {
+                        let size = screen.actions.state.size;
+                        screen.actions.state.resize(size)
+                    },
                     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
                     // All other errors (Outdated, Timeout) should be resolved by the next frame
                     Err(e) => eprintln!("{:?}", e),
                 }
+                drop(screen); // Drop screen to clear mutex
+                dispatcher.dispatch(&mut world);
             }
             _ => {}
         }
