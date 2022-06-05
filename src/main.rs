@@ -35,7 +35,9 @@ mod components;
 // - Adicionar menu para mudanças de propriedades da camera
 
 use specs::DispatcherBuilder;
+use voxelviewer::ScreenView;
 
+pub type ScreenMutex = Arc<Mutex<ScreenView>>;
 
 fn main() {
     let mut world = World::new();
@@ -47,10 +49,14 @@ fn main() {
     let (screen, evloop) = voxelviewer::create_screen();
     let arc_screen = Arc::new(Mutex::new(screen));
 
-    let mut dispatcher = DispatcherBuilder::new()
+    let mut dispatcher = 
+        DispatcherBuilder::new()
         .with(systems::UpdateDtSystem{
             last_time: std::time::Instant::now()
         }, "update_dt_system", &[])
+        .with(
+            terrain::TerrainSystem, "terrain", &[]
+        )
         .with_thread_local(systems::RenderTextInfoSystem{
             texts_ids: HashMap::new(),
             time_counter: std::time::Duration::new(0, 0),
@@ -58,6 +64,7 @@ fn main() {
         .build();
 
     world.insert(arc_screen.clone());
+    world.insert(terrain::LoadedChunks::new());
     world.insert(systems::WorldDt(Duration::new(0, 0)));
 
     dispatcher.setup(&mut world);
