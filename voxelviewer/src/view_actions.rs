@@ -17,10 +17,9 @@ pub struct ViewObjectInfo{
 
 impl ViewActions{
 
-    pub fn create_grid(&mut self, position: [f32; 3], cube_size: f32, grid_mat: grid::GridMatrix) -> ViewObjectInfo{
-      let mut grid = grid::Grid::create_from(
-          cube_size,
-          grid_mat
+    pub fn create_grid(&mut self, position: [f32; 3], cube_size: f32, grid_mat: &grid::GridMatrix) -> ViewObjectInfo{
+      let mut grid = grid::Grid::create_with(
+          cube_size
       );
       grid.move_origin(Point3::from(position));
         // Create outline for mesh
@@ -34,7 +33,7 @@ impl ViewActions{
 
       let new_ent = scene_entity::SceneEntity::new(
           &self.state.device,
-          grid.build()
+          grid.build_from(grid_mat)
       );
 
       let id = new_ent.id;
