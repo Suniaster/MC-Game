@@ -8,7 +8,6 @@ mod entities;
 mod systems;
 mod terrain;
 mod components;
-mod events;
 
 // Proximos Objetivos
 // x - Adicionar bordas (linhas) nos cubos - LineStrip = 2,
@@ -25,9 +24,9 @@ mod events;
 //  - Adicionar Eventos
 //  - Adicionar metodos de toggle em objeto, framewire, e bounding box
 // - Ajustar geração de terreno
+// - Fazer render ser independete do resto, de modo a poder mexer a camera mesmo com as coisas carregando
 // - Adicionar algum tipo de terminal, console ou algo que ajude na visualização dos dados
 // - Adicionar luz no céu
-
 
 // - Ajustar cores (não tão sendo efetivamente usados)
 // - Descobrir como fazer um tipo de animação de entrada
@@ -39,7 +38,8 @@ mod events;
 use specs::DispatcherBuilder;
 use voxelviewer::ScreenView;
 
-pub type ScreenMutex = Arc<Mutex<ScreenView>>;
+pub type MultiThread<T> = Arc<Mutex<T>>;
+pub type ScreenMutex = MultiThread<ScreenView>;
 
 
 fn main() {
@@ -69,6 +69,7 @@ fn main() {
     world.insert(arc_screen.clone());
     world.insert(terrain::LoadedChunks::new());
     world.insert(systems::WorldDt(Duration::new(0, 0)));
+
 
     dispatcher.setup(&mut world);
     voxelviewer::start(world, dispatcher, arc_screen, evloop);

@@ -3,6 +3,8 @@ use std::{collections::HashMap, sync::{Arc, Mutex}, time::Duration};
 use specs::prelude::*;
 use voxelviewer::ScreenView;
 
+pub mod events;
+
 pub struct RenderTextInfoSystem{
     pub texts_ids: HashMap<&'static str, usize>,
     pub time_counter: std::time::Duration,
