@@ -44,16 +44,16 @@ impl CameraUniform {
 }
 
 pub struct State {
-    surface: wgpu::Surface,
+    pub surface: wgpu::Surface,
     pub device: wgpu::Device,
     pub queue: wgpu::Queue,
     config: wgpu::SurfaceConfiguration,
     pub size: winit::dpi::PhysicalSize<u32>,
 
-    depth_texture: texture::Texture,
+    pub depth_texture: texture::Texture,
 
-    static_cube_pipeline: wgpu::RenderPipeline,
-    static_lines_pipeline: wgpu::RenderPipeline,
+    pub static_cube_pipeline: wgpu::RenderPipeline,
+    pub static_lines_pipeline: wgpu::RenderPipeline,
 
     //Glyph
     glyph_brush: GlyphBrush<()>,
