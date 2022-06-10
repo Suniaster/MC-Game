@@ -8,6 +8,7 @@ mod entities;
 mod systems;
 mod terrain;
 mod components;
+mod events;
 
 // Proximos Objetivos
 // x - Adicionar bordas (linhas) nos cubos - LineStrip = 2,
@@ -21,11 +22,12 @@ mod components;
 // X - Concertar o treco de cima
 // X - Mudar no front uso de cgmath para nalgebra
 // - Melhorar interface com front
+//  - Adicionar Eventos
+//  - Adicionar metodos de toggle em objeto, framewire, e bounding box
+// - Ajustar geração de terreno
+// - Adicionar algum tipo de terminal, console ou algo que ajude na visualização dos dados
 // - Adicionar luz no céu
-// - Melhorar uso de entidades na GameScene
-// - Deixar padronizado chunk size no back e no front
-// - Melhorar iteração por componentes no GameScene
-// - Melhorar interface de comunicação entre back e front
+
 
 // - Ajustar cores (não tão sendo efetivamente usados)
 // - Descobrir como fazer um tipo de animação de entrada
@@ -38,6 +40,7 @@ use specs::DispatcherBuilder;
 use voxelviewer::ScreenView;
 
 pub type ScreenMutex = Arc<Mutex<ScreenView>>;
+
 
 fn main() {
     let mut world = World::new();
