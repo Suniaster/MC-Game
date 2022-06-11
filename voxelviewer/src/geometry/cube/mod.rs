@@ -1,11 +1,6 @@
 use nalgebra::Vector3;
 use nalgebra::Point3;
 
-
-use crate::draw::geometry::cube_face::cube_face_to_vertex_list;
-use crate::draw::mesh::StaticVertexMesh;
-use crate::draw::mesh::vertex::Vertex;
-
 use super::cube_face::{CubeFace, cube_face_direction::*};
 
 pub struct Cuboid{
@@ -47,25 +42,7 @@ impl Cuboid{
         self.origin = position;
     }
 
-    pub fn get_static_vertices(&self) -> Vec<Vertex>{
-        let mut result = vec![];
-        for quad in &self.faces {
-            let mut vertices = cube_face_to_vertex_list(&quad);
-            result.append(&mut vertices);
-        }
-        result
-    }
-
     pub fn remove_face(&mut self, dir: CubeFaceDirection){
         self.faces.retain(|quad| quad.direction != dir);
-    }
-}
-
-impl Cuboid{
-    pub fn build(&self) -> StaticVertexMesh{
-        return StaticVertexMesh::new(
-            self.get_static_vertices(), 
-            self.origin.into()
-        );
     }
 }
