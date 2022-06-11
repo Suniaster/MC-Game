@@ -2,7 +2,7 @@ use std::{sync::{Arc, Mutex}, iter};
 
 use nalgebra::Point3;
 use specs::prelude::*;
-use crate::{geometry::{grid::{self, GridMatrix}}, draw::mesh::StaticVertexMesh};
+use crate::{geometry::{grid::{self, GridMatrix}}, draw::{mesh::StaticVertexMesh, geometry::grid::build_grid_mesh_from_desc}};
 
 pub mod boundingbox;
 use crate::draw::renderer::SceneEntityRenderer;
@@ -41,12 +41,13 @@ impl MeshRenderer {
         }
     }
 
-    pub fn from_grid(cube_size: f32, grid: GridMatrix) -> Self {
+    pub fn from_grid(cube_size: f32, desc: GridMatrix) -> Self {
         let grid_mesh = grid::Grid::create_with(
             cube_size
         );
 
-        let mesh = grid_mesh.build_from(&grid);
+        let mesh = build_grid_mesh_from_desc(&grid_mesh, &desc);
+
         MeshRenderer::create_without_renderer(
             mesh
         )

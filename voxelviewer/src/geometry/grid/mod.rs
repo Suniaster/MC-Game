@@ -1,5 +1,3 @@
-use crate::{draw::{mesh::StaticVertexMesh, geometry::cube_face::cube_face_to_vertex_list}};
-
 use super::cube::Cuboid;
 use nalgebra::{Point3, Vector3};
 
@@ -35,7 +33,7 @@ impl Grid{
     self.origin = new_origin;
   }
 
-  fn create_hex_in_pos(&self, grid: &GridMatrix, i:usize, j:usize, k:usize)->Cuboid{
+  pub fn create_hex_in_pos(&self, grid: &GridMatrix, i:usize, j:usize, k:usize)->Cuboid{
     let mut hex = Cuboid::new(
       self.cube_half_sizes,
       [0.1, 1.0, 0.1]
@@ -87,44 +85,5 @@ impl Grid{
         cube.remove_face(CubeFaceDirection::Left);
       }
     }
-  }
-
-  pub fn build_from(&self, grid: &GridMatrix)->StaticVertexMesh{
-    let mut hexes:Vec<Vec<Vec<Cuboid>>> = vec![];
-
-    for x_idx in 0..grid.len(){
-      hexes.push(vec![]);
-      for y_idx in 0..grid[x_idx].len(){
-        hexes[x_idx].push(vec![]);
-        for z_idx in 0..grid[x_idx][y_idx].len(){
-          if grid[x_idx][y_idx][z_idx] {
-            let cube = self.create_hex_in_pos(grid, x_idx, y_idx, z_idx);
-            if !cube.is_empty(){
-              hexes[x_idx][y_idx].push(cube);
-            }
-          }
-        }
-      }
-    }
-
-    return Grid::build_from_3dmat(self.origin, &hexes);
-  }
-
-  fn build_from_3dmat(position:Point3<f32>, grid: &Vec<Vec<Vec<Cuboid>>>) -> StaticVertexMesh{
-    let mut vertices = vec![];
-    for row in grid{
-        for col in row{
-            for hex in col{
-                for quad in &hex.faces {
-                    let mut quad_vertices = cube_face_to_vertex_list(&quad);
-                    vertices.append(&mut quad_vertices);
-                }
-            }
-        }
-    }
-    return StaticVertexMesh::new(
-        vertices, 
-        position.into()
-    );
   }
 }
