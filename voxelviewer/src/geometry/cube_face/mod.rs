@@ -3,7 +3,7 @@ pub mod cube_face_direction;
 use cube_face_direction::CubeFaceDirection;
 use nalgebra::{Point3, Vector3};
 
-use crate::draw::mesh::vertex::StaticVertex;
+use crate::draw::mesh::vertex::Vertex;
 
 pub struct CubeFace{
     pub vertices: [Point3<f32>; 4],
@@ -19,8 +19,8 @@ impl CubeFace{
         }
     }
 
-    pub fn to_static_vertex_list(&self) -> Vec<StaticVertex>{
-        let mut result:Vec<StaticVertex> = vec![];
+    pub fn to_static_vertex_list(&self) -> Vec<Vertex>{
+        let mut result:Vec<Vertex> = vec![];
         let v1 = self.vertices[0];
         let v2 = self.vertices[1];
         let v3 = self.vertices[2];
@@ -36,7 +36,7 @@ impl CubeFace{
         ];
 
         for v in vertices{
-            result.push(StaticVertex{
+            result.push(Vertex{
                 color_diffuse: self.color,
                 position: v.into(),
                 normal: quad_normal
@@ -46,8 +46,8 @@ impl CubeFace{
         return result;
     } 
 
-    pub fn to_outline_vertex_list(&self) -> Vec<StaticVertex>{
-        let mut result:Vec<StaticVertex> = vec![];
+    pub fn to_outline_vertex_list(&self) -> Vec<Vertex>{
+        let mut result:Vec<Vertex> = vec![];
         let v1 = self.vertices[0];
         let v2 = self.vertices[1];
         let v3 = self.vertices[2];
@@ -70,7 +70,7 @@ impl CubeFace{
         ];
 
         for v in vertices{
-            result.push(StaticVertex{
+            result.push(Vertex{
                 color_diffuse: [0., 0., 0.],
                 position: v.into(),
                 normal: quad_normal

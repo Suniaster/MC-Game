@@ -1,15 +1,15 @@
 pub mod vertex;
 pub mod instance;
-use vertex::StaticVertex;
+use vertex::Vertex;
 use instance::MeshInstance;
 
 pub struct StaticVertexMesh{
-  pub vertices: Vec<StaticVertex>,
+  pub vertices: Vec<Vertex>,
   pub mesh_instance: [MeshInstance; 1],
 }
 
 impl StaticVertexMesh {
-  pub fn new(vertices: Vec<StaticVertex>, origin: [f32;3]) -> Self {
+  pub fn new(vertices: Vec<Vertex>, origin: [f32;3]) -> Self {
     Self {
       vertices,
       mesh_instance: [MeshInstance { origin }]
@@ -25,7 +25,7 @@ impl StaticVertexMesh {
   }
 
   pub fn to_vertex_buffer<T: bytemuck::Pod>(&self)->&[T]{
-    bytemuck::cast_slice::<StaticVertex, T>(&self.vertices)
+    bytemuck::cast_slice::<Vertex, T>(&self.vertices)
   }
 
   pub fn to_instance_buffer<T: bytemuck::Pod>(&self)->&[T]{

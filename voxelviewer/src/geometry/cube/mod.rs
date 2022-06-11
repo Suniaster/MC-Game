@@ -3,7 +3,7 @@ use nalgebra::Point3;
 
 
 use crate::draw::mesh::StaticVertexMesh;
-use crate::draw::mesh::vertex::StaticVertex;
+use crate::draw::mesh::vertex::Vertex;
 
 use super::cube_face::{CubeFace, cube_face_direction::*};
 
@@ -46,7 +46,7 @@ impl Cuboid{
         self.origin = position;
     }
 
-    pub fn get_static_vertices(&self) -> Vec<StaticVertex>{
+    pub fn get_static_vertices(&self) -> Vec<Vertex>{
         let mut result = vec![];
         for quad in &self.faces {
             result.append(&mut quad.to_static_vertex_list());
@@ -54,7 +54,7 @@ impl Cuboid{
         result
     }
 
-    pub fn get_outline_vertices(&self) -> Vec<StaticVertex>{
+    pub fn get_outline_vertices(&self) -> Vec<Vertex>{
         let mut result = vec![];
         for quad in &self.faces {
             result.append(&mut quad.to_outline_vertex_list());
