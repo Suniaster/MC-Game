@@ -65,7 +65,7 @@ fn get_unloaded_chunks(loaded_chunks: &LoadedChunks, ids: Vec<[isize; 2]>) -> Ve
 
 fn get_chunks_ids_surround_id(id: [isize; 2]) -> Vec<[isize; 2]> {
     let mut chunks_ids = Vec::new();
-    const VIEW_RANGE: isize = 8;
+    const VIEW_RANGE: isize = 2;
     for x in -VIEW_RANGE..VIEW_RANGE {
         for y in -VIEW_RANGE..VIEW_RANGE {
             chunks_ids.push([id[0] + x, id[1] + y]);

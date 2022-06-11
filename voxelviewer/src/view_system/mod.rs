@@ -4,6 +4,7 @@ use nalgebra::Point3;
 use specs::prelude::*;
 use crate::geometry::{grid::{self, GridMatrix}};
 
+pub mod boundingbox;
 
 use crate::{
     ScreenView, 

@@ -19,6 +19,12 @@ mod components;
 // X - Concertar o treco de cima
 // X - Mudar no front uso de cgmath para nalgebra
 // - Melhorar interface com front
+//      - Reescrevendo shaders do front para padronizar uso de grid 
+//      - Parei em reescrevendo "grid_instance"
+//      - Proximos passos são, reescrever grid instance, refotarar criação de grid para não incluir vertex
+//      - Mudar render system para usar novo padrão
+//      - Adicionar no novo modelo a criação de BB
+//      - Adicionar no novo modelo a criação de Wireframe
 //  - Adicionar interface com front parar mesh
 //  - Adicionar interface com front parar BoundingBox
 //  - Adicionar interface com front parar Wireframe
