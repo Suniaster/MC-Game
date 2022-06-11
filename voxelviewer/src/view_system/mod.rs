@@ -5,10 +5,10 @@ use specs::prelude::*;
 use crate::geometry::{grid::{self, GridMatrix}};
 
 pub mod boundingbox;
+use crate::draw::renderer::SceneEntityRenderer;
 
 use crate::{
     ScreenView, 
-    scene_entity::scene_entity_renderer::SceneEntityRenderer, 
     vertex::StaticVertexMesh,
 };
 

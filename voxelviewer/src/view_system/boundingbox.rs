@@ -2,9 +2,8 @@ use nalgebra::Point3;
 use specs::prelude::*;
 
 use crate::{
-  scene_entity::scene_entity_renderer::SceneEntityRenderer, 
-  vertex::StaticVertexMesh, 
-  geometry::grid::Grid
+  draw::renderer::SceneEntityRenderer, 
+  vertex::StaticVertexMesh,
 };
 
 pub struct BoundBoxRenderer{
