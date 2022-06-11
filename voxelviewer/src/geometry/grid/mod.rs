@@ -1,4 +1,4 @@
-use crate::{cube, draw::{mesh::StaticVertexMesh, geometry::cube_face::cube_face_to_vertex_list}};
+use crate::{draw::{mesh::StaticVertexMesh, geometry::cube_face::cube_face_to_vertex_list}};
 
 use super::cube::Cuboid;
 use nalgebra::{Point3, Vector3};
@@ -126,14 +126,5 @@ impl Grid{
         vertices, 
         position.into()
     );
-  }
-
-  pub fn _build_outline(&self) -> StaticVertexMesh{
-    let mut overall_cuboid = cube::Cuboid::new(
-      self.half_grid_sizes,
-      [0., 0., 0.]
-    );
-    overall_cuboid.move_origin_to(self.origin);
-    overall_cuboid.build_outline()
   }
 }

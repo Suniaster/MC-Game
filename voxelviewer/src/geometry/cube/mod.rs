@@ -56,14 +56,6 @@ impl Cuboid{
         result
     }
 
-    pub fn get_outline_vertices(&self) -> Vec<Vertex>{
-        let mut result = vec![];
-        for quad in &self.faces {
-            result.append(&mut quad.to_outline_vertex_list());
-        }
-        result
-    }
-
     pub fn remove_face(&mut self, dir: CubeFaceDirection){
         self.faces.retain(|quad| quad.direction != dir);
     }
@@ -73,12 +65,6 @@ impl Cuboid{
     pub fn build(&self) -> StaticVertexMesh{
         return StaticVertexMesh::new(
             self.get_static_vertices(), 
-            self.origin.into()
-        );
-    }
-    pub fn build_outline(&self) -> StaticVertexMesh{
-        return StaticVertexMesh::new(
-            self.get_outline_vertices(), 
             self.origin.into()
         );
     }

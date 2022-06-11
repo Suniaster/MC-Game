@@ -15,7 +15,6 @@ mod draw;
 pub mod view_system;
 
 use scene::*;
-use geometry::*;
 
 pub mod view_actions;
 
