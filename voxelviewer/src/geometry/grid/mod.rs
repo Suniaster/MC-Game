@@ -1,6 +1,5 @@
-use crate::cube;
+use crate::{cube, draw::mesh::StaticVertexMesh};
 
-use super::super::vertex::{StaticVertexMesh};
 use super::cube::Cuboid;
 use nalgebra::{Point3, Vector3};
 

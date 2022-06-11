@@ -2,14 +2,13 @@ use std::{sync::{Arc, Mutex}, iter};
 
 use nalgebra::Point3;
 use specs::prelude::*;
-use crate::geometry::{grid::{self, GridMatrix}};
+use crate::{geometry::{grid::{self, GridMatrix}}, draw::mesh::StaticVertexMesh};
 
 pub mod boundingbox;
 use crate::draw::renderer::SceneEntityRenderer;
 
 use crate::{
-    ScreenView, 
-    vertex::StaticVertexMesh,
+    ScreenView
 };
 
 /************* VIEW COMPONENT ***************/

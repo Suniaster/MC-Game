@@ -5,8 +5,10 @@
 //   voxel_tools::rendering::voxel_vertex::VoxelVertex,
 // };
 // use super::cube_vertex::VoxelVertex;
-use super::super::vertex::static_vertex::StaticVertex;
-use super::super::vertex::mesh_instance::MeshInstance;
+use super::mesh::vertex::StaticVertex;
+use super::mesh::instance::MeshInstance;
+
+
 fn create_render_pipeline(
   device: &wgpu::Device,
   layout: &wgpu::PipelineLayout,

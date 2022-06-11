@@ -1,7 +1,7 @@
-pub mod static_vertex;
-pub mod mesh_instance;
-use static_vertex::StaticVertex;
-use mesh_instance::MeshInstance;
+pub mod vertex;
+pub mod instance;
+use vertex::StaticVertex;
+use instance::MeshInstance;
 
 pub struct StaticVertexMesh{
   pub vertices: Vec<StaticVertex>,

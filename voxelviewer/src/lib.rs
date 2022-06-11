@@ -11,7 +11,6 @@ mod camera;
 mod scene;
 mod geometry;
 mod screen_text;
-mod vertex;
 mod draw;
 pub mod view_system;
 

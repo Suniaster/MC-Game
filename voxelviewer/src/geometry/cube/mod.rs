@@ -1,9 +1,10 @@
 use nalgebra::Vector3;
 use nalgebra::Point3;
 
-use super::super::vertex::{
-  static_vertex::StaticVertex, StaticVertexMesh
-};
+
+use crate::draw::mesh::StaticVertexMesh;
+use crate::draw::mesh::vertex::StaticVertex;
+
 use super::cube_face::{CubeFace, cube_face_direction::*};
 
 pub struct Cuboid{

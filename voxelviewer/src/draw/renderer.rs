@@ -1,5 +1,5 @@
 use wgpu::util::DeviceExt;
-use super::super::vertex::{StaticVertexMesh};
+use super::mesh::{StaticVertexMesh};
 
 
 pub struct SceneEntityRenderer{

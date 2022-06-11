@@ -1,10 +1,9 @@
-
-use super::super::vertex::static_vertex::StaticVertex;
-
 pub mod cube_face_direction;
 
 use cube_face_direction::CubeFaceDirection;
 use nalgebra::{Point3, Vector3};
+
+use crate::draw::mesh::vertex::StaticVertex;
 
 pub struct CubeFace{
     pub vertices: [Point3<f32>; 4],
