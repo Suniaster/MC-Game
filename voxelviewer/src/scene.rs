@@ -69,8 +69,8 @@ pub struct State {
     projection: camera::Projection,
 
     // Instances
-    pub entities: HashMap<u32, SceneEntity>,
-    pub entities_outlines: HashMap<u32, SceneEntity>,
+    // pub entities: HashMap<u32, SceneEntity>,
+    // pub entities_outlines: HashMap<u32, SceneEntity>,
 
     // Input: bool
     mouse_pressed: bool,
@@ -207,8 +207,8 @@ impl State {
             camera_buffer,
             camera_bind_group,    
             camera_controller,
-            entities: HashMap::new(),
-            entities_outlines: HashMap::new(),
+            // entities: HashMap::new(),
+            // entities_outlines: HashMap::new(),
             
             static_cube_pipeline,
             static_lines_pipeline,
@@ -310,22 +310,22 @@ impl State {
                 }),
             });
 
-            render_pass.set_pipeline(&self.static_cube_pipeline);
-            for (_, ent) in &self.entities{
-                draw_entity(
-                    &mut render_pass,
-                    &ent.renderer,
-                    &self.camera_bind_group
-                );
-            }
+            // render_pass.set_pipeline(&self.static_cube_pipeline);
+            // for (_, ent) in &self.entities{
+            //     draw_entity(
+            //         &mut render_pass,
+            //         &ent.renderer,
+            //         &self.camera_bind_group
+            //     );
+            // }
 
-            render_pass.set_pipeline(&self.static_lines_pipeline);
-            for(_, ent) in &self.entities_outlines{
-                render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
-                render_pass.set_vertex_buffer(0, ent.renderer.vertex_buffer.slice(..));
-                render_pass.set_vertex_buffer(1, ent.renderer.instance_buffer.slice(..));
-                render_pass.draw(0..ent.renderer.num_vertices, 0..1);
-            }
+            // render_pass.set_pipeline(&self.static_lines_pipeline);
+            // for(_, ent) in &self.entities_outlines{
+            //     render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
+            //     render_pass.set_vertex_buffer(0, ent.renderer.vertex_buffer.slice(..));
+            //     render_pass.set_vertex_buffer(1, ent.renderer.instance_buffer.slice(..));
+            //     render_pass.draw(0..ent.renderer.num_vertices, 0..1);
+            // }
         }
         
         for text in self.screen_texts.iter(){

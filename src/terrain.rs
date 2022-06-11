@@ -65,7 +65,7 @@ fn get_unloaded_chunks(loaded_chunks: &LoadedChunks, ids: Vec<[isize; 2]>) -> Ve
 
 fn get_chunks_ids_surround_id(id: [isize; 2]) -> Vec<[isize; 2]> {
     let mut chunks_ids = Vec::new();
-    const VIEW_RANGE: isize = 2;
+    const VIEW_RANGE: isize = 8;
     for x in -VIEW_RANGE..VIEW_RANGE {
         for y in -VIEW_RANGE..VIEW_RANGE {
             chunks_ids.push([id[0] + x, id[1] + y]);
@@ -85,7 +85,7 @@ type Mat3 = Vec<Vec<Vec<bool>>>;
 use perlin2d::PerlinNoise2D;
 fn create_chunk_mat_at(postion: Point3<f32>) -> Mat3 {
     let mut mat: Mat3 = vec![];
-    let perlin = PerlinNoise2D::new(1, 1., 1.0, 0.5, 2.0, (10.0, 10.0), 0., 1);
+    let perlin = PerlinNoise2D::new(4, 1., 1.0, 0.5, 2.0, (10.0, 10.0), 0., 1);
 
     for i in 0..GRID_SIZE {
         mat.push(vec![]);

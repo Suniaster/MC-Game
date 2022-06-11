@@ -3,7 +3,6 @@ use std::time::Duration;
 
 use specs::prelude::*;
 
-mod entities;
 mod systems;
 mod terrain;
 mod components;
@@ -43,10 +42,6 @@ pub type ScreenMutex = MultiThread<ScreenView>;
 
 fn main() {
     let mut world = World::new();
-
-    world.register::<components::RenderComponent>();
-    world.register::<components::PositionComponent>();
-    world.register::<components::GridDescriptorComponent>();
 
     let (screen, evloop) = voxelviewer::create_screen();
     let arc_screen = Arc::new(Mutex::new(screen));

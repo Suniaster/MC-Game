@@ -92,16 +92,6 @@ pub fn start(
                 let dt = now - last_render_time;
                 last_render_time = now;
                 screen.state.update(dt);
-                // match screen.state.render() {
-                //     Ok(_) => {}
-                //     Err(wgpu::SurfaceError::Lost) => {
-                //         let size = screen.state.size;
-                //         screen.state.resize(size)
-                //     },
-                //     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
-                //     // All other errors (Outdated, Timeout) should be resolved by the next frame
-                //     Err(e) => eprintln!("{:?}", e),
-                // }
                 drop(screen); // Drop screen to clear mutex
                 dispatcher.dispatch(&mut world);
             }
