@@ -2,6 +2,7 @@ use nalgebra::Vector3;
 use nalgebra::Point3;
 
 
+use crate::draw::geometry::cube_face::cube_face_to_vertex_list;
 use crate::draw::mesh::StaticVertexMesh;
 use crate::draw::mesh::vertex::Vertex;
 
@@ -49,7 +50,8 @@ impl Cuboid{
     pub fn get_static_vertices(&self) -> Vec<Vertex>{
         let mut result = vec![];
         for quad in &self.faces {
-            result.append(&mut quad.to_static_vertex_list());
+            let mut vertices = cube_face_to_vertex_list(&quad);
+            result.append(&mut vertices);
         }
         result
     }

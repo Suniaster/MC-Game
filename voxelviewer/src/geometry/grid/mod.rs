@@ -1,4 +1,4 @@
-use crate::{cube, draw::mesh::StaticVertexMesh};
+use crate::{cube, draw::{mesh::StaticVertexMesh, geometry::cube_face::cube_face_to_vertex_list}};
 
 use super::cube::Cuboid;
 use nalgebra::{Point3, Vector3};
@@ -116,7 +116,8 @@ impl Grid{
         for col in row{
             for hex in col{
                 for quad in &hex.faces {
-                    vertices.append(&mut quad.to_static_vertex_list());
+                    let mut quad_vertices = cube_face_to_vertex_list(&quad);
+                    vertices.append(&mut quad_vertices);
                 }
             }
         }
