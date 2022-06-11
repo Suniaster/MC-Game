@@ -13,11 +13,8 @@ use winit::{
 
 use crate::texture;
 use crate::camera;
-use std::collections::HashMap;
 
 use super::screen_text::ScreenText;
-use crate::scene_entity::{SceneEntity};
-use crate::scene_entity::scene_entity_renderer::draw_entity;
 use wgpu_glyph::{ab_glyph, GlyphBrushBuilder};
 
 use nalgebra::Matrix4;
@@ -285,7 +282,7 @@ impl State {
             });
 
         {
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            let mut _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
                 label: Some("Render Pass"),
                 color_attachments: &[wgpu::RenderPassColorAttachment {
                     view: &view,

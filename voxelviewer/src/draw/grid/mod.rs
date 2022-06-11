@@ -3,7 +3,6 @@ use super::create_render_pipeline;
 mod grid_vertex;
 mod grid_instance;
 
-
 pub fn create_grid_render_pipeline(
   device: &wgpu::Device,
   binds: &[&wgpu::BindGroupLayout],
@@ -83,6 +82,3 @@ impl GridRenderer{
         }
     }
 }
-  
-  
-  
