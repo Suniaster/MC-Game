@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
@@ -58,15 +57,16 @@ fn main() {
             last_time: std::time::Instant::now()
         }, "update_dt_system", &[])
         .with(
-            terrain::TerrainSystem, "terrain", &[]
+            terrain::TerrainSystem
+        , "terrain_system", &[])
+        .with_thread_local(
+            voxelviewer::view_system::UpdateViewMeshesSystem::new(arc_screen.clone())
         )
-        .with_thread_local(systems::RenderTextInfoSystem{
-            texts_ids: HashMap::new(),
-            time_counter: std::time::Duration::new(0, 0),
-        })
+        .with_thread_local(
+            voxelviewer::view_system::ViewSystem::new(arc_screen.clone())
+        )
         .build();
 
-    world.insert(arc_screen.clone());
     world.insert(terrain::LoadedChunks::new());
     world.insert(systems::WorldDt(Duration::new(0, 0)));
 

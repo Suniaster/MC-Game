@@ -3,7 +3,6 @@ use std::{collections::HashMap, sync::{Arc, Mutex}, time::Duration};
 use specs::prelude::*;
 use voxelviewer::ScreenView;
 
-pub mod events;
 
 pub struct RenderTextInfoSystem{
     pub texts_ids: HashMap<&'static str, usize>,
@@ -17,34 +16,34 @@ impl<'a> System<'a> for RenderTextInfoSystem {
     );
 
     fn run(&mut self, (scren_mutex, dt): Self::SystemData){
-        self.time_counter += dt.0;
-        if self.time_counter.as_secs_f32() > 0.1 {
-            self.time_counter = Duration::new(0, 0);
-            let mut screen = scren_mutex.lock().unwrap();
+        // self.time_counter += dt.0;
+        // if self.time_counter.as_secs_f32() > 0.1 {
+        //     self.time_counter = Duration::new(0, 0);
+        //     let mut screen = scren_mutex.lock().unwrap();
             
-            let fps = 1./ dt.0.as_secs_f32();
-            let text = format!("Vextex count: {}", fps);
-            let id = self.texts_ids.get("fps").unwrap();
-            screen.actions.update_text(*id, text);
+        //     let fps = 1./ dt.0.as_secs_f32();
+        //     let text = format!("Vextex count: {}", fps);
+        //     let id = self.texts_ids.get("fps").unwrap();
+        //     screen.actions.update_text(*id, text);
 
-            let looking_dir = screen.actions.state.camera.get_looking_dir();
-            let looking_text = format!("Looking XZ: ({}, {})", looking_dir[0], looking_dir[1]);
-            let id = self.texts_ids.get("looking").unwrap();
-            screen.actions.update_text(*id, looking_text);
+        //     let looking_dir = screen.actions.state.camera.get_looking_dir();
+        //     let looking_text = format!("Looking XZ: ({}, {})", looking_dir[0], looking_dir[1]);
+        //     let id = self.texts_ids.get("looking").unwrap();
+        //     screen.actions.update_text(*id, looking_text);
 
-            let position = screen.actions.state.camera.get_position();
-            let position_text = format!(
-                "Position: ({:.0}, {:.0}, {:.0})", 
-                position.x, position.y, position.z
-            );
-            let id = self.texts_ids.get("position").unwrap();
-            screen.actions.update_text(*id, position_text);
+        //     let position = screen.actions.state.camera.get_position();
+        //     let position_text = format!(
+        //         "Position: ({:.0}, {:.0}, {:.0})", 
+        //         position.x, position.y, position.z
+        //     );
+        //     let id = self.texts_ids.get("position").unwrap();
+        //     screen.actions.update_text(*id, position_text);
 
-            let count = screen.actions.get_vertex_count();
-            let count_text = format!("Vertex count: {}", count);
-            let id = self.texts_ids.get("vertices").unwrap();
-            screen.actions.update_text(*id, count_text);
-        }
+        //     let count = screen.actions.get_vertex_count();
+        //     let count_text = format!("Vertex count: {}", count);
+        //     let id = self.texts_ids.get("vertices").unwrap();
+        //     screen.actions.update_text(*id, count_text);
+        // }
     }
 
     fn setup(&mut self, world: &mut World) {
@@ -52,10 +51,10 @@ impl<'a> System<'a> for RenderTextInfoSystem {
         let screen_mutex = world.read_resource::<Arc<Mutex<ScreenView>>>();
         let mut screen = screen_mutex.lock().unwrap();
 
-        self.texts_ids.insert("fps", screen.actions.create_text());
-        self.texts_ids.insert("looking", screen.actions.create_text());
-        self.texts_ids.insert("position", screen.actions.create_text());
-        self.texts_ids.insert("vertices", screen.actions.create_text());
+        // self.texts_ids.insert("fps", screen.actions.create_text());
+        // self.texts_ids.insert("looking", screen.actions.create_text());
+        // self.texts_ids.insert("position", screen.actions.create_text());
+        // self.texts_ids.insert("vertices", screen.actions.create_text());
     }
 }
 

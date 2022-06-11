@@ -13,15 +13,15 @@ mod pipelines;
 mod screen_text;
 mod scene_entity;
 mod vertex;
+pub mod view_system;
 
 use scene::*;
 use geometry::*;
-use view_actions::*;
 
 pub mod view_actions;
 
 pub struct ScreenView {
-    pub actions: ViewActions,
+    pub state: State,
     window: winit::window::Window,
 }
 
@@ -34,10 +34,10 @@ pub fn create_screen() -> (ScreenView, EventLoop<()>) {
         .build(&event_loop)
         .unwrap();
 
-    let actions = ViewActions{state: pollster::block_on(State::new(&window))};
+    let state =  pollster::block_on(State::new(&window));
 
     let screen = ScreenView {
-        actions,
+        state,
         window,
     };
 
@@ -61,7 +61,7 @@ pub fn start(
                 ref event,
                 .. // We're not using device_id currently
             } => {
-                screen.actions.state.input(event);
+                screen.state.input(event);
             }
             Event::WindowEvent {
                 ref event,
@@ -79,10 +79,10 @@ pub fn start(
                         ..
                     } => *control_flow = ControlFlow::Exit,
                     WindowEvent::Resized(physical_size) => {
-                        screen.actions.state.resize(*physical_size);
+                        screen.state.resize(*physical_size);
                     }
                     WindowEvent::ScaleFactorChanged { new_inner_size, .. } => {
-                        screen.actions.state.resize(**new_inner_size);
+                        screen.state.resize(**new_inner_size);
                     }
                     _ => {}
                 }
@@ -91,17 +91,17 @@ pub fn start(
                 let now = std::time::Instant::now();
                 let dt = now - last_render_time;
                 last_render_time = now;
-                screen.actions.state.update(dt);
-                match screen.actions.state.render() {
-                    Ok(_) => {}
-                    Err(wgpu::SurfaceError::Lost) => {
-                        let size = screen.actions.state.size;
-                        screen.actions.state.resize(size)
-                    },
-                    Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
-                    // All other errors (Outdated, Timeout) should be resolved by the next frame
-                    Err(e) => eprintln!("{:?}", e),
-                }
+                screen.state.update(dt);
+                // match screen.state.render() {
+                //     Ok(_) => {}
+                //     Err(wgpu::SurfaceError::Lost) => {
+                //         let size = screen.state.size;
+                //         screen.state.resize(size)
+                //     },
+                //     Err(wgpu::SurfaceError::OutOfMemory) => *control_flow = ControlFlow::Exit,
+                //     // All other errors (Outdated, Timeout) should be resolved by the next frame
+                //     Err(e) => eprintln!("{:?}", e),
+                // }
                 drop(screen); // Drop screen to clear mutex
                 dispatcher.dispatch(&mut world);
             }

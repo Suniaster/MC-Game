@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use crate::{components, ScreenMutex};
 use nalgebra::Point3;
 use specs::prelude::*;
 
@@ -16,14 +15,14 @@ pub const CHUNK_SIZE: f32 = GRID_SIZE as f32 * CUBE_SIZE;
 pub struct TerrainSystem;
 impl <'a> System<'a> for TerrainSystem {
     type SystemData = (
+        Entities<'a>,
+        WriteStorage<'a, voxelviewer::view_system::MeshRenderer>,
+        WriteStorage<'a, voxelviewer::view_system::PositionComponent>,
         WriteExpect<'a, LoadedChunks>,
-        WriteExpect<'a, ScreenMutex>
     );
 
-    fn run(&mut self, (mut loaded_chunks, screen_mutex): Self::SystemData) {
-        let mut screen = screen_mutex.lock().unwrap();
-        let camera = &screen.actions.state.camera;
-        let camera_pos = camera.position;
+    fn run(&mut self, (entities, mut mr, mut ps, mut loaded_chunks): Self::SystemData) {
+        let camera_pos = Point3::origin();
 
         let camera_chunk = position_to_chunk_idx(camera_pos);
 
@@ -34,10 +33,21 @@ impl <'a> System<'a> for TerrainSystem {
             ids_surround
         );
 
-        for id in unloaded_ids {
-            load_chunk(&mut loaded_chunks, &mut screen, id);
+        for chunk_id in unloaded_ids {            
+            let chunk_x = chunk_id[0] as f32 * CHUNK_SIZE;
+            let chunk_z = chunk_id[1] as f32 * CHUNK_SIZE;
+            let chunk_pos = Point3::from([chunk_x, 0., chunk_z]);
+            let grid = create_chunk_mat_at(chunk_pos);
+        
+            // Insert
+            loaded_chunks
+                .chunks
+                .insert(chunk_id[0] * GRID_SIZE as isize + chunk_id[1], ());
+                
+            let chunk = entities.create();
+            mr.insert(chunk, voxelviewer::view_system::MeshRenderer::from_grid(CUBE_SIZE, grid)).unwrap();
+            ps.insert(chunk, voxelviewer::view_system::PositionComponent::new(chunk_pos)).unwrap();
         }
-    
     }
 }
 
@@ -55,7 +65,7 @@ fn get_unloaded_chunks(loaded_chunks: &LoadedChunks, ids: Vec<[isize; 2]>) -> Ve
 
 fn get_chunks_ids_surround_id(id: [isize; 2]) -> Vec<[isize; 2]> {
     let mut chunks_ids = Vec::new();
-    const VIEW_RANGE: isize = 8;
+    const VIEW_RANGE: isize = 2;
     for x in -VIEW_RANGE..VIEW_RANGE {
         for y in -VIEW_RANGE..VIEW_RANGE {
             chunks_ids.push([id[0] + x, id[1] + y]);
@@ -70,23 +80,9 @@ fn position_to_chunk_idx(position: Point3<f32>) -> [isize; 2] {
     [chunk_i.floor() as isize, chunk_j.floor() as isize]
 }
 
-fn load_chunk(loaded_chunks: &mut LoadedChunks, screen: &mut ScreenView, chunk_id: [isize; 2]) {
-    let chunk_x = chunk_id[0] as f32 * CHUNK_SIZE;
-    let chunk_z = chunk_id[1] as f32 * CHUNK_SIZE;
-    let chunk_pos = Point3::from([chunk_x, 0., chunk_z]);
-    let grid = create_chunk_mat_at(chunk_pos);
-
-    // Insert
-    loaded_chunks
-        .chunks
-        .insert(chunk_id[0] * GRID_SIZE as isize + chunk_id[1], ());
-
-    create_chunk(screen, chunk_pos, grid);
-}
 
 type Mat3 = Vec<Vec<Vec<bool>>>;
 use perlin2d::PerlinNoise2D;
-use voxelviewer::ScreenView;
 fn create_chunk_mat_at(postion: Point3<f32>) -> Mat3 {
     let mut mat: Mat3 = vec![];
     let perlin = PerlinNoise2D::new(1, 1., 1.0, 0.5, 2.0, (10.0, 10.0), 0., 1);
@@ -111,12 +107,4 @@ fn create_chunk_mat_at(postion: Point3<f32>) -> Mat3 {
         }
     }
     return mat;
-}
-
-fn create_chunk(
-    screen: &mut ScreenView,
-    position: Point3<f32>,
-    grid: Mat3,
-) {
-    screen.actions.create_grid(position.into(), CUBE_SIZE, &grid);
 }

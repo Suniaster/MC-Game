@@ -65,7 +65,7 @@ pub struct State {
     pub camera_controller: camera::CameraController,
     camera_uniform: CameraUniform,
     camera_buffer: wgpu::Buffer,
-    camera_bind_group: wgpu::BindGroup,
+    pub camera_bind_group: wgpu::BindGroup,
     projection: camera::Projection,
 
     // Instances
