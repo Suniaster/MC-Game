@@ -74,7 +74,7 @@ pub fn create_cube_render_pipeline(
 )->wgpu::RenderPipeline{
     let shader = wgpu::ShaderModuleDescriptor {
         label: Some("Normal Shader"),
-        source: wgpu::ShaderSource::Wgsl(include_str!("./static_vertex.wgsl").into()),
+        source: wgpu::ShaderSource::Wgsl(include_str!("./shaders/static_vertex.wgsl").into()),
     };
     let render_pipeline_layout =
         device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {

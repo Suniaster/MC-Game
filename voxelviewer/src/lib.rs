@@ -10,7 +10,6 @@ mod texture;
 mod camera;
 mod scene;
 mod geometry;
-mod pipelines;
 mod screen_text;
 mod scene_entity;
 mod vertex;

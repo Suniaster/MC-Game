@@ -13,6 +13,7 @@ use winit::{
 
 use crate::texture;
 use crate::camera;
+use crate::draw::pipelines::create_cube_render_pipeline;
 
 use super::screen_text::ScreenText;
 use wgpu_glyph::{ab_glyph, GlyphBrushBuilder};
@@ -164,7 +165,7 @@ impl State {
         });
 
 
-        let static_cube_pipeline = super::pipelines::static_vertex_pipeline::create_cube_render_pipeline(
+        let static_cube_pipeline = create_cube_render_pipeline(
             &device, 
             &[
                 &camera_bind_group_layout,
@@ -173,7 +174,7 @@ impl State {
             wgpu::PrimitiveTopology::TriangleList
         );
 
-        let static_lines_pipeline =  super::pipelines::static_vertex_pipeline::create_cube_render_pipeline(
+        let static_lines_pipeline =  create_cube_render_pipeline(
             &device, 
             &[
                 &camera_bind_group_layout,
