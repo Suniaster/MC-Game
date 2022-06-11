@@ -19,8 +19,9 @@ mod components;
 // X - Concertar o treco de cima
 // X - Mudar no front uso de cgmath para nalgebra
 // - Melhorar interface com front
-//  - Adicionar Eventos
-//  - Adicionar metodos de toggle em objeto, framewire, e bounding box
+//  - Adicionar interface com front parar mesh
+//  - Adicionar interface com front parar BoundingBox
+//  - Adicionar interface com front parar Wireframe
 // - Ajustar geração de terreno
 // - Fazer render ser independete do resto, de modo a poder mexer a camera mesmo com as coisas carregando
 // - Adicionar algum tipo de terminal, console ou algo que ajude na visualização dos dados
