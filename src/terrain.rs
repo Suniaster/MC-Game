@@ -9,9 +9,9 @@ pub struct LoadedChunks {
 impl LoadedChunks { pub fn new() -> Self { LoadedChunks { chunks: HashMap::new() } } }
 
 pub const GRID_SIZE: usize = 16;
+pub const CHUNK_HEIGHT: usize = 64;
 pub const CUBE_SIZE: f32 = 1.;
 pub const CHUNK_SIZE: f32 = GRID_SIZE as f32 * CUBE_SIZE;
-
 pub struct TerrainSystem;
 impl <'a> System<'a> for TerrainSystem {
     type SystemData = (
@@ -65,7 +65,7 @@ fn get_unloaded_chunks(loaded_chunks: &LoadedChunks, ids: Vec<[isize; 2]>) -> Ve
 
 fn get_chunks_ids_surround_id(id: [isize; 2]) -> Vec<[isize; 2]> {
     let mut chunks_ids = Vec::new();
-    const VIEW_RANGE: isize = 2;
+    const VIEW_RANGE: isize = 8;
     for x in -VIEW_RANGE..VIEW_RANGE {
         for y in -VIEW_RANGE..VIEW_RANGE {
             chunks_ids.push([id[0] + x, id[1] + y]);
@@ -83,26 +83,30 @@ fn position_to_chunk_idx(position: Point3<f32>) -> [isize; 2] {
 
 type Mat3 = Vec<Vec<Vec<bool>>>;
 use perlin2d::PerlinNoise2D;
+
 fn create_chunk_mat_at(postion: Point3<f32>) -> Mat3 {
-    let mut mat: Mat3 = vec![];
-    let perlin = PerlinNoise2D::new(4, 1., 1.0, 0.5, 2.0, (10.0, 10.0), 0., 1);
+    let mut mat: Mat3 = vec![vec![vec![false; GRID_SIZE]; CHUNK_HEIGHT]; GRID_SIZE];
+    let perlin_n = PerlinNoise2D::new(
+        6, 
+        10.0, 
+        0.5, 
+        1.0,
+        2.0,
+        (100. as f64, 100. as f64), 
+        10.,
+        101
+    );
 
     for i in 0..GRID_SIZE {
-        mat.push(vec![]);
-        for j in 0..GRID_SIZE {
-            mat[i].push(vec![]);
-            for k in 0..GRID_SIZE {
-                let pos_x = postion.x + i as f32 * CUBE_SIZE - CHUNK_SIZE / 2.;
-                let pos_y = postion.y + j as f32 * CUBE_SIZE - CHUNK_SIZE / 2.;
-                let pos_z = postion.z + k as f32 * CUBE_SIZE - CHUNK_SIZE / 2.;
+        for k in 0..GRID_SIZE {
 
-                let mut val = perlin.get_noise(pos_x as f64, pos_z as f64);
+            let pos_x = postion.x + (i as f32 * CUBE_SIZE) - CHUNK_SIZE / 2.;
+            let pos_z = postion.z + (k as f32 * CUBE_SIZE) - CHUNK_SIZE / 2.;
+            let height = perlin_n.get_noise(pos_x as f64, pos_z as f64);
 
-                val += 1.;
-                val /= 2.;
-                val *= 7.;
-
-                mat[i][j].push(val > pos_y.into());
+            for j in 0..CHUNK_HEIGHT {
+                let pos_y = postion.y + (j as f32 * CUBE_SIZE) - CHUNK_SIZE / 2.;
+                mat[i][j][k] = height > pos_y.into();
             }
         }
     }
