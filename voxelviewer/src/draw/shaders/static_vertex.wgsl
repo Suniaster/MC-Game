@@ -47,7 +47,10 @@ fn fs_main(
 ) -> [[location(0)]] vec4<f32> {
     let normal = normalize(in.normal);
 
-    let view_dir = normalize(u_camera.position.xyz - in.position);
+    var light_pos = u_camera.position.xyz;
+    light_pos = vec3<f32>(light_pos.x, 100.0, light_pos.z);
+
+    let view_dir = normalize(light_pos.xyz - in.position);
     let half_dir = normalize(view_dir);
 
     let specular_strength = pow(max(dot(normal, half_dir), 0.0), 1.0);
