@@ -5,16 +5,17 @@ use specs::prelude::*;
 use crate::{geometry::{grid::{self, GridMatrix}}, draw::{mesh::StaticVertexMesh, geometry::grid::build_grid_mesh_from_desc}, screen_text::ScreenText};
 
 pub mod boundingbox;
+pub mod camera_system;
+pub mod components;
 use crate::draw::renderer::SceneEntityRenderer;
 
 use crate::{
     ScreenView
 };
 
+use self::components::PositionComponent;
+
 /************* VIEW COMPONENT ***************/
-pub struct PositionComponent(Point3<f32>);
-impl Component for PositionComponent {type Storage = VecStorage<Self>;}
-impl PositionComponent {pub fn new(position: Point3<f32>) -> Self {Self(position)}}
 pub struct MeshRenderer{
     pub renderer: Option<SceneEntityRenderer>,
     pub mesh: StaticVertexMesh

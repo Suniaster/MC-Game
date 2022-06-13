@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use nalgebra::Point3;
 use specs::prelude::*;
 
+use voxelviewer::view_system::components::*;
 
 pub struct LoadedChunks {
     chunks: HashMap<isize, ()>,
@@ -17,7 +18,7 @@ impl <'a> System<'a> for TerrainSystem {
     type SystemData = (
         Entities<'a>,
         WriteStorage<'a, voxelviewer::view_system::MeshRenderer>,
-        WriteStorage<'a, voxelviewer::view_system::PositionComponent>,
+        WriteStorage<'a, PositionComponent>,
         WriteExpect<'a, LoadedChunks>,
     );
 
@@ -46,7 +47,7 @@ impl <'a> System<'a> for TerrainSystem {
                 
             let chunk = entities.create();
             mr.insert(chunk, voxelviewer::view_system::MeshRenderer::from_grid(CUBE_SIZE, grid)).unwrap();
-            ps.insert(chunk, voxelviewer::view_system::PositionComponent::new(chunk_pos)).unwrap();
+            ps.insert(chunk, PositionComponent::new(chunk_pos)).unwrap();
         }
     }
 }
@@ -65,7 +66,7 @@ fn get_unloaded_chunks(loaded_chunks: &LoadedChunks, ids: Vec<[isize; 2]>) -> Ve
 
 fn get_chunks_ids_surround_id(id: [isize; 2]) -> Vec<[isize; 2]> {
     let mut chunks_ids = Vec::new();
-    const VIEW_RANGE: isize = 3;
+    const VIEW_RANGE: isize = 8;
     for x in -VIEW_RANGE..VIEW_RANGE {
         for y in -VIEW_RANGE..VIEW_RANGE {
             chunks_ids.push([id[0] + x, id[1] + y]);
