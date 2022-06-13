@@ -41,6 +41,7 @@ mod components;
 // - Adicionar menu para mudanças de propriedades da camera
 
 use specs::DispatcherBuilder;
+use systems::RenderTextInfoSystem;
 use voxelviewer::ScreenView;
 
 pub type MultiThread<T> = Arc<Mutex<T>>;
@@ -61,6 +62,9 @@ fn main() {
         .with(
             terrain::TerrainSystem
         , "terrain_system", &[])
+        .with(
+            RenderTextInfoSystem::new()
+        , "render_text_info_system", &["update_dt_system"])
         .with_thread_local(
             voxelviewer::view_system::UpdateViewMeshesSystem::new(arc_screen.clone())
         )

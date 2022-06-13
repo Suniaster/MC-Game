@@ -2,7 +2,7 @@ use std::{sync::{Arc, Mutex}, iter};
 
 use nalgebra::Point3;
 use specs::prelude::*;
-use crate::{geometry::{grid::{self, GridMatrix}}, draw::{mesh::StaticVertexMesh, geometry::grid::build_grid_mesh_from_desc}};
+use crate::{geometry::{grid::{self, GridMatrix}}, draw::{mesh::StaticVertexMesh, geometry::grid::build_grid_mesh_from_desc}, screen_text::ScreenText};
 
 pub mod boundingbox;
 use crate::draw::renderer::SceneEntityRenderer;
@@ -87,9 +87,10 @@ impl ViewSystem {
 }
 
 impl <'a> System <'a> for ViewSystem {
-    type SystemData = 
-        ReadStorage<'a, MeshRenderer>
-    ;
+    type SystemData = (
+        ReadStorage<'a, MeshRenderer>,
+        Read<'a, Vec<ScreenText>>
+    );
 
     fn setup(&mut self, world: &mut specs::World) {
         Self::SystemData::setup(world);
@@ -97,7 +98,7 @@ impl <'a> System <'a> for ViewSystem {
         world.register::<PositionComponent>();
     }
 
-    fn run(&mut self, meshes: Self::SystemData) {
+    fn run(&mut self, (meshes, texts): Self::SystemData) {
         let mut view = self.state.lock().unwrap();
         let state = &mut view.state;
         let output = state.surface.get_current_texture().unwrap();
@@ -153,8 +154,25 @@ impl <'a> System <'a> for ViewSystem {
             }
         }
         
-  
+        for text in texts.iter() {
+            text.draw(
+                &mut state.glyph_brush, 
+                state.size.width as f32, 
+                state.size.height as f32
+            )
+        }
 
+        state.glyph_brush
+            .draw_queued(
+                &state.device,
+                &mut state.staging_belt,
+                &mut encoder,
+                &view,
+                state.size.width,
+                state.size.height,
+            )
+            .expect("Draw queued");
+        state.staging_belt.finish();
         state.queue.submit(iter::once(encoder.finish()));
         output.present();
 

@@ -1,4 +1,5 @@
 
+use specs::Component;
 use wgpu_glyph::{GlyphBrush, Section, Text};
 
 pub struct ScreenText{
@@ -6,6 +7,9 @@ pub struct ScreenText{
     pub x: f32,
     pub y: f32,
     pub color: [f32; 4],
+}
+impl Component for ScreenText {
+    type Storage = specs::HashMapStorage<Self>;
 }
 
 impl ScreenText{
@@ -23,8 +27,9 @@ impl ScreenText{
             screen_position: (self.x, self.y),
             bounds: (width, heigth),
             text: vec![Text::new(self.text.as_str())
-                .with_color([0.0, 0.0, 0.0, 1.0])
-                .with_scale(20.0)],
+                .with_color(self.color)
+                .with_scale(20.0)    
+            ],
             ..Section::default()
         });
     }

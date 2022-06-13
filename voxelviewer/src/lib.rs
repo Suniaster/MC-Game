@@ -10,7 +10,7 @@ mod texture;
 mod camera;
 mod scene;
 mod geometry;
-mod screen_text;
+pub mod screen_text;
 mod draw;
 pub mod view_system;
 

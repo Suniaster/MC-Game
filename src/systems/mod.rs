@@ -1,24 +1,52 @@
-use std::{collections::HashMap, sync::{Arc, Mutex}, time::Duration};
+use std::{collections::HashMap, time::Duration};
 
 use specs::prelude::*;
-use voxelviewer::ScreenView;
-
+use voxelviewer::screen_text::ScreenText;
 
 pub struct RenderTextInfoSystem{
     pub texts_ids: HashMap<&'static str, usize>,
     pub time_counter: std::time::Duration,
 }
 
+impl RenderTextInfoSystem {
+    pub fn new() -> Self {
+        RenderTextInfoSystem{
+            texts_ids: HashMap::new(),
+            time_counter: Duration::new(0, 0),
+        }
+    }
+}
+
 impl<'a> System<'a> for RenderTextInfoSystem {
     type SystemData = (
-        ReadExpect<'a, Arc<Mutex<ScreenView>>>,
+        Write<'a, Vec<ScreenText>>,
         Read<'a, WorldDt>,
     );
 
-    fn run(&mut self, (scren_mutex, dt): Self::SystemData){
-        // self.time_counter += dt.0;
-        // if self.time_counter.as_secs_f32() > 0.1 {
-        //     self.time_counter = Duration::new(0, 0);
+    fn setup(&mut self, world: &mut specs::World) {
+        Self::SystemData::setup(world);
+        let mut screen_texts :Vec<ScreenText> = vec![];
+        screen_texts.push(ScreenText::new(
+            String::from(""),
+            0.0,
+            0.0,
+            [0.0, 0.0, 0.0, 1.0],
+        ));
+        self.texts_ids.insert("fps", screen_texts.len() - 1);
+        world.insert::<Vec<ScreenText>>(screen_texts);
+    }
+
+    fn run(&mut self, (mut texts, dt): Self::SystemData){
+
+        self.time_counter += dt.0;
+        if self.time_counter.as_secs_f32() > 0.1 {
+            self.time_counter = Duration::new(0, 0);
+
+
+            let fps_ent = self.texts_ids.get("fps").unwrap();
+            texts[*fps_ent].text = format!("FPS: {:.1}", 1.0 / dt.0.as_secs_f32());
+
+        }
         //     let mut screen = scren_mutex.lock().unwrap();
             
         //     let fps = 1./ dt.0.as_secs_f32();
@@ -46,16 +74,7 @@ impl<'a> System<'a> for RenderTextInfoSystem {
         // }
     }
 
-    fn setup(&mut self, world: &mut World) {
-        Self::SystemData::setup(world);
-        let screen_mutex = world.read_resource::<Arc<Mutex<ScreenView>>>();
-        let mut screen = screen_mutex.lock().unwrap();
-
-        // self.texts_ids.insert("fps", screen.actions.create_text());
-        // self.texts_ids.insert("looking", screen.actions.create_text());
-        // self.texts_ids.insert("position", screen.actions.create_text());
-        // self.texts_ids.insert("vertices", screen.actions.create_text());
-    }
+  
 }
 
 

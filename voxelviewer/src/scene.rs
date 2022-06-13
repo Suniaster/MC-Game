@@ -1,8 +1,3 @@
-
-
-
-use std::iter;
-
 use wgpu::util::DeviceExt;
 use wgpu_glyph::GlyphBrush;
 use winit::{
@@ -15,7 +10,6 @@ use crate::texture;
 use crate::camera;
 use crate::draw::pipelines::create_cube_render_pipeline;
 
-use super::screen_text::ScreenText;
 use wgpu_glyph::{ab_glyph, GlyphBrushBuilder};
 
 use nalgebra::Matrix4;
@@ -54,9 +48,8 @@ pub struct State {
     pub static_lines_pipeline: wgpu::RenderPipeline,
 
     //Glyph
-    glyph_brush: GlyphBrush<()>,
-    staging_belt:  wgpu::util::StagingBelt,
-    pub screen_texts: Vec<ScreenText>,
+    pub glyph_brush: GlyphBrush<()>,
+    pub staging_belt:  wgpu::util::StagingBelt,
 
     // Camera
     pub camera: camera::Camera,
@@ -65,10 +58,6 @@ pub struct State {
     camera_buffer: wgpu::Buffer,
     pub camera_bind_group: wgpu::BindGroup,
     projection: camera::Projection,
-
-    // Instances
-    // pub entities: HashMap<u32, SceneEntity>,
-    // pub entities_outlines: HashMap<u32, SceneEntity>,
 
     // Input: bool
     mouse_pressed: bool,
@@ -205,8 +194,6 @@ impl State {
             camera_buffer,
             camera_bind_group,    
             camera_controller,
-            // entities: HashMap::new(),
-            // entities_outlines: HashMap::new(),
             
             static_cube_pipeline,
             static_lines_pipeline,
@@ -215,7 +202,6 @@ impl State {
 
             glyph_brush, 
             staging_belt,
-            screen_texts: vec![]
         }
     }
 
@@ -268,86 +254,5 @@ impl State {
         self.camera_uniform.update_view_proj(&self.camera, &self.projection);
 
         self.queue.write_buffer(&self.camera_buffer, 0, bytemuck::cast_slice(&[self.camera_uniform]));
-    }
-
-    pub fn render(&mut self) -> Result<(), wgpu::SurfaceError> {
-        let output = self.surface.get_current_texture()?;
-        let view = output
-            .texture
-            .create_view(&wgpu::TextureViewDescriptor::default());
-
-        let mut encoder = self
-            .device
-            .create_command_encoder(&wgpu::CommandEncoderDescriptor {
-                label: Some("Render Encoder"),
-            });
-
-        {
-            let mut _render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("Render Pass"),
-                color_attachments: &[wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.2,
-                            b: 0.3,
-                            a: 1.0,
-                        }),
-                        store: true,
-                    },
-                }],
-                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: &self.depth_texture.view,
-                    depth_ops: Some(wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(1.0),
-                        store: true,
-                    }),
-                    stencil_ops: None,
-                }),
-            });
-
-            // render_pass.set_pipeline(&self.static_cube_pipeline);
-            // for (_, ent) in &self.entities{
-            //     draw_entity(
-            //         &mut render_pass,
-            //         &ent.renderer,
-            //         &self.camera_bind_group
-            //     );
-            // }
-
-            // render_pass.set_pipeline(&self.static_lines_pipeline);
-            // for(_, ent) in &self.entities_outlines{
-            //     render_pass.set_bind_group(0, &self.camera_bind_group, &[]);
-            //     render_pass.set_vertex_buffer(0, ent.renderer.vertex_buffer.slice(..));
-            //     render_pass.set_vertex_buffer(1, ent.renderer.instance_buffer.slice(..));
-            //     render_pass.draw(0..ent.renderer.num_vertices, 0..1);
-            // }
-        }
-        
-        for text in self.screen_texts.iter(){
-            text.draw(
-                &mut self.glyph_brush, 
-                self.size.width as f32, 
-                self.size.height as f32
-            )
-        }
-
-        self.glyph_brush
-            .draw_queued(
-                &self.device,
-                &mut self.staging_belt,
-                &mut encoder,
-                &view,
-                self.size.width,
-                self.size.height,
-            )
-            .expect("Draw queued");
-        self.staging_belt.finish();
-        self.queue.submit(iter::once(encoder.finish()));
-        output.present();
-
-        Ok(())
     }
 }
