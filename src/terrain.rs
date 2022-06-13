@@ -17,7 +17,7 @@ pub struct TerrainSystem;
 impl <'a> System<'a> for TerrainSystem {
     type SystemData = (
         Entities<'a>,
-        WriteStorage<'a, voxelviewer::view_system::MeshRenderer>,
+        WriteStorage<'a, MeshRendererComponent>,
         WriteStorage<'a, PositionComponent>,
         WriteExpect<'a, LoadedChunks>,
     );
@@ -46,7 +46,7 @@ impl <'a> System<'a> for TerrainSystem {
                 .insert(chunk_id[0] * GRID_SIZE as isize + chunk_id[1], ());
                 
             let chunk = entities.create();
-            mr.insert(chunk, voxelviewer::view_system::MeshRenderer::from_grid(CUBE_SIZE, grid)).unwrap();
+            mr.insert(chunk, MeshRendererComponent::from_grid(CUBE_SIZE, grid)).unwrap();
             ps.insert(chunk, PositionComponent::new(chunk_pos)).unwrap();
         }
     }

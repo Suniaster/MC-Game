@@ -1,79 +1,18 @@
 use std::{sync::{Arc, Mutex}, iter};
 
-use nalgebra::Point3;
 use specs::prelude::*;
-use crate::{geometry::{grid::{self, GridMatrix}}, draw::{mesh::StaticVertexMesh, geometry::grid::build_grid_mesh_from_desc}, screen_text::ScreenText};
+use crate::{screen_text::ScreenText};
 
 pub mod boundingbox;
 pub mod camera_system;
 pub mod components;
-use crate::draw::renderer::SceneEntityRenderer;
+
 
 use crate::{
     ScreenView
 };
 
-use self::components::PositionComponent;
-
-/************* VIEW COMPONENT ***************/
-pub struct MeshRenderer{
-    pub renderer: Option<SceneEntityRenderer>,
-    pub mesh: StaticVertexMesh
-}
-
-impl Component for MeshRenderer {
-    type Storage = VecStorage<Self>;
-}
-
-impl MeshRenderer {
-    pub fn new(device: &wgpu::Device, mesh: StaticVertexMesh) -> MeshRenderer {
-        let mut mesh = mesh;
-        let renderer = SceneEntityRenderer::new(device, &mut mesh);
-        MeshRenderer{
-            renderer: Some(renderer),
-            mesh
-        }
-    }
-
-    pub fn create_without_renderer(mesh: StaticVertexMesh) -> Self{
-        MeshRenderer{
-            renderer: None,
-            mesh
-        }
-    }
-
-    pub fn from_grid(cube_size: f32, desc: GridMatrix) -> Self {
-        let grid_mesh = grid::Grid::create_with(
-            cube_size
-        );
-
-        let mesh = build_grid_mesh_from_desc(&grid_mesh, &desc);
-
-        MeshRenderer::create_without_renderer(
-            mesh
-        )
-    }
-
-    pub fn update_origin(&mut self, queue: &wgpu::Queue, new_pos: Point3<f32>){
-        if self.mesh.update_origin(new_pos.into()) {
-            if let Some(renderer) = &self.renderer {
-                queue.write_buffer(
-                    &renderer.instance_buffer, 
-                    0, 
-                    self.mesh.to_instance_buffer()
-                );
-            }
-        }
-    }
-
-    pub fn update_renderer(&mut self, device: &wgpu::Device) {
-        let renderer = SceneEntityRenderer::new(device, &mut self.mesh);
-        self.renderer = Some(renderer);
-    }
-
-
-}
-
+use self::components::{PositionComponent, MeshRendererComponent};
 
 /*************** VIEW SYSTEM *******************/
 pub struct ViewSystem{
@@ -89,13 +28,13 @@ impl ViewSystem {
 
 impl <'a> System <'a> for ViewSystem {
     type SystemData = (
-        ReadStorage<'a, MeshRenderer>,
+        ReadStorage<'a, MeshRendererComponent>,
         Read<'a, Vec<ScreenText>>
     );
 
     fn setup(&mut self, world: &mut specs::World) {
         Self::SystemData::setup(world);
-        world.register::<MeshRenderer>();
+        world.register::<MeshRendererComponent>();
         world.register::<PositionComponent>();
     }
 
@@ -196,7 +135,7 @@ impl UpdateViewMeshesSystem {
 impl <'a> System <'a> for UpdateViewMeshesSystem {
     type SystemData = (
         ReadStorage<'a, PositionComponent>,
-        WriteStorage<'a, MeshRenderer>,
+        WriteStorage<'a, MeshRendererComponent>,
     );
 
     fn run(&mut self, (positions, mut meshes): Self::SystemData) {
