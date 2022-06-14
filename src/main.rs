@@ -54,6 +54,8 @@ fn main() {
     let (screen, evloop) = voxelviewer::create_screen();
     let arc_screen = Arc::new(Mutex::new(screen));
 
+
+
     let mut dispatcher = 
         DispatcherBuilder::new()
         .with(systems::UpdateDtSystem{
@@ -65,6 +67,9 @@ fn main() {
         .with(
             RenderTextInfoSystem::new()
         , "render_text_info_system", &["update_dt_system"])
+        .with(
+            voxelviewer::view_system::camera_system::CameraSystem::new()
+        , "camera_system", &["update_dt_system"])
         .with_thread_local(
             voxelviewer::view_system::UpdateViewMeshesSystem::new(arc_screen.clone())
         )
@@ -75,7 +80,8 @@ fn main() {
 
     world.insert(terrain::LoadedChunks::new());
     world.insert(systems::WorldDt(Duration::new(0, 0)));
-
+    world.insert(voxelviewer::view_system::resources::DeviceEventBuffer::default());
+    world.insert(arc_screen.clone());
 
     dispatcher.setup(&mut world);
     voxelviewer::start(world, dispatcher, arc_screen, evloop);

@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 use std::{sync::{Mutex, Arc}};
 
+use specs::WorldExt;
 use winit::{
     event::*,
     event_loop::{ControlFlow, EventLoop},
@@ -59,7 +60,8 @@ pub fn start(
                 ref event,
                 .. // We're not using device_id currently
             } => {
-                screen.state.input(event);
+                world.write_resource::<view_system::resources::DeviceEventBuffer>().events.push(event.clone());
+                // screen.state.input(event);
             }
             Event::WindowEvent {
                 ref event,
@@ -92,6 +94,9 @@ pub fn start(
                 screen.state.update(dt);
                 drop(screen); // Drop screen to clear mutex
                 dispatcher.dispatch(&mut world);
+
+                // Clear buffers
+                world.write_resource::<view_system::resources::DeviceEventBuffer>().events.clear();
             }
             _ => {}
         }

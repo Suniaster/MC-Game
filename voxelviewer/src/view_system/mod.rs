@@ -6,7 +6,7 @@ use crate::{screen_text::ScreenText};
 pub mod boundingbox;
 pub mod camera_system;
 pub mod components;
-
+pub mod resources;
 
 use crate::{
     ScreenView

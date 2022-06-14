@@ -16,7 +16,7 @@ pub const OPENGL_TO_WGPU_MATRIX: Matrix4<f32> = Matrix4::new(
 pub struct Camera {
     pub position: Point3<f32>,
     pub yaw: UnitComplex<f32>,
-    pitch: UnitComplex<f32>,
+    pub pitch: UnitComplex<f32>,
 }
 
 impl Camera {

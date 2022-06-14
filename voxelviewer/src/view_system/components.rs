@@ -3,11 +3,19 @@ use specs::{Component, VecStorage};
 
 use crate::{draw::{renderer::SceneEntityRenderer, mesh::StaticVertexMesh, geometry::grid::build_grid_mesh_from_desc}, geometry::grid::{GridMatrix, self}};
 
-pub struct LookingDirection {
-    yaw: UnitComplex<f32>,
-    pitch: UnitComplex<f32>,
+pub struct LookingDirectionComponent {
+    pub yaw: UnitComplex<f32>,
+    pub pitch: UnitComplex<f32>,
 }
-impl Component for LookingDirection {type Storage = specs::VecStorage<Self>;}
+impl Component for LookingDirectionComponent {type Storage = specs::VecStorage<Self>;}
+impl LookingDirectionComponent{
+    pub fn new(yaw: f32, pitch: f32) -> Self {
+        LookingDirectionComponent {
+            yaw: UnitComplex::new(yaw),
+            pitch: UnitComplex::new(pitch),
+        }
+    }
+}
 
 pub struct PositionComponent(pub Point3<f32>);
 impl Component for PositionComponent {type Storage = VecStorage<Self>;}
