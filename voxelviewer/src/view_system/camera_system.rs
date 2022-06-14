@@ -11,6 +11,15 @@ pub struct CameraResource {
     pub entity: specs::Entity,
 }
 
+impl CameraResource {
+    pub fn new(entity: specs::Entity) -> Self {
+        Self {
+            entity,
+        }
+    }
+}
+
+
 pub struct CameraSystem{
 }
 
@@ -29,19 +38,6 @@ impl<'a> System<'a> for CameraSystem {
         ReadStorage<'a, PositionComponent>,
         ReadStorage<'a, LookingDirectionComponent>
     );
-
-    fn setup(&mut self, world: &mut specs::World) {
-        Self::SystemData::setup(world);
-        world.register::<LookingDirectionComponent>();
-        
-        let camera = world
-            .create_entity()
-            .with(LookingDirectionComponent::new(0.0, 0.0))
-            .with(PositionComponent::new(Point3::new(0.0, 10.0, 0.0)))
-            .build();
-
-        world.insert(CameraResource {entity: camera});
-    }
 
     fn run(&mut self, (screen_view, camera, pc, ld): Self::SystemData) {
         let pos = pc.get(camera.entity);

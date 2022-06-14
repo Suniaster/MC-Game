@@ -32,12 +32,6 @@ impl <'a> System <'a> for ViewSystem {
         Read<'a, Vec<ScreenText>>
     );
 
-    fn setup(&mut self, world: &mut specs::World) {
-        Self::SystemData::setup(world);
-        world.register::<MeshRendererComponent>();
-        world.register::<PositionComponent>();
-    }
-
     fn run(&mut self, (meshes, texts): Self::SystemData) {
         let mut view = self.state.lock().unwrap();
         let state = &mut view.state;

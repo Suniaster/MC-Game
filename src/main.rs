@@ -1,6 +1,8 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use components::PhysicsComponent;
+use nalgebra::{Point3, Vector3};
 use specs::prelude::*;
 
 mod systems;
@@ -42,7 +44,10 @@ mod components;
 
 use specs::DispatcherBuilder;
 use systems::RenderTextInfoSystem;
+use systems::physics::PhysicsSystem;
 use voxelviewer::ScreenView;
+use voxelviewer::view_system::camera_system::CameraResource;
+use voxelviewer::view_system::components::{PositionComponent, LookingDirectionComponent, MeshRendererComponent};
 
 pub type MultiThread<T> = Arc<Mutex<T>>;
 pub type ScreenMutex = MultiThread<ScreenView>;
@@ -54,29 +59,33 @@ fn main() {
     let (screen, evloop) = voxelviewer::create_screen();
     let arc_screen = Arc::new(Mutex::new(screen));
 
-
+    world.register::<LookingDirectionComponent>();
+    world.register::<PhysicsComponent>();
+    world.register::<PositionComponent>();
+    world.register::<MeshRendererComponent>();
 
     let mut dispatcher = 
         DispatcherBuilder::new()
         .with(systems::UpdateDtSystem{
             last_time: std::time::Instant::now()
-        }, "update_dt_system", &[])
-        .with(
+        }, "update_dt_system", &[]
+        ).with(
             terrain::TerrainSystem
-        , "terrain_system", &[])
-        .with(
+        , "terrain_system", &[]
+        ).with(
             RenderTextInfoSystem::new()
-        , "render_text_info_system", &["update_dt_system"])
-        .with(
+        , "render_text_info_system", &["update_dt_system"]
+        ).with(
             voxelviewer::view_system::camera_system::CameraSystem::new()
-        , "camera_system", &["update_dt_system"])
-        .with_thread_local(
+        , "camera_system", &["update_dt_system"]
+        ).with(
+            PhysicsSystem, 
+            "physics_system", &["update_dt_system"]
+        ).with_thread_local(
             voxelviewer::view_system::UpdateViewMeshesSystem::new(arc_screen.clone())
-        )
-        .with_thread_local(
+        ).with_thread_local(
             voxelviewer::view_system::ViewSystem::new(arc_screen.clone())
-        )
-        .build();
+        ).build();
 
     world.insert(terrain::LoadedChunks::new());
     world.insert(systems::WorldDt(Duration::new(0, 0)));
@@ -84,5 +93,16 @@ fn main() {
     world.insert(arc_screen.clone());
 
     dispatcher.setup(&mut world);
+
+    // Create camera
+    let camera = world
+        .create_entity()
+        .with(PositionComponent::new(Point3::new(0.0, 10.0, 0.0)))
+        .with(LookingDirectionComponent::new(0.,0.))
+        .with(PhysicsComponent::new(Vector3::new(2.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 0.0)))
+        .build() 
+    ;
+    world.insert(CameraResource::new(camera));
+
     voxelviewer::start(world, dispatcher, arc_screen, evloop);
 }
