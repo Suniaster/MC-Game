@@ -1,17 +1,15 @@
-use std::{collections::HashMap, time::Duration};
+use std::{time::Duration};
 
 use specs::prelude::*;
-use voxelviewer::screen_text::ScreenText;
+use voxelviewer::{screen_text::ScreenText, view_system::{camera_system::CameraResource, components::{PositionComponent, LookingDirectionComponent}}};
 
 pub struct RenderTextInfoSystem{
-    pub texts_ids: HashMap<&'static str, usize>,
     pub time_counter: std::time::Duration,
 }
 
 impl RenderTextInfoSystem {
     pub fn new() -> Self {
         RenderTextInfoSystem{
-            texts_ids: HashMap::new(),
             time_counter: Duration::new(0, 0),
         }
     }
@@ -21,6 +19,10 @@ impl<'a> System<'a> for RenderTextInfoSystem {
     type SystemData = (
         Write<'a, Vec<ScreenText>>,
         Read<'a, WorldDt>,
+        ReadExpect<'a, CameraResource>,
+
+        ReadStorage<'a, PositionComponent>,
+        ReadStorage<'a, LookingDirectionComponent>,
     );
 
     fn setup(&mut self, world: &mut specs::World) {
@@ -32,40 +34,43 @@ impl<'a> System<'a> for RenderTextInfoSystem {
             0.0,
             [0.0, 0.0, 0.0, 1.0],
         ));
-        self.texts_ids.insert("fps", screen_texts.len() - 1);
+
+        screen_texts.push(ScreenText::new(
+            String::from(""),
+            0.0,
+            20.0,
+            [0.0, 0.0, 0.0, 1.0],
+        ));
+
+        screen_texts.push(ScreenText::new(
+            String::from(""),
+            0.0,
+            40.0,
+            [0.0, 0.0, 0.0, 1.0],
+        ));
+
         world.insert::<Vec<ScreenText>>(screen_texts);
     }
 
-    fn run(&mut self, (mut texts, dt): Self::SystemData){
+    fn run(&mut self, (mut texts, dt, camera, pos_storage, ldc): Self::SystemData){
 
         self.time_counter += dt.0;
         if self.time_counter.as_secs_f32() > 0.1 {
             self.time_counter = Duration::new(0, 0);
 
 
-            let fps_ent = self.texts_ids.get("fps").unwrap();
-            texts[*fps_ent].text = format!("FPS: {:.1}", 1.0 / dt.0.as_secs_f32());
+            texts[0].text = format!("FPS: {:.1}", 1.0 / dt.0.as_secs_f32());
 
+            let camera_pos = pos_storage.get(camera.entity);
+            if let Some(camera_pos) = camera_pos {
+                texts[1].text = format!("Position (X,Y,Z): ({:.1}, {:.1}, {:.1})", camera_pos.0.x, camera_pos.0.y, camera_pos.0.z);
+            }
+
+            let camera_dir = ldc.get(camera.entity);
+            if let Some(camera_dir) = camera_dir {
+                texts[2].text = format!("Looking direction (Yaw, Pitch): ({:.1}, {:.1})", camera_dir.yaw, camera_dir.pitch);
+            }
         }
-        //     let mut screen = scren_mutex.lock().unwrap();
-            
-        //     let fps = 1./ dt.0.as_secs_f32();
-        //     let text = format!("Vextex count: {}", fps);
-        //     let id = self.texts_ids.get("fps").unwrap();
-        //     screen.actions.update_text(*id, text);
-
-        //     let looking_dir = screen.actions.state.camera.get_looking_dir();
-        //     let looking_text = format!("Looking XZ: ({}, {})", looking_dir[0], looking_dir[1]);
-        //     let id = self.texts_ids.get("looking").unwrap();
-        //     screen.actions.update_text(*id, looking_text);
-
-        //     let position = screen.actions.state.camera.get_position();
-        //     let position_text = format!(
-        //         "Position: ({:.0}, {:.0}, {:.0})", 
-        //         position.x, position.y, position.z
-        //     );
-        //     let id = self.texts_ids.get("position").unwrap();
-        //     screen.actions.update_text(*id, position_text);
 
         //     let count = screen.actions.get_vertex_count();
         //     let count_text = format!("Vertex count: {}", count);

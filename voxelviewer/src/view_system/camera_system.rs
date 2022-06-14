@@ -8,7 +8,7 @@ use crate::ScreenView;
 use super::components::{LookingDirectionComponent, PositionComponent};
 
 pub struct CameraResource {
-    entity: specs::Entity,
+    pub entity: specs::Entity,
 }
 
 pub struct CameraSystem{
@@ -37,7 +37,7 @@ impl<'a> System<'a> for CameraSystem {
         let camera = world
             .create_entity()
             .with(LookingDirectionComponent::new(0.0, 0.0))
-            .with(PositionComponent::new(Point3::new(0.0, 0.0, 0.0)))
+            .with(PositionComponent::new(Point3::new(0.0, 10.0, 0.0)))
             .build();
 
         world.insert(CameraResource {entity: camera});
