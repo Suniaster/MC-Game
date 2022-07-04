@@ -81,7 +81,11 @@ fn main() {
         ).with(
             PhysicsSystem, 
             "physics_system", &["update_dt_system"]
-        ).with_thread_local(
+        ).with(
+            systems::io::IoSystem::new(),
+            "io_system", &["update_dt_system"]
+        ).
+        with_thread_local(
             voxelviewer::view_system::UpdateViewMeshesSystem::new(arc_screen.clone())
         ).with_thread_local(
             voxelviewer::view_system::ViewSystem::new(arc_screen.clone())

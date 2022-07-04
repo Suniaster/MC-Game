@@ -1,6 +1,7 @@
 use std::{time::Duration};
 
 pub mod physics;
+pub mod io;
 
 use specs::prelude::*;
 use voxelviewer::{screen_text::ScreenText, view_system::{camera_system::CameraResource, components::{PositionComponent, LookingDirectionComponent}}};

@@ -8,7 +8,7 @@ use winit::{
 };
 
 mod texture; 
-mod camera;
+pub mod camera;
 mod scene;
 mod geometry;
 pub mod screen_text;
