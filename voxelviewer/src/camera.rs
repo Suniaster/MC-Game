@@ -110,6 +110,8 @@ pub struct CameraController {
     pub scroll: f32,
     pub speed: f32,
     pub sensitivity: f32,
+    pub mouse_pressed: bool,
+    pub pressed_keys: Vec<VirtualKeyCode>,
 }
 
 impl CameraController {
@@ -126,11 +128,19 @@ impl CameraController {
             scroll: 0.0,
             speed,
             sensitivity,
+            mouse_pressed: false,
+            pressed_keys: Vec::new(),
         }
     }
 
     pub fn process_keyboard(&mut self, key: VirtualKeyCode, state: ElementState) -> bool{
         let amount = if state == ElementState::Pressed { 1.0 } else { 0.0 };
+        if state == ElementState::Pressed{
+            self.pressed_keys.push(key);
+        }
+        else{
+            self.pressed_keys.retain(|x| *x != key);
+        }
         match key {
             VirtualKeyCode::W | VirtualKeyCode::Up => {
                 self.amount_forward = amount;
