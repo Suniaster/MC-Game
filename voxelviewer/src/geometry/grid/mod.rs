@@ -11,12 +11,13 @@ pub struct Grid{
   pub cube_sizes: Vector3<f32>,
   cube_half_sizes: Vector3<f32>,
   half_grid_sizes: Vector3<f32>,
-  adjust_vector: Vector3<f32>
+  adjust_vector: Vector3<f32>,
+  color: [f32; 3],
 }
 
 
 impl Grid{
-  pub fn create_with(cube_size: f32) -> Self{
+  pub fn create_with(cube_size: f32, color: [f32; 3]) -> Self{
     let cube_sizes = Vector3::new(cube_size, cube_size, cube_size);
     let half_grid_sizes = Vector3::from([GRID_SIZE as f32, GRID_SIZE as f32, GRID_SIZE as f32]).component_mul(&cube_sizes) / 2.;
     let cube_half_sizes = cube_sizes/2.;
@@ -25,7 +26,8 @@ impl Grid{
       cube_sizes,
       half_grid_sizes,
       cube_half_sizes,
-      adjust_vector: - half_grid_sizes + cube_half_sizes
+      adjust_vector: - half_grid_sizes + cube_half_sizes,
+      color,
     }
   }
 
@@ -36,7 +38,7 @@ impl Grid{
   pub fn create_hex_in_pos(&self, grid: &GridMatrix, i:usize, j:usize, k:usize)->Cuboid{
     let mut hex = Cuboid::new(
       self.cube_half_sizes,
-      [0.1, 1.0, 0.1]
+      self.color
     );
     Grid::filter_cube(grid, &mut hex, i, j, k);
     if hex.is_empty() {return hex;}

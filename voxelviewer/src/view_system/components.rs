@@ -48,9 +48,10 @@ impl MeshRendererComponent {
         }
     }
 
-    pub fn from_grid(cube_size: f32, desc: GridMatrix) -> Self {
+    pub fn from_grid(cube_size: f32, color: [f32;3], desc: GridMatrix) -> Self {
         let grid_mesh = grid::Grid::create_with(
-            cube_size
+            cube_size,
+            color
         );
 
         let mesh = build_grid_mesh_from_desc(&grid_mesh, &desc);
