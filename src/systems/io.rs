@@ -1,11 +1,9 @@
-use std::ops::Add;
-
-use nalgebra::{Vector3, Rotation3, UnitComplex, Vector2};
+use nalgebra::{Vector3, UnitComplex};
 use specs::prelude::*;
 use voxelviewer::{view_system::{camera_system::CameraResource, components::LookingDirectionComponent, resources::DeviceEventBuffer}, camera::CameraController};
 use winit::event::{DeviceEvent, KeyboardInput, VirtualKeyCode, ElementState};
 
-use crate::components::PhysicsComponent;
+use super::physics::VelocityComponent;
 
 
 
@@ -19,13 +17,13 @@ impl<'a> System<'a> for IoSystem{
         Read<'a, DeviceEventBuffer>,
         ReadExpect<'a, CameraResource>,
 
-        WriteStorage<'a, PhysicsComponent>,
+        WriteStorage<'a, VelocityComponent>,
         WriteStorage<'a, LookingDirectionComponent>,
     );
  
     
-    fn run(&mut self, (evnts, camera, mut phys_strg, mut ldc_strg): Self::SystemData){
-        let p = phys_strg.get_mut(camera.entity).unwrap();
+    fn run(&mut self, (evnts, camera, mut vel_s, mut ldc_strg): Self::SystemData){
+        let p = vel_s.get_mut(camera.entity).unwrap();
         let ldc = ldc_strg.get_mut(camera.entity).unwrap();
 
         for evnt in &evnts.events {
@@ -73,7 +71,7 @@ impl IoSystem{
         }
     }
 
-    pub fn update_camera_dir_vel(&mut self, p: &mut PhysicsComponent, ldc: &mut LookingDirectionComponent){
+    pub fn update_camera_dir_vel(&mut self, p: &mut VelocityComponent, ldc: &mut LookingDirectionComponent){
         let mut direction = Vector3::new(0., 0., 0.);
         let look_vec = Vector3::new(
             ldc.yaw.cos_angle(),
@@ -98,12 +96,14 @@ impl IoSystem{
         }
 
         if self.camera_controller.pressed_keys.contains(&VirtualKeyCode::Space){
-            direction.y += 1.;
+            p.0.y = 20.;
         }
         if self.camera_controller.pressed_keys.contains(&VirtualKeyCode::LShift){
-            direction.y -= 1.;
+            // direction.y -= 1.;
         }
-        p.velocity = direction * 50.;
+        let result = direction * 50.;
+        p.0.x = result.x;
+        p.0.z = result.z;
     }
 
     fn update_camera_rotation(&mut self, ldc: &mut LookingDirectionComponent){
@@ -121,41 +121,3 @@ impl IoSystem{
         }
     }
 }
-
-
-
-
-/*
-
-    let mut move_dir = Vector3::new(
-            ldc.yaw.cos_angle(),
-            ldc.pitch.sin_angle(),
-            ldc.yaw.sin_angle()
-        );
-
-        move_dir = move_dir.normalize();
-
-        // let axis = Vector3::y_axis();
-        // let mut rot = Rotation3::from_axis_angle(&axis, 0);
-        
-        let mut final_vel = Vector3::new(0.,0.,0.);
-        if self.camera_controller.amount_left == 1. {
-            
-        }
-        if self.camera_controller.amount_right == 1. {
-            final_vel += Vector3::new(1., 0., 0.);
-        }
-        if self.camera_controller.amount_forward == 1.{
-            final_vel += Vector3::new(0., 0., -1.);
-        }
-        if self.camera_controller.amount_backward == 1.{
-            final_vel += Vector3::new(0., 0., 1.);
-        }
-        if self.camera_controller.amount_up == 1.{
-            final_vel += Vector3::new(0., 1., 0.);
-        }
-        if self.camera_controller.amount_down == 1.{
-            final_vel += Vector3::new(0., -1., 0.);
-        }
-
-*/

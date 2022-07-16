@@ -1,13 +1,13 @@
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use components::PhysicsComponent;
 use nalgebra::{Point3, Vector3};
+use rapier3d::prelude::{ RigidBodySet, ColliderSet};
 use specs::prelude::*;
 
 mod systems;
 mod terrain;
-mod components;
+
 
 // Proximos Objetivos
 // x - Adicionar bordas (linhas) nos cubos - LineStrip = 2,
@@ -44,7 +44,7 @@ mod components;
 
 use specs::DispatcherBuilder;
 use systems::RenderTextInfoSystem;
-use systems::physics::PhysicsSystem;
+use systems::physics::{PhysicsSystem, VelocityComponent, RigidBodyComponent, AddRigidBodyCubeFlag, PhysicsWorldResource, PhysicsWorldManagerSystem};
 use voxelviewer::ScreenView;
 use voxelviewer::view_system::camera_system::CameraResource;
 use voxelviewer::view_system::components::{PositionComponent, LookingDirectionComponent, MeshRendererComponent};
@@ -59,10 +59,22 @@ fn main() {
     let (screen, evloop) = voxelviewer::create_screen();
     let arc_screen = Arc::new(Mutex::new(screen));
 
+    // Components
     world.register::<LookingDirectionComponent>();
-    world.register::<PhysicsComponent>();
     world.register::<PositionComponent>();
     world.register::<MeshRendererComponent>();
+    world.register::<RigidBodyComponent>();
+    world.register::<VelocityComponent>();
+    world.register::<AddRigidBodyCubeFlag>();
+
+    // Resources
+    world.insert(terrain::LoadedChunks::new());
+    world.insert(systems::WorldDt(Duration::new(0, 0)));
+    world.insert(voxelviewer::view_system::resources::DeviceEventBuffer::default());
+    world.insert(arc_screen.clone());
+    world.insert(PhysicsWorldResource::new());
+    world.insert(RigidBodySet::new());
+    world.insert(ColliderSet::new());
 
     let mut dispatcher = 
         DispatcherBuilder::new()
@@ -79,8 +91,11 @@ fn main() {
             voxelviewer::view_system::camera_system::CameraSystem::new()
         , "camera_system", &["update_dt_system"]
         ).with(
-            PhysicsSystem, 
-            "physics_system", &["update_dt_system"]
+            PhysicsWorldManagerSystem,
+            "physics_manager_system", &["update_dt_system"]
+        ).with(
+            PhysicsSystem::new(),
+            "physics_system", &["update_dt_system", "physics_manager_system"]
         ).with(
             systems::io::IoSystem::new(),
             "io_system", &["update_dt_system"]
@@ -90,12 +105,6 @@ fn main() {
         ).with_thread_local(
             voxelviewer::view_system::ViewSystem::new(arc_screen.clone())
         ).build();
-
-    world.insert(terrain::LoadedChunks::new());
-    world.insert(systems::WorldDt(Duration::new(0, 0)));
-    world.insert(voxelviewer::view_system::resources::DeviceEventBuffer::default());
-    world.insert(arc_screen.clone());
-
     dispatcher.setup(&mut world);
 
     // Create camera
@@ -103,7 +112,8 @@ fn main() {
         .create_entity()
         .with(PositionComponent::new(Point3::new(0.0, 10.0, 0.0)))
         .with(LookingDirectionComponent::new(0.,0.))
-        .with(PhysicsComponent::new(Vector3::new(2.0, 0.0, 0.0), Vector3::new(0.0, 0.0, 0.0)))
+        .with(VelocityComponent(Vector3::new(0.0, 0.0, 0.0)))
+        .with(AddRigidBodyCubeFlag(1.))
         .build() 
     ;
     world.insert(CameraResource::new(camera));
