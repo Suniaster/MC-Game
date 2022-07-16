@@ -41,6 +41,12 @@ fn vs_main(
     return out;
 }
 
+
+[[group(1), binding(0)]]
+var depth_texture: texture_depth_2d;
+[[group(1), binding(1)]]
+var depth_sampler: sampler_comparison;
+
 [[stage(fragment), early_depth_test]]
 fn fs_main(
     in: VertexOutput,
@@ -59,6 +65,21 @@ fn fs_main(
     let surface_color = vec4<f32>(in.diffuse_color, 1.0);
 
     let result = (specular_color) * surface_color.xyz;
+    let color_result = result * in.builtin_position.xyz;
 
-    return vec4<f32>(result, surface_color.a);
+    return vec4<f32>(color_result, 1.0);
+    // let x = in.builtin_position.x / 1024.0;
+    // let y = in.builtin_position.y / 768.0;
+    // return vec4<f32>(x, y, in.builtin_position.z, surface_color.a);
+
+    // let texture_pos = vec2<f32>(x, y);
+    // let depth = textureSampleCompare(
+    //     depth_texture, 
+    //     depth_sampler, 
+    //     texture_pos, 
+    //     in.builtin_position.w
+    // );
+    // return vec4<f32>(vec3<f32>(depth), 1.0);
+
+    // return textureSample(depth_texture, depth_sampler, texture_pos);
 }

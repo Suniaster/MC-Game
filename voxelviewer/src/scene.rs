@@ -6,6 +6,7 @@ use winit::{
     window::Window,
 };
 
+use crate::camera::Camera;
 use crate::texture;
 use crate::camera;
 use crate::draw::pipelines::create_cube_render_pipeline;
@@ -42,10 +43,7 @@ pub struct State {
     config: wgpu::SurfaceConfiguration,
     pub size: winit::dpi::PhysicalSize<u32>,
 
-    pub depth_texture: texture::Texture,
-
     pub static_cube_pipeline: wgpu::RenderPipeline,
-    pub static_lines_pipeline: wgpu::RenderPipeline,
 
     //Glyph
     pub glyph_brush: GlyphBrush<()>,
@@ -59,16 +57,19 @@ pub struct State {
     pub camera_bind_group: wgpu::BindGroup,
     projection: camera::Projection,
 
+    // Textures for better drawing
+    pub depth_texture: texture::Texture,
+    pub depth_bind_group: wgpu::BindGroup,
+
     // Input: bool
     mouse_pressed: bool,
 }
 
 impl State {
     pub async fn new(window: &Window) -> Self {
-        let size = window.inner_size();
 
-        // The instance is a handle to our GPU
-        // Backends::all => Vulkan + Metal + DX12 + Browser WebGPU
+        /******** Creating Configuration and control Variables ***********/
+        let size = window.inner_size();
         let instance = wgpu::Instance::new(wgpu::Backends::all());
         let surface = unsafe { instance.create_surface(window) };
         let adapter = instance.request_adapter(
@@ -99,7 +100,7 @@ impl State {
         let depth_texture =
             texture::Texture::create_depth_texture(&device, &config, "depth_texture");
 
-        // ********** CAMERA
+        /************** CAMERA VARIABLES *************/
         let camera = camera::Camera::new(
             nalgebra::Point3::new(0.0, 5.0, 10.0), 
             nalgebra::UnitComplex::new(-1.), 
@@ -114,11 +115,8 @@ impl State {
         );
         let camera_controller = camera::CameraController::new(4.0, 0.4);
 
-        // in new() after creating `camera`
-
         let mut camera_uniform = CameraUniform::new();
         camera_uniform.update_view_proj(&camera, &projection);
-
         let camera_buffer = device.create_buffer_init(
             &wgpu::util::BufferInitDescriptor {
                 label: Some("Camera Buffer"),
@@ -127,49 +125,28 @@ impl State {
             }
         );
 
-        let camera_bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-            entries: &[
-                wgpu::BindGroupLayoutEntry {
-                    binding: 0,
-                    visibility: wgpu::ShaderStages::VERTEX | wgpu::ShaderStages::FRAGMENT,
-                    ty: wgpu::BindingType::Buffer {
-                        ty: wgpu::BufferBindingType::Uniform,
-                        has_dynamic_offset: false,
-                        min_binding_size: None,
-                    },
-                    count: None,
-                }
-            ],
-            label: Some("camera_bind_group_layout"),
-        });
-        let camera_bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-            layout: &camera_bind_group_layout,
-            entries: &[
-                wgpu::BindGroupEntry {
-                    binding: 0,
-                    resource: camera_buffer.as_entire_binding(),
-                }
-            ],
-            label: Some("camera_bind_group"),
-        });
+        let camera_bind_group_layout = Camera::create_bind_gropu_layout(&device);
+        let camera_bind_group = Camera::create_bind_group(&device, &camera_bind_group_layout, &camera_buffer);
 
+        /*********** TEXTURES **************/
+        let depth_bind_group_layout = texture::Texture::create_depth_texture_bindgroup_layouy(&device);
+        
+        // let t_bytes = include_bytes!("./img_lights.jpg");
+        // let t_texture = texture::Texture::from_bytes(&device, &queue, t_bytes, "texture");
+        // let depth_bind_group = t_texture.create_bind_group(&device, &depth_bind_group_layout);
+
+        let depth_bind_group = depth_texture.create_bind_group(&device, &depth_bind_group_layout);
+
+        /*********** PIPELINES **************/
 
         let static_cube_pipeline = create_cube_render_pipeline(
             &device, 
             &[
                 &camera_bind_group_layout,
+                &depth_bind_group_layout,
             ], 
             &config,
             wgpu::PrimitiveTopology::TriangleList
-        );
-
-        let static_lines_pipeline =  create_cube_render_pipeline(
-            &device, 
-            &[
-                &camera_bind_group_layout,
-            ], 
-            &config,
-            wgpu::PrimitiveTopology::LineList
         );
 
         // Prepare glyph_brush
@@ -196,7 +173,8 @@ impl State {
             camera_controller,
             
             static_cube_pipeline,
-            static_lines_pipeline,
+
+            depth_bind_group,
 
             mouse_pressed: false,
 

@@ -78,6 +78,8 @@ impl <'a> System <'a> for ViewSystem {
                 let renderer = &mesh.renderer;
                 if let Some(renderer) = renderer {
                     render_pass.set_bind_group(0, &state.camera_bind_group, &[]);
+                    render_pass.set_bind_group(1, &&state.depth_bind_group, &[]);
+                    
                     render_pass.set_vertex_buffer(0, renderer.vertex_buffer.slice(..));
     
                     render_pass.set_vertex_buffer(1, renderer.instance_buffer.slice(..));

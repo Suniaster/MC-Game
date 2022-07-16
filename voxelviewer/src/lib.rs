@@ -4,7 +4,7 @@ use std::{sync::{Mutex, Arc}};
 use specs::WorldExt;
 use winit::{
     event::*,
-    event_loop::{ControlFlow, EventLoop},
+    event_loop::{ControlFlow, EventLoop}, dpi::LogicalSize,
 };
 
 mod texture; 
@@ -30,8 +30,10 @@ pub fn create_screen() -> (ScreenView, EventLoop<()>) {
     let title = env!("CARGO_PKG_NAME");
     let window = winit::window::WindowBuilder::new()
         .with_title(title)
+        .with_inner_size(LogicalSize::new(1024.0, 768.0))
         .build(&event_loop)
         .unwrap();
+    
 
     let state =  pollster::block_on(State::new(&window));
 
