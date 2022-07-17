@@ -1,11 +1,12 @@
 use voxelviewer::view_system::components::PositionComponent;
 use specs::prelude::*;
 
-use nalgebra::{Vector3, Point3};
+use nalgebra::{Vector3, Point3, Isometry3};
 use specs::{System, WriteStorage, Component,ReadStorage, Entities, VecStorage, Entity, WriteExpect};
 use rapier3d::prelude::*;
 use specs::Join;
 
+use voxelviewer::geometry::grid::CubeTensor;
 
 pub struct PhysicsWorldResource{
     // rigid_body_set: RigidBodySet,
@@ -131,6 +132,9 @@ impl PhysicsSystem {
 pub struct AddRigidBodyCubeFlag(pub f32);
 impl Component for AddRigidBodyCubeFlag { type Storage = HashMapStorage<Self>;}
 
+pub struct AddRigidCompoundShapeFlag(pub CubeTensor);
+impl Component for AddRigidCompoundShapeFlag { type Storage = HashMapStorage<Self>;}
+
 pub struct PhysicsWorldManagerSystem;
 impl<'a> System<'a> for PhysicsWorldManagerSystem {
     type SystemData = (
@@ -140,14 +144,56 @@ impl<'a> System<'a> for PhysicsWorldManagerSystem {
         ReadStorage<'a, PositionComponent>,
         WriteStorage<'a, RigidBodyComponent>,
         WriteStorage<'a, AddRigidBodyCubeFlag>,
+        WriteStorage<'a, AddRigidCompoundShapeFlag>,
     );
 
-    fn run(&mut self, (ents, mut rb_set, mut coll_set, pos_s, mut rb_s, mut arb_cube_s): Self::SystemData) {
+    fn run(&mut self, (ents, mut rb_set, mut coll_set, pos_s, mut rb_s, mut arb_cube_s, mut arc_shape_s): Self::SystemData) {
         PhysicsWorldManagerSystem::add_rigid_body_cube(&ents, &mut rb_set, &mut coll_set, &pos_s, &mut rb_s, &mut arb_cube_s);
+        PhysicsWorldManagerSystem::add_rigid_compound_shape(&ents, &mut rb_set, &mut coll_set, &pos_s, &mut rb_s, &mut arc_shape_s);
     }
 } 
 
 impl PhysicsWorldManagerSystem {
+    pub fn add_rigid_compound_shape(
+        ents: &Entities, 
+        rb_set: &mut WriteExpect<RigidBodySet>, 
+        coll_set: &mut WriteExpect<ColliderSet>, 
+        pos_s: &ReadStorage<PositionComponent>, 
+        rb_s: &mut WriteStorage<RigidBodyComponent>, 
+        arc_shape_s: &mut WriteStorage<AddRigidCompoundShapeFlag>
+    ) {
+        let mut ents_added:Vec<Entity> = Vec::new();
+        for (ent, pos, rb_f) in (ents, pos_s, &*arc_shape_s).join(){
+            let rb = RigidBodyBuilder::fixed()
+                .translation(pos.0.coords)
+                .build();
+
+            let cubes_positions = rb_f.0.get_positions();
+            let res = cubes_positions.iter().map(|pos| {
+                let cube = SharedShape::cuboid(rb_f.0.cube_half_size, rb_f.0.cube_half_size, rb_f.0.cube_half_size);
+                return (pos.0.clone(), cube);
+            }).collect::<Vec<(Isometry3<f32>, SharedShape)>>();
+            let collider = ColliderBuilder::compound(
+                res
+            )   .friction(1.)
+                .build();
+
+            let rb_handle = rb_set.insert(rb);
+            coll_set.insert_with_parent(
+                collider,
+                rb_handle.clone(),
+                rb_set
+            );
+
+            rb_s.insert(ent, RigidBodyComponent(rb_handle)).unwrap();
+            ents_added.push(ent);
+        }
+        for ent in ents_added {
+            arc_shape_s.remove(ent);
+        }
+    }
+
+
     pub fn add_rigid_body_cube(
         ents: &Entities, 
         rb_set: &mut WriteExpect<RigidBodySet>, 
@@ -158,7 +204,6 @@ impl PhysicsWorldManagerSystem {
     ) {
         let mut ents_added:Vec<Entity> = Vec::new();
         for (ent, pos, rb_f) in (ents, pos_s, &*arb_cube_s).join(){
-           
             let rb = RigidBodyBuilder::dynamic()
                 .translation(pos.0.coords)
                 .build();

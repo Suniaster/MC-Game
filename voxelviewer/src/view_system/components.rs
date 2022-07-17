@@ -1,7 +1,7 @@
 use nalgebra::{UnitComplex, Point3};
 use specs::{Component, VecStorage};
 
-use crate::{draw::{renderer::SceneEntityRenderer, mesh::StaticVertexMesh, geometry::grid::build_grid_mesh_from_desc}, geometry::grid::{GridMatrix, self}};
+use crate::{draw::{renderer::SceneEntityRenderer, mesh::StaticVertexMesh, geometry::grid::build_grid_mesh_from_desc}, geometry::grid::{GridMatrix, self, CubeTensor}};
 
 pub struct LookingDirectionComponent {
     pub yaw: UnitComplex<f32>,
@@ -48,13 +48,8 @@ impl MeshRendererComponent {
         }
     }
 
-    pub fn from_grid(cube_size: f32, color: [f32;3], desc: GridMatrix) -> Self {
-        let grid_mesh = grid::Grid::create_with(
-            cube_size,
-            color
-        );
-
-        let mesh = build_grid_mesh_from_desc(&grid_mesh, &desc);
+    pub fn from_grid(color: [f32;3], desc: &CubeTensor) -> Self {
+        let mesh = build_grid_mesh_from_desc(color, desc);
 
         MeshRendererComponent::create_without_renderer(
             mesh

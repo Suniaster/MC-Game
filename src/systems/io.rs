@@ -96,12 +96,12 @@ impl IoSystem{
         }
 
         if self.camera_controller.pressed_keys.contains(&VirtualKeyCode::Space){
-            p.0.y = 20.;
+            p.0.y = 5.;
         }
         if self.camera_controller.pressed_keys.contains(&VirtualKeyCode::LShift){
             // direction.y -= 1.;
         }
-        let result = direction * 50.;
+        let result = direction * 5.;
         p.0.x = result.x;
         p.0.z = result.z;
     }

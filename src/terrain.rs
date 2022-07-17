@@ -4,6 +4,9 @@ use specs::prelude::*;
 
 use voxelviewer::view_system::components::*;
 
+use crate::systems::physics::{AddRigidCompoundShapeFlag};
+use voxelviewer::geometry::grid::CubeTensor;
+
 pub struct LoadedChunks {
     chunks: HashMap<isize, ()>,
 }
@@ -20,9 +23,10 @@ impl <'a> System<'a> for TerrainSystem {
         WriteStorage<'a, MeshRendererComponent>,
         WriteStorage<'a, PositionComponent>,
         WriteExpect<'a, LoadedChunks>,
+        WriteStorage<'a, AddRigidCompoundShapeFlag>,
     );
 
-    fn run(&mut self, (entities, mut mr, mut ps, mut loaded_chunks): Self::SystemData) {
+    fn run(&mut self, (entities, mut mr, mut ps, mut loaded_chunks, mut arc_f): Self::SystemData) {
         let camera_pos = Point3::origin();
 
         let camera_chunk = position_to_chunk_idx(camera_pos);
@@ -51,8 +55,13 @@ impl <'a> System<'a> for TerrainSystem {
                 rand::random::<f32>(),
                 rand::random::<f32>(),
             ];
-            mr.insert(chunk, MeshRendererComponent::from_grid(CUBE_SIZE, random_color, grid)).unwrap();
+
+            let cube_tensor = CubeTensor::new(grid, CUBE_SIZE, [GRID_SIZE, CHUNK_HEIGHT, GRID_SIZE]);
+            mr.insert(chunk, MeshRendererComponent::from_grid(random_color, &cube_tensor)).unwrap();
             ps.insert(chunk, PositionComponent::new(chunk_pos)).unwrap();
+            arc_f.insert(chunk, AddRigidCompoundShapeFlag(
+                cube_tensor
+            )).unwrap();
         }
     }
 }
