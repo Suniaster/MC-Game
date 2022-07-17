@@ -106,7 +106,11 @@ impl PhysicsSystem {
         for (vel, rb) in (vel_s, rb_s).join() {
             let phy_rigid = rb_set.get_mut(rb.0).unwrap();
             let wake = vel.0 != Vector3::zeros();
-            phy_rigid.set_linvel(vel.0, true);
+            phy_rigid.set_linvel(vel.0, wake);
+        }
+        for (pos, rb) in (pos_s, rb_s).join() {
+            let phy_rigid = rb_set.get_mut(rb.0).unwrap();
+            phy_rigid.set_translation(pos.0.coords, false);
         }
     }
 
@@ -138,10 +142,22 @@ impl<'a> System<'a> for PhysicsWorldManagerSystem {
         WriteStorage<'a, AddRigidBodyCubeFlag>,
     );
 
-
     fn run(&mut self, (ents, mut rb_set, mut coll_set, pos_s, mut rb_s, mut arb_cube_s): Self::SystemData) {
+        PhysicsWorldManagerSystem::add_rigid_body_cube(&ents, &mut rb_set, &mut coll_set, &pos_s, &mut rb_s, &mut arb_cube_s);
+    }
+} 
+
+impl PhysicsWorldManagerSystem {
+    pub fn add_rigid_body_cube(
+        ents: &Entities, 
+        rb_set: &mut WriteExpect<RigidBodySet>, 
+        coll_set: &mut WriteExpect<ColliderSet>, 
+        pos_s: &ReadStorage<PositionComponent>, 
+        rb_s: &mut WriteStorage<RigidBodyComponent>, 
+        arb_cube_s: &mut WriteStorage<AddRigidBodyCubeFlag>
+    ) {
         let mut ents_added:Vec<Entity> = Vec::new();
-        for (ent, pos, rb_f) in (&ents, &pos_s, &arb_cube_s).join(){
+        for (ent, pos, rb_f) in (ents, pos_s, &*arb_cube_s).join(){
            
             let rb = RigidBodyBuilder::dynamic()
                 .translation(pos.0.coords)
@@ -154,7 +170,7 @@ impl<'a> System<'a> for PhysicsWorldManagerSystem {
             coll_set.insert_with_parent(
                 collider,
                 rb_handle.clone(),
-                &mut rb_set
+                rb_set
             );
 
             rb_s.insert(ent, RigidBodyComponent(rb_handle)).unwrap();
@@ -164,4 +180,4 @@ impl<'a> System<'a> for PhysicsWorldManagerSystem {
             arb_cube_s.remove(ent);
         }
     }
-} 
+}
