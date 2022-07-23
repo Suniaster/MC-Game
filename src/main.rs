@@ -20,24 +20,14 @@ mod terrain;
 // X - Descobrir porque as paradas que tão longe somem
 // X - Concertar o treco de cima
 // X - Mudar no front uso de cgmath para nalgebra
-// - Melhorar interface com front
-//      - Reescrevendo shaders do front para padronizar uso de grid 
-//      - Parei em reescrevendo "grid_instance"
-//      - Proximos passos são, reescrever grid instance, refotarar criação de grid para não incluir vertex
-//      - Mudar render system para usar novo padrão
-//      - Adicionar no novo modelo a criação de BB
-//      - Adicionar no novo modelo a criação de Wireframe
-//  - Adicionar interface com front parar mesh
-//  - Adicionar interface com front parar BoundingBox
-//  - Adicionar interface com front parar Wireframe
 // - Ajustar geração de terreno
-// - Fazer render ser independete do resto, de modo a poder mexer a camera mesmo com as coisas carregando
+// - Fazer geração de terreno ser independete do resto, de modo a poder mexer a camera mesmo com as coisas carregando
 // - Adicionar algum tipo de terminal, console ou algo que ajude na visualização dos dados
-// - Adicionar luz no céu
+// - Adicionar ray tracing
 
-// - Ajustar cores (não tão sendo efetivamente usados)
-// - Descobrir como fazer um tipo de animação de entrada
+// X Ajustar cores (não tão sendo efetivamente usados)
 // - Descobrir como rotacionar cubos e grids
+// - Descobrir como fazer um tipo de animação de entrada
 // - Tentar fazer algum modelo no MagicaVoxel
 // - Tentar importar modelo pelo back e passar para o front renderiza-lo
 // - Adicionar menu para mudanças de propriedades da camera

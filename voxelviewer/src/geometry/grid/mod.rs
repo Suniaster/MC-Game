@@ -76,10 +76,10 @@ impl CubeTensor {
               for k in 0..self.shape[2] {
                   if self.desc[i][j][k] {
                       let position_v = Vector3::new(
-                          i as f32 * self.cube_half_size,
-                          j as f32 * self.cube_half_size,
-                          k as f32 * self.cube_half_size
-                      ) + adjust_vector;
+                          i as f32,
+                          j as f32,
+                          k as f32
+                      ) + (v_cube_half * 2. )+ adjust_vector;
 
                       positions.push((Isometry3::new(
                           position_v,

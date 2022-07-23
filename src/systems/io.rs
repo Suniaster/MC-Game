@@ -78,6 +78,7 @@ impl IoSystem{
             0.,
             ldc.yaw.sin_angle()
         );
+        let mut vel = 5.;
         if self.camera_controller.pressed_keys.contains(&VirtualKeyCode::D){
             let look_x = look_vec.x;
             direction.x += -look_vec.z;
@@ -95,13 +96,14 @@ impl IoSystem{
             direction -= look_vec;
         }
 
-        if self.camera_controller.pressed_keys.contains(&VirtualKeyCode::Space){
-            p.0.y = 5.;
-        }
         if self.camera_controller.pressed_keys.contains(&VirtualKeyCode::LShift){
             // direction.y -= 1.;
+            vel *= 2.;
         }
-        let result = direction * 5.;
+        if self.camera_controller.pressed_keys.contains(&VirtualKeyCode::Space){
+            p.0.y = vel;
+        }
+        let result = direction * vel;
         p.0.x = result.x;
         p.0.z = result.z;
     }

@@ -32,7 +32,7 @@ impl <'a> System<'a> for TerrainSystem {
         let camera_chunk = position_to_chunk_idx(camera_pos);
 
         let ids_surround = get_chunks_ids_surround_id(camera_chunk);
-
+    
         let unloaded_ids = get_unloaded_chunks(
             &loaded_chunks, 
             ids_surround
@@ -47,7 +47,7 @@ impl <'a> System<'a> for TerrainSystem {
             // Insert
             loaded_chunks
                 .chunks
-                .insert(chunk_id[0] * GRID_SIZE as isize + chunk_id[1], ());
+                .insert(chunk_id[1] * GRID_SIZE as isize + chunk_id[0], ());
                 
             let chunk = entities.create();
             let random_color:[f32;3] = [
@@ -69,7 +69,7 @@ impl <'a> System<'a> for TerrainSystem {
 fn get_unloaded_chunks(loaded_chunks: &LoadedChunks, ids: Vec<[isize; 2]>) -> Vec<[isize; 2]> {
     let mut unloaded_chunks = vec![];
     for id in ids {
-        let key = id[0] * GRID_SIZE as isize + id[1];
+        let key = id[1] * GRID_SIZE as isize + id[0];
         let res = loaded_chunks.chunks.get(&key);
         if res.is_none() {
             unloaded_chunks.push(id);
@@ -112,15 +112,18 @@ fn create_chunk_mat_at(postion: Point3<f32>) -> Mat3 {
         101
     );
 
+    let correct_x = postion.x - CHUNK_SIZE / 2. + CUBE_SIZE / 2.;
+    let correct_z = postion.z - CHUNK_SIZE / 2. + CUBE_SIZE / 2.;
+    let correct_y = postion.y - CHUNK_SIZE / 2. + CUBE_SIZE / 2.;
+
     for i in 0..GRID_SIZE {
         for k in 0..GRID_SIZE {
-
-            let pos_x = postion.x + (i as f32 * CUBE_SIZE) - CHUNK_SIZE / 2.;
-            let pos_z = postion.z + (k as f32 * CUBE_SIZE) - CHUNK_SIZE / 2.;
+            let pos_x = correct_x + (i as f32 * CUBE_SIZE);
+            let pos_z = correct_z + (k as f32 * CUBE_SIZE);
             let height = perlin_n.get_noise(pos_x as f64, pos_z as f64);
 
             for j in 0..CHUNK_HEIGHT {
-                let pos_y = postion.y + (j as f32 * CUBE_SIZE) - CHUNK_SIZE / 2.;
+                let pos_y = correct_y + (j as f32 * CUBE_SIZE);
                 mat[i][j][k] = height > pos_y.into();
             }
         }

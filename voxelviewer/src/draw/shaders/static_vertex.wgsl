@@ -52,34 +52,18 @@ fn fs_main(
     in: VertexOutput,
 ) -> [[location(0)]] vec4<f32> {
     let normal = normalize(in.normal);
+    
+    let ambient_strength = 0.1;
+    let light_color = vec3<f32>(1.0, 1.0, 1.0);
+    let light_pos = vec3<f32>(0.0, 100.0, 0.0);
+    let ambient_color = light_color * ambient_strength;
 
-    var light_pos = u_camera.position.xyz;
-    light_pos = vec3<f32>(light_pos.x, 100.0, light_pos.z);
+    let light_dir = normalize(light_pos - in.position);
 
-    let view_dir = normalize(light_pos.xyz - in.position);
-    let half_dir = normalize(view_dir);
+    let diffuse_strength = max(dot(in.normal, light_dir), 0.0);
+    let diffuse_color = light_color * diffuse_strength;
 
-    let specular_strength = pow(max(dot(normal, half_dir), 0.0), 1.0);
-    let specular_color = specular_strength;
+    let result = (ambient_color + diffuse_color) * in.diffuse_color;
 
-    let surface_color = vec4<f32>(in.diffuse_color, 1.0);
-
-    let result = (specular_color) * surface_color.xyz;
-    let color_result = result * in.builtin_position.xyz;
-
-    return vec4<f32>(color_result, 1.0);
-    // let x = in.builtin_position.x / 1024.0;
-    // let y = in.builtin_position.y / 768.0;
-    // return vec4<f32>(x, y, in.builtin_position.z, surface_color.a);
-
-    // let texture_pos = vec2<f32>(x, y);
-    // let depth = textureSampleCompare(
-    //     depth_texture, 
-    //     depth_sampler, 
-    //     texture_pos, 
-    //     in.builtin_position.w
-    // );
-    // return vec4<f32>(vec3<f32>(depth), 1.0);
-
-    // return textureSample(depth_texture, depth_sampler, texture_pos);
+    return vec4<f32>(result, 1.0);
 }
