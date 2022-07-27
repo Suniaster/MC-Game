@@ -12,17 +12,23 @@ pub struct App<'a> {
     pub world: specs::World,
     pub plugins: Vec<Box<dyn Plugin>>,
     pub dispatcher_builder: DispatcherBuilder<'a, 'a>,
+    pub dispatcher: Dispatcher<'a, 'a>,
 }
-
+trait NewTrait: Plugin + Sized {}
 impl<'a> App<'a> {
     pub fn new() -> Self {
         App {
             world: specs::World::new(),
             plugins: Vec::new(),
             dispatcher_builder: DispatcherBuilder::new(),
+            dispatcher: DispatcherBuilder::new().build(),
         }
     }
 
+    pub fn with(&mut self, plugin: &dyn Plugin) -> &mut Self {
+        plugin.build(self);
+        self
+    }
 
     pub fn add_system<S>(&mut self, system: S) 
     where
@@ -32,37 +38,35 @@ impl<'a> App<'a> {
     }
 
     pub fn setup(&mut self) {
-        let disp = self.dispatcher_builder.build();
+        let b = std::mem::replace(&mut self.dispatcher_builder, DispatcherBuilder::new());
+        let disp = b.build();
+        self.dispatcher = disp;
     }
 
     pub fn run(&mut self) {
-        // let mut dispatcher = self.build_systems();
-        // dispatcher.dispatch(&mut self.world);
+        self.setup();
+        self.dispatcher.dispatch(&mut self.world);
     }
 }
 
-fn build_dispatcher<'a>(app: &mut App, plugins: &Vec<Box<dyn Plugin>>) -> Dispatcher<'a, 'a> {
-    let mut dispatcher_builder = DispatcherBuilder::new();
-    for plugin in plugins {
-        plugin.build(app);
-    }
-    dispatcher_builder.build()
-}
+
 struct TestSystem;
 impl System<'_> for TestSystem {
     type SystemData = ();
     fn run(&mut self, _data: Self::SystemData) {
-        println!("TestSystem");
+        println!("TestSystem aaaaaa");
+    }
+}
+impl PluginSytem<'_> for TestSystem {
+    fn name(&self) -> String {
+        "TestSystem".to_string()
     }
 }
 
-struct TestPlugin;
+pub struct TestPlugin;
 impl Plugin for TestPlugin {
-    // fn name(&self) -> String {
-    //     "TestPlugin".to_string()
-    // }
-
     fn build(&self, app: &mut App) {
+        app.add_system(TestSystem);
         // app.builder.borrow_mut().with(TestSystem, "test_system", &[]);
     }
 }

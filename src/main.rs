@@ -108,5 +108,12 @@ fn main() {
     ;
     world.insert(CameraResource::new(camera));
 
-    voxelviewer::start(world, dispatcher, arc_screen, evloop);
+
+    let mut app = plugins::App::new();
+    app.with(&plugins::TestPlugin)
+        .with(&plugins::TestPlugin)
+        .with(&plugins::TestPlugin)
+    ;
+    app.run();
+    // voxelviewer::start(world, dispatcher, arc_screen, evloop);
 }
