@@ -110,10 +110,8 @@ fn main() {
 
 
     let mut app = plugins::App::new();
-    app.with(&plugins::TestPlugin)
-        .with(&plugins::TestPlugin)
-        .with(&plugins::TestPlugin)
-    ;
-    app.run();
-    // voxelviewer::start(world, dispatcher, arc_screen, evloop);
+    app.with(plugins::TestPlugin);
+    app.setup();
+    app.run_once();
+    voxelviewer::start(world, dispatcher, arc_screen, evloop);
 }

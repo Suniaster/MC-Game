@@ -1,7 +1,10 @@
 use specs::prelude::*;
 
 pub trait PluginSytem<'a> : System<'a> {
-    fn name(&self) -> String;
+    fn name(&self) -> &'static str;
+    fn deps(&self) -> Vec<&'static str> {
+        vec![]
+    }
 }
 
 pub trait Plugin {
@@ -9,10 +12,10 @@ pub trait Plugin {
 }
 
 pub struct App<'a> {
-    pub world: specs::World,
-    pub plugins: Vec<Box<dyn Plugin>>,
-    pub dispatcher_builder: DispatcherBuilder<'a, 'a>,
-    pub dispatcher: Dispatcher<'a, 'a>,
+    world: specs::World,
+    plugins: Vec<Box<dyn Plugin>>,
+    dispatcher_builder: DispatcherBuilder<'a, 'a>,
+    dispatcher: Dispatcher<'a, 'a>,
 }
 trait NewTrait: Plugin + Sized {}
 impl<'a> App<'a> {
@@ -25,7 +28,7 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn with(&mut self, plugin: &dyn Plugin) -> &mut Self {
+    pub fn with<P: Plugin>(&mut self, plugin: P) -> &mut Self {
         plugin.build(self);
         self
     }
@@ -34,7 +37,31 @@ impl<'a> App<'a> {
     where
         S: for<'c> PluginSytem<'c> + Send + 'a,
     {
-        self.dispatcher_builder.add(system, "", &[]);
+        let name = system.name();
+        let deps = system.deps();
+        self.dispatcher_builder.add(system, name, &deps);
+    }
+
+    pub fn add_system_thread_local<S>(&mut self, system: S) 
+    where
+        S: for<'c> PluginSytem<'c> + Send + 'a,
+    {
+        self.dispatcher_builder.add_thread_local(system);
+    }
+
+    pub fn add_component_storage<C>(&mut self)
+    where
+        C: Component + Send + Sync + 'a,
+        C::Storage: Default,
+    {
+        self.world.register::<C>();
+    }
+
+    pub fn add_resource<R>(&mut self, resource: R)
+    where
+        R: Resource + Send + Sync + 'a,
+    {
+        self.world.insert(resource);
     }
 
     pub fn setup(&mut self) {
@@ -43,12 +70,12 @@ impl<'a> App<'a> {
         self.dispatcher = disp;
     }
 
-    pub fn run(&mut self) {
-        self.setup();
+    pub fn run_once(&mut self) {
         self.dispatcher.dispatch(&mut self.world);
     }
 }
 
+/*********** TESTS *************/
 
 struct TestSystem;
 impl System<'_> for TestSystem {
@@ -58,15 +85,20 @@ impl System<'_> for TestSystem {
     }
 }
 impl PluginSytem<'_> for TestSystem {
-    fn name(&self) -> String {
-        "TestSystem".to_string()
+    fn name(&self) -> &'static str {
+        "TestSystem"
     }
+}
+
+struct TestComponent;
+impl Component for TestComponent {
+    type Storage = VecStorage<Self>;
 }
 
 pub struct TestPlugin;
 impl Plugin for TestPlugin {
     fn build(&self, app: &mut App) {
         app.add_system(TestSystem);
-        // app.builder.borrow_mut().with(TestSystem, "test_system", &[]);
+        app.add_component_storage::<TestComponent>();
     }
 }
