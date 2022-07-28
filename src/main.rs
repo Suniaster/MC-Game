@@ -44,74 +44,77 @@ pub type ScreenMutex = MultiThread<ScreenView>;
 
 
 fn main() {
-    let mut world = World::new();
 
-    let (screen, evloop) = voxelviewer::create_screen();
-    let arc_screen = Arc::new(Mutex::new(screen));
-
-    // Components
-    world.register::<LookingDirectionComponent>();
-    world.register::<PositionComponent>();
-    world.register::<MeshRendererComponent>();
-    world.register::<RigidBodyComponent>();
-    world.register::<VelocityComponent>();
-    world.register::<AddRigidBodyCubeFlag>();
-
-    // Resources
-    world.insert(terrain::LoadedChunks::new());
-    world.insert(systems::WorldDt(Duration::new(0, 0)));
-    world.insert(voxelviewer::view_system::resources::DeviceEventBuffer::default());
-    world.insert(arc_screen.clone());
-    world.insert(PhysicsWorldResource::new());
-    world.insert(RigidBodySet::new());
-    world.insert(ColliderSet::new());
-
-    let mut dispatcher = 
-        DispatcherBuilder::new()
-        .with(systems::UpdateDtSystem{
-            last_time: std::time::Instant::now()
-        }, "update_dt_system", &[]
-        ).with(
-            terrain::TerrainSystem
-        , "terrain_system", &[]
-        ).with(
-            RenderTextInfoSystem::new()
-        , "render_text_info_system", &["update_dt_system"]
-        ).with(
-            voxelviewer::view_system::camera_system::CameraSystem::new()
-        , "camera_system", &["update_dt_system"]
-        ).with(
-            PhysicsWorldManagerSystem,
-            "physics_manager_system", &["update_dt_system"]
-        ).with(
-            PhysicsSystem::new(),
-            "physics_system", &["update_dt_system", "physics_manager_system"]
-        ).with(
-            systems::io::IoSystem::new(),
-            "io_system", &["update_dt_system"]
-        ).
-        with_thread_local(
-            voxelviewer::view_system::UpdateViewMeshesSystem::new(arc_screen.clone())
-        ).with_thread_local(
-            voxelviewer::view_system::ViewSystem::new(arc_screen.clone())
-        ).build();
-    dispatcher.setup(&mut world);
-
-    // Create camera
-    let camera = world
-        .create_entity()
-        .with(PositionComponent::new(Point3::new(0.0, 10.0, 0.0)))
-        .with(LookingDirectionComponent::new(0.,0.))
-        .with(VelocityComponent(Vector3::new(0.0, 0.0, 0.0)))
-        .with(AddRigidBodyCubeFlag(1.))
-        .build() 
-    ;
-    world.insert(CameraResource::new(camera));
-
-
+    // let (screen, evloop) = voxelviewer::create_screen();
+    // let arc_screen = Arc::new(Mutex::new(screen));
+    
     let mut app = plugins::App::new();
-    app.with(plugins::TestPlugin);
+    app.with(voxelviewer::plugin::WindowPlugin);
+    // Components
+
     app.setup();
-    app.run_once();
-    voxelviewer::start(world, dispatcher, arc_screen, evloop);
+    app.run();
+
+    // let mut world = World::new();
+    // // Components
+    // world.register::<LookingDirectionComponent>();
+    // world.register::<PositionComponent>();
+    // world.register::<MeshRendererComponent>();
+    // world.register::<RigidBodyComponent>();
+    // world.register::<VelocityComponent>();
+    // world.register::<AddRigidBodyCubeFlag>();
+
+    // // Resources
+    // world.insert(terrain::LoadedChunks::new());
+    // world.insert(systems::WorldDt(Duration::new(0, 0)));
+    // world.insert(voxelviewer::view_system::resources::DeviceEventBuffer::default());
+    // world.insert(arc_screen.clone());
+    // world.insert(PhysicsWorldResource::new());
+    // world.insert(RigidBodySet::new());
+    // world.insert(ColliderSet::new());
+
+    // let mut dispatcher = 
+    //     DispatcherBuilder::new()
+    //     .with(systems::UpdateDtSystem{
+    //         last_time: std::time::Instant::now()
+    //     }, "update_dt_system", &[]
+    //     ).with(
+    //         terrain::TerrainSystem
+    //     , "terrain_system", &[]
+    //     ).with(
+    //         RenderTextInfoSystem::new()
+    //     , "render_text_info_system", &["update_dt_system"]
+    //     ).with(
+    //         voxelviewer::view_system::camera_system::CameraSystem::new()
+    //     , "camera_system", &["update_dt_system"]
+    //     ).with(
+    //         PhysicsWorldManagerSystem,
+    //         "physics_manager_system", &["update_dt_system"]
+    //     ).with(
+    //         PhysicsSystem::new(),
+    //         "physics_system", &["update_dt_system", "physics_manager_system"]
+    //     ).with(
+    //         systems::io::IoSystem::new(),
+    //         "io_system", &["update_dt_system"]
+    //     ).
+    //     with_thread_local(
+    //         voxelviewer::view_system::UpdateViewMeshesSystem::new(arc_screen.clone())
+    //     ).with_thread_local(
+    //         voxelviewer::view_system::ViewSystem::new(arc_screen.clone())
+    //     ).build();
+    // dispatcher.setup(&mut world);
+
+    // // Create camera
+    // let camera = world
+    //     .create_entity()
+    //     .with(PositionComponent::new(Point3::new(0.0, 10.0, 0.0)))
+    //     .with(LookingDirectionComponent::new(0.,0.))
+    //     .with(VelocityComponent(Vector3::new(0.0, 0.0, 0.0)))
+    //     .with(AddRigidBodyCubeFlag(1.))
+    //     .build() 
+    // ;
+    // world.insert(CameraResource::new(camera));
+
+
+    // voxelviewer::start(world, dispatcher, arc_screen, evloop);
 }

@@ -8,11 +8,12 @@ pub trait PluginSytem<'a> : System<'a> {
 }
 
 pub trait Plugin {
-    fn build(&self, app: &mut App);
+    fn build(&self, _app: &mut App){}
+    fn before_run(&self, _app: &mut App<'static>){}
 }
 
 pub struct App<'a> {
-    world: specs::World,
+    pub world: specs::World,
     plugins: Vec<Box<dyn Plugin>>,
     dispatcher_builder: DispatcherBuilder<'a, 'a>,
     dispatcher: Dispatcher<'a, 'a>,
@@ -28,8 +29,10 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn with<P: Plugin>(&mut self, plugin: P) -> &mut Self {
+    pub fn with<P: Plugin + 'static>(&mut self, plugin: P) -> &mut Self {
         plugin.build(self);
+        let t = Box::new(plugin);
+        self.plugins.push(t);
         self
     }
 
@@ -75,6 +78,16 @@ impl<'a> App<'a> {
     }
 }
 
+impl App<'static> {
+    pub fn run(&mut self) {
+        let plugins = std::mem::replace(&mut self.plugins, Vec::new());
+        for plugin in plugins.iter() {
+            plugin.before_run(self);
+        }
+        let _ = std::mem::replace(&mut self.plugins, plugins);
+        self.run_once();
+    }
+}
 /*********** TESTS *************/
 
 struct TestSystem;

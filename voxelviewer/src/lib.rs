@@ -15,6 +15,7 @@ pub mod screen_text;
 mod draw;
 pub mod view_system;
 
+pub mod plugin;
 use scene::*;
 
 pub mod view_actions;

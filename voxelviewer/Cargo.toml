@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+plugins={path="../plugins"}
 anyhow = "1.0"
 bytemuck = { version = "1.4", features = [ "derive" ] }
 env_logger = "0.9"
