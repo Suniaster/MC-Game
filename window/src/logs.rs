@@ -11,7 +11,7 @@ impl<'a> System<'a> for FpsLogSystem {
     );
 
     fn run(&mut self, (dt, fc): Self::SystemData) {
-        if fc.0 % 300 == 0 {
+        if fc.0 % 30 == 0 {
             let fps = 1.0 / dt.0;
             println!("FPS: {}", fps);
         }
