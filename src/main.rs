@@ -49,7 +49,10 @@ fn main() {
     // let arc_screen = Arc::new(Mutex::new(screen));
     
     let mut app = plugins::App::new();
-    app.with(voxelviewer::plugin::WindowPlugin);
+    app
+        .with(window::WindowPlugin::default())
+        .with(voxelviewer::plugin::VoxelPlugin)
+    ;
     // Components
 
     app.setup();

@@ -8,8 +8,8 @@ pub trait PluginSytem<'a> : System<'a> {
 }
 
 pub trait Plugin {
-    fn build(&self, _app: &mut App){}
-    fn before_run(&self, _app: &mut App<'static>){}
+    fn build(&mut self, _app: &mut App){}
+    fn before_run(&mut self, _app: &mut App<'static>){}
 }
 
 pub struct App<'a> {
@@ -29,7 +29,7 @@ impl<'a> App<'a> {
         }
     }
 
-    pub fn with<P: Plugin + 'static>(&mut self, plugin: P) -> &mut Self {
+    pub fn with<P: Plugin + 'static>(&mut self, mut plugin: P) -> &mut Self {
         plugin.build(self);
         let t = Box::new(plugin);
         self.plugins.push(t);
@@ -80,8 +80,8 @@ impl<'a> App<'a> {
 
 impl App<'static> {
     pub fn run(&mut self) {
-        let plugins = std::mem::replace(&mut self.plugins, Vec::new());
-        for plugin in plugins.iter() {
+        let mut plugins = std::mem::replace(&mut self.plugins, Vec::new());
+        for plugin in plugins.iter_mut() {
             plugin.before_run(self);
         }
         let _ = std::mem::replace(&mut self.plugins, plugins);
@@ -110,7 +110,7 @@ impl Component for TestComponent {
 
 pub struct TestPlugin;
 impl Plugin for TestPlugin {
-    fn build(&self, app: &mut App) {
+    fn build(&mut self, app: &mut App) {
         app.add_system(TestSystem);
         app.add_component_storage::<TestComponent>();
     }
