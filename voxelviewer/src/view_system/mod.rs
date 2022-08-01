@@ -1,7 +1,8 @@
 use std::{sync::{Arc, Mutex}, iter};
 
+use plugins::PluginSytem;
 use specs::prelude::*;
-use crate::{screen_text::ScreenText};
+use crate::{screen_text::ScreenText, scene::State};
 
 pub mod boundingbox;
 pub mod camera_system;
@@ -15,26 +16,23 @@ use crate::{
 use self::components::{PositionComponent, MeshRendererComponent};
 
 /*************** VIEW SYSTEM *******************/
-pub struct ViewSystem{
-    state: Arc<Mutex<ScreenView>>,
-}
-impl ViewSystem {
-    pub fn new(state: Arc<Mutex<ScreenView>>) -> Self {
-        Self {
-            state,
-        }
+pub struct ViewSystem;
+
+impl PluginSytem<'_> for ViewSystem {
+    fn name(&self) -> &'static str {
+        "voxel_viewer_view_system"
     }
 }
 
 impl <'a> System <'a> for ViewSystem {
     type SystemData = (
+        WriteExpect<'a, Mutex<State>>,
         ReadStorage<'a, MeshRendererComponent>,
         Read<'a, Vec<ScreenText>>
     );
 
-    fn run(&mut self, (meshes, texts): Self::SystemData) {
-        let mut view = self.state.lock().unwrap();
-        let state = &mut view.state;
+    fn run(&mut self, (mut state_mutex, meshes, texts): Self::SystemData) {
+        let mut state = state_mutex.lock().unwrap();
         let output = state.surface.get_current_texture().unwrap();
 
         let view = output
@@ -56,7 +54,7 @@ impl <'a> System <'a> for ViewSystem {
                     ops: wgpu::Operations {
                         load: wgpu::LoadOp::Clear(wgpu::Color {
                             r: 0.1,
-                            g: 0.2,
+                            g: 0.7,
                             b: 0.3,
                             a: 1.0,
                         }),
@@ -90,28 +88,28 @@ impl <'a> System <'a> for ViewSystem {
             }
         }
         
-        for text in texts.iter() {
-            text.draw(
-                &mut state.glyph_brush, 
-                state.size.width as f32, 
-                state.size.height as f32
-            )
-        }
+        // for text in texts.iter() {
+        //     text.draw(
+        //         &mut state.glyph_brush, 
+        //         state.size.width as f32, 
+        //         state.size.height as f32
+        //     )
+        // }
 
-        state.glyph_brush
-            .draw_queued(
-                &state.device,
-                &mut state.staging_belt,
-                &mut encoder,
-                &view,
-                state.size.width,
-                state.size.height,
-            )
-            .expect("Draw queued");
+        // state.glyph_brush
+        //     .draw_queued(
+        //         &state.device,
+        //         &mut state.staging_belt,
+        //         &mut encoder,
+        //         &view,
+        //         state.size.width,
+        //         state.size.height,
+        //     )
+        //     .expect("Draw queued");
+    
         state.staging_belt.finish();
         state.queue.submit(iter::once(encoder.finish()));
         output.present();
-
     }
 }
 

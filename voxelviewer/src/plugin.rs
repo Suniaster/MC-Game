@@ -4,7 +4,7 @@ use window::WindowResizeBuffer;
 use plugins::{Plugin, PluginSytem, App};
 use specs::{System, WorldExt, Read, WriteExpect};
 use winit::{window::Window};
-use crate::scene::State;
+use crate::{scene::State, view_system::{ViewSystem, components::MeshRendererComponent}, screen_text::ScreenText};
 
 struct VoxelViewerSystem;
 impl<'a> System<'a> for VoxelViewerSystem {
@@ -32,7 +32,12 @@ impl PluginSytem<'_> for VoxelViewerSystem {
 pub struct VoxelPlugin;
 impl Plugin for VoxelPlugin {
     fn build(&mut self, app: &mut App) {
-        app.add_system(VoxelViewerSystem);
+        app.add_system_thread_local(VoxelViewerSystem);
+        app.add_system_thread_local(ViewSystem);
+
+        app.add_component_storage::<MeshRendererComponent>();
+        app.add_resource(Vec::<ScreenText>::new());
+
         let win = app.world.read_resource::<Arc<Window>>();
         
         let state =  pollster::block_on(State::new(&win));
