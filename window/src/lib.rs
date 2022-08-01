@@ -43,16 +43,11 @@ impl Default for WindowSystem {
 
 impl<'a> System<'a> for WindowSystem {
     type SystemData = (
-        Write<'a, DeviceEventBuffer>,
-        Write<'a, WindowResizeBuffer>,
         Write<'a, DeltaTime>,
         Write<'a, FrameCount>,
     );
 
-    fn run(&mut self, (mut d_ev, mut wr_ev, mut dt, mut frame_c): Self::SystemData) {
-        d_ev.events.clear();
-        wr_ev.events.clear();
-
+    fn run(&mut self, (mut dt, mut frame_c): Self::SystemData) {
         let delta = self.last_update_time.elapsed().as_secs_f32();
         self.last_update_time = std::time::Instant::now();
         *dt = DeltaTime(delta);
@@ -129,6 +124,11 @@ impl Plugin for WindowPlugin {
                 }
                 Event::RedrawRequested(window_id) if window_id == window.id() => {
                     app.run_once();
+
+                    let mut buffer = app.world.write_resource::<WindowResizeBuffer>();
+                    buffer.events.clear();
+                    let mut buffer = app.world.write_resource::<DeviceEventBuffer>();
+                    buffer.events.clear();
                 }
                 _ => {}
             }
