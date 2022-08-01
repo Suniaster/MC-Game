@@ -45,48 +45,48 @@ impl <'a> System <'a> for ViewSystem {
                 label: Some("Render Encoder"),
             });
 
-        {
-            let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-                label: Some("Render Pass"),
-                color_attachments: &[wgpu::RenderPassColorAttachment {
-                    view: &view,
-                    resolve_target: None,
-                    ops: wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(wgpu::Color {
-                            r: 0.1,
-                            g: 0.7,
-                            b: 0.3,
-                            a: 1.0,
-                        }),
-                        store: true,
-                    },
-                }],
-                depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
-                    view: &state.depth_texture.view,
-                    depth_ops: Some(wgpu::Operations {
-                        load: wgpu::LoadOp::Clear(1.0),
-                        store: true,
+        
+        let mut render_pass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+            label: Some("Render Pass"),
+            color_attachments: &[wgpu::RenderPassColorAttachment {
+                view: &view,
+                resolve_target: None,
+                ops: wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(wgpu::Color {
+                        r: 0.1,
+                        g: 0.7,
+                        b: 0.3,
+                        a: 1.0,
                     }),
-                    stencil_ops: None,
+                    store: true,
+                },
+            }],
+            depth_stencil_attachment: Some(wgpu::RenderPassDepthStencilAttachment {
+                view: &state.depth_texture.view,
+                depth_ops: Some(wgpu::Operations {
+                    load: wgpu::LoadOp::Clear(1.0),
+                    store: true,
                 }),
-            });
+                stencil_ops: None,
+            }),
+        });
 
-            render_pass.set_pipeline(&state.static_cube_pipeline);
-            for mesh in (&meshes).join() {
-                let renderer = &mesh.renderer;
-                if let Some(renderer) = renderer {
-                    render_pass.set_bind_group(0, &state.camera_bind_group, &[]);
-                    render_pass.set_bind_group(1, &&state.depth_bind_group, &[]);
-                    
-                    render_pass.set_vertex_buffer(0, renderer.vertex_buffer.slice(..));
-    
-                    render_pass.set_vertex_buffer(1, renderer.instance_buffer.slice(..));
-                    
-                    render_pass.set_index_buffer(renderer.index_buffer.slice(..), wgpu::IndexFormat::Uint32); // 1.
-                    render_pass.draw_indexed(0..renderer.num_indices, 0, 0..1); // 2.
-                }
+        render_pass.set_pipeline(&state.static_cube_pipeline);
+        for mesh in (&meshes).join() {
+            let renderer = &mesh.renderer;
+            if let Some(renderer) = renderer {
+                render_pass.set_bind_group(0, &state.camera_bind_group, &[]);
+                render_pass.set_bind_group(1, &&state.depth_bind_group, &[]);
+                
+                render_pass.set_vertex_buffer(0, renderer.vertex_buffer.slice(..));
+
+                render_pass.set_vertex_buffer(1, renderer.instance_buffer.slice(..));
+                
+                render_pass.set_index_buffer(renderer.index_buffer.slice(..), wgpu::IndexFormat::Uint32); // 1.
+                render_pass.draw_indexed(0..renderer.num_indices, 0, 0..1); // 2.
             }
         }
+        
         
         // for text in texts.iter() {
         //     text.draw(
@@ -106,7 +106,8 @@ impl <'a> System <'a> for ViewSystem {
         //         state.size.height,
         //     )
         //     .expect("Draw queued");
-    
+        
+        drop(render_pass);
         state.staging_belt.finish();
         state.queue.submit(iter::once(encoder.finish()));
         output.present();
