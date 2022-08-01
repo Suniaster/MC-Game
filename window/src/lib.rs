@@ -5,6 +5,7 @@ use specs::{System, WorldExt, Write};
 use winit::{event_loop::{EventLoop, ControlFlow}, dpi::{LogicalSize, PhysicalSize}, event::{Event, WindowEvent}, window::Window};
 use winit::event::DeviceEvent;
 
+pub mod logs;
 
 /**** Event Buffers ****/
 #[derive(Default)]
@@ -18,17 +19,44 @@ pub struct DeviceEventBuffer {
 }
 /**** END - Event Buffers ****/
 
+/**** Timers ******/
 
-struct WindowSystem;
+#[derive(Default)]
+pub struct DeltaTime(f32);
+
+#[derive(Default)]
+pub struct FrameCount(u32);
+
+/**** END - Timers ******/
+
+
+struct WindowSystem{
+    last_update_time: std::time::Instant,
+}
+impl Default for WindowSystem {
+    fn default() -> Self {
+        Self {
+            last_update_time: std::time::Instant::now(),
+        }
+    }
+}
+
 impl<'a> System<'a> for WindowSystem {
     type SystemData = (
         Write<'a, DeviceEventBuffer>,
         Write<'a, WindowResizeBuffer>,
+        Write<'a, DeltaTime>,
+        Write<'a, FrameCount>,
     );
 
-    fn run(&mut self, (mut d_ev, mut wr_ev): Self::SystemData) {
+    fn run(&mut self, (mut d_ev, mut wr_ev, mut dt, mut frame_c): Self::SystemData) {
         d_ev.events.clear();
         wr_ev.events.clear();
+
+        let delta = self.last_update_time.elapsed().as_secs_f32();
+        self.last_update_time = std::time::Instant::now();
+        *dt = DeltaTime(delta);
+        *frame_c = FrameCount(frame_c.0 + 1);
     }
 }
 
@@ -38,7 +66,6 @@ impl PluginSytem<'_> for WindowSystem {
     }
 }
 
-
 #[derive(Default)]
 pub struct WindowPlugin{
     pub event_loop: Option<EventLoop<()>>,
@@ -47,9 +74,11 @@ pub struct WindowPlugin{
 
 impl Plugin for WindowPlugin {
     fn build(&mut self, app: &mut App) {
-        app.add_system(WindowSystem);
+        app.add_system(WindowSystem::default());
         app.add_resource(WindowResizeBuffer::default());
         app.add_resource(DeviceEventBuffer::default());
+        app.add_resource(DeltaTime::default());
+        app.add_resource(FrameCount::default());
 
         let title = env!("CARGO_PKG_NAME");
         let event_loop = EventLoop::new();

@@ -51,6 +51,7 @@ fn main() {
     let mut app = plugins::App::new();
     app
         .with(window::WindowPlugin::default())
+        .with(window::logs::FpsLoggerPlugin)
         .with(voxelviewer::plugin::VoxelPlugin)
     ;
     // Components
