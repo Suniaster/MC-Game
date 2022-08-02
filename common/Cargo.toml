@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 specs = "0.17.0"
 nalgebra = "0.31.0"
+plugins={path="../plugins"}
