@@ -6,8 +6,8 @@ use specs::{System, WorldExt, Read, WriteExpect};
 use winit::{window::Window};
 use crate::{scene::State, view_system::{ViewSystem, components::MeshRendererComponent}, screen_text::ScreenText};
 
-struct VoxelViewerSystem;
-impl<'a> System<'a> for VoxelViewerSystem {
+struct ResizeScreenSystem;
+impl<'a> System<'a> for ResizeScreenSystem {
     type SystemData = (
         WriteExpect<'a, Mutex<State>>,
         Read<'a, WindowResizeBuffer>,
@@ -18,12 +18,11 @@ impl<'a> System<'a> for VoxelViewerSystem {
         for ev in win_evs.events.iter() {
             state.resize(*ev);
         }
-        drop(state);
     }
 
 }
 
-impl PluginSytem<'_> for VoxelViewerSystem {
+impl PluginSytem<'_> for ResizeScreenSystem {
     fn name(&self) -> &'static str {
         "voxel_viewer_system"
     }
@@ -32,7 +31,7 @@ impl PluginSytem<'_> for VoxelViewerSystem {
 pub struct VoxelPlugin;
 impl Plugin for VoxelPlugin {
     fn build(&mut self, app: &mut App) {
-        app.add_system_thread_local(VoxelViewerSystem);
+        app.add_system_thread_local(ResizeScreenSystem);
         app.add_system_thread_local(ViewSystem);
 
         app.add_component_storage::<MeshRendererComponent>();
