@@ -3,8 +3,9 @@ use std::{time::Duration};
 pub mod physics;
 pub mod io;
 
+use common::PositionComponent;
 use specs::prelude::*;
-use voxelviewer::{screen_text::ScreenText, view_system::{camera_system::CameraResource, components::{PositionComponent, LookingDirectionComponent}}};
+use voxelviewer::{screen_text::ScreenText, view_system::{camera_system::CameraResource, components::{LookingDirectionComponent}}};
 
 pub struct RenderTextInfoSystem{
     pub time_counter: std::time::Duration,

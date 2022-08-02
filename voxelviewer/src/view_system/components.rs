@@ -17,11 +17,6 @@ impl LookingDirectionComponent{
     }
 }
 
-pub struct PositionComponent(pub Point3<f32>);
-impl Component for PositionComponent {type Storage = VecStorage<Self>;}
-impl PositionComponent {pub fn new(position: Point3<f32>) -> Self {Self(position)}}
-
-
 pub struct MeshRendererComponent{
     pub renderer: Option<SceneEntityRenderer>,
     pub mesh: StaticVertexMesh

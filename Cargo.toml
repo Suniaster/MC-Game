@@ -9,6 +9,7 @@ resolver="2"
 voxelviewer = {path="./voxelviewer"}
 window={path="./window"}
 plugins={path="./plugins"}
+common={path="./common"}
 winit = "0.26"
 rand = "0.8.4"
 perlin2d = "0.2.6"

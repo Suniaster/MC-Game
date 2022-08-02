@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use common::PositionComponent;
 use nalgebra::Point3;
 use specs::prelude::*;
 

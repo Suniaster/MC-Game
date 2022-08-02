@@ -1,10 +1,4 @@
 use std::sync::{Arc, Mutex};
-use std::time::Duration;
-
-use nalgebra::{Point3, Vector3};
-use rapier3d::prelude::{ RigidBodySet, ColliderSet};
-use specs::prelude::*;
-
 mod systems;
 mod terrain;
 
@@ -32,12 +26,7 @@ mod terrain;
 // - Tentar importar modelo pelo back e passar para o front renderiza-lo
 // - Adicionar menu para mudanças de propriedades da camera
 
-use specs::DispatcherBuilder;
-use systems::RenderTextInfoSystem;
-use systems::physics::{PhysicsSystem, VelocityComponent, RigidBodyComponent, AddRigidBodyCubeFlag, PhysicsWorldResource, PhysicsWorldManagerSystem};
 use voxelviewer::ScreenView;
-use voxelviewer::view_system::camera_system::CameraResource;
-use voxelviewer::view_system::components::{PositionComponent, LookingDirectionComponent, MeshRendererComponent};
 
 pub type MultiThread<T> = Arc<Mutex<T>>;
 pub type ScreenMutex = MultiThread<ScreenView>;

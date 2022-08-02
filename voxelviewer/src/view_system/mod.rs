@@ -1,5 +1,6 @@
 use std::{sync::{Arc, Mutex}, iter};
 
+use common::PositionComponent;
 use plugins::PluginSytem;
 use specs::prelude::*;
 use crate::{screen_text::ScreenText, scene::State};
@@ -13,7 +14,7 @@ use crate::{
     ScreenView
 };
 
-use self::components::{PositionComponent, MeshRendererComponent};
+use self::components::{MeshRendererComponent};
 
 /*************** VIEW SYSTEM *******************/
 pub struct ViewSystem;

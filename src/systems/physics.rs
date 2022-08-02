@@ -1,4 +1,4 @@
-use voxelviewer::view_system::components::PositionComponent;
+use common::PositionComponent;
 use specs::prelude::*;
 
 use nalgebra::{Vector3, Point3, Isometry3};

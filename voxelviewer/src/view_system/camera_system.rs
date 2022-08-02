@@ -1,11 +1,12 @@
 use std::sync::{Mutex, Arc};
 
+use common::PositionComponent;
 use nalgebra::Point3;
 use specs::prelude::*;
 
 use crate::ScreenView;
 
-use super::components::{LookingDirectionComponent, PositionComponent};
+use super::components::{LookingDirectionComponent};
 
 pub struct CameraResource {
     pub entity: specs::Entity,
