@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+
 mod systems;
 mod terrain;
 
@@ -25,12 +25,6 @@ mod terrain;
 // - Tentar fazer algum modelo no MagicaVoxel
 // - Tentar importar modelo pelo back e passar para o front renderiza-lo
 // - Adicionar menu para mudanças de propriedades da camera
-
-use voxelviewer::ScreenView;
-
-pub type MultiThread<T> = Arc<Mutex<T>>;
-pub type ScreenMutex = MultiThread<ScreenView>;
-
 
 fn main() {
 

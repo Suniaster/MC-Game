@@ -1,10 +1,9 @@
-use std::sync::{Mutex, Arc};
+use std::sync::{Mutex};
 
 use common::PositionComponent;
-use nalgebra::Point3;
 use specs::prelude::*;
 
-use crate::ScreenView;
+use crate::scene::State;
 
 use super::components::{LookingDirectionComponent};
 
@@ -34,23 +33,23 @@ impl CameraSystem {
 
 impl<'a> System<'a> for CameraSystem {
     type SystemData = (
-        WriteExpect<'a, Arc<Mutex<ScreenView>>>,
+        WriteExpect<'a, Mutex<State>>,
         ReadExpect<'a, CameraResource>,
         ReadStorage<'a, PositionComponent>,
         ReadStorage<'a, LookingDirectionComponent>
     );
 
-    fn run(&mut self, (screen_view, camera, pc, ld): Self::SystemData) {
+    fn run(&mut self, (state_mutex, camera, pc, ld): Self::SystemData) {
+        let mut state = state_mutex.lock().unwrap();
         let pos = pc.get(camera.entity);
         let look_dir = ld.get(camera.entity);
 
-        let mut screen_view = screen_view.lock().unwrap();
         if let Some(pos) = pos {
-            screen_view.state.camera.position = pos.0;
+            state.camera.position = pos.0;
         }
         if let Some(look_dir) = look_dir {
-            screen_view.state.camera.yaw = look_dir.yaw;
-            screen_view.state.camera.pitch = look_dir.pitch;
+            state.camera.yaw = look_dir.yaw;
+            state.camera.pitch = look_dir.pitch;
         }
     }
 }

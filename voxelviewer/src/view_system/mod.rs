@@ -1,4 +1,4 @@
-use std::{sync::{Arc, Mutex}, iter};
+use std::{sync::{Mutex}, iter};
 
 use common::PositionComponent;
 use plugins::PluginSytem;
@@ -9,10 +9,6 @@ pub mod boundingbox;
 pub mod camera_system;
 pub mod components;
 pub mod resources;
-
-use crate::{
-    ScreenView
-};
 
 use self::components::{MeshRendererComponent};
 
@@ -32,7 +28,7 @@ impl <'a> System <'a> for ViewSystem {
         Read<'a, Vec<ScreenText>>
     );
 
-    fn run(&mut self, (mut state_mutex, meshes, texts): Self::SystemData) {
+    fn run(&mut self, (state_mutex, meshes, texts): Self::SystemData) {
         let mut state = state_mutex.lock().unwrap();
         let output = state.surface.get_current_texture().unwrap();
 
@@ -117,27 +113,16 @@ impl <'a> System <'a> for ViewSystem {
 
 
 /*************** VIEW SYSTEM *******************/
-pub struct UpdateViewMeshesSystem{
-    state: Arc<Mutex<ScreenView>>
-}
-
-impl UpdateViewMeshesSystem {
-    pub fn new(state: Arc<Mutex<ScreenView>>) -> Self {
-        Self {
-            state,
-        }
-    }
-}
+pub struct UpdateViewMeshesSystem{}
 impl <'a> System <'a> for UpdateViewMeshesSystem {
     type SystemData = (
+        WriteExpect<'a, Mutex<State>>,
         ReadStorage<'a, PositionComponent>,
         WriteStorage<'a, MeshRendererComponent>,
     );
 
-    fn run(&mut self, (positions, mut meshes): Self::SystemData) {
-        let mut view = self.state.lock().unwrap();
-        let state = &mut view.state;
-
+    fn run(&mut self, (state_mutex, positions, mut meshes): Self::SystemData) {
+        let state = state_mutex.lock().unwrap();
         for (pos, mesh) in (&positions, &mut meshes).join() {
             if mesh.renderer.is_none(){
                 mesh.mesh.update_origin(pos.0.into());
