@@ -4,7 +4,7 @@ use window::WindowResizeBuffer;
 use plugins::{Plugin, PluginSytem, App};
 use specs::{System, WorldExt, Read, WriteExpect};
 use winit::{window::Window};
-use crate::{scene::State, view_system::{ViewSystem, components::MeshRendererComponent}, screen_text::ScreenText};
+use crate::{scene::State, view_system::{ViewSystem, components::MeshRendererComponent, UpdateViewMeshesSystem}, screen_text::ScreenText};
 
 struct ResizeScreenSystem;
 impl<'a> System<'a> for ResizeScreenSystem {
@@ -31,6 +31,7 @@ impl PluginSytem<'_> for ResizeScreenSystem {
 pub struct VoxelPlugin;
 impl Plugin for VoxelPlugin {
     fn build(&mut self, app: &mut App) {
+        app.add_system(UpdateViewMeshesSystem);
         app.add_system_thread_local(ResizeScreenSystem);
         app.add_system_thread_local(ViewSystem);
 

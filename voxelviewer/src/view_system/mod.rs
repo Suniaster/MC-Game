@@ -28,7 +28,7 @@ impl <'a> System <'a> for ViewSystem {
         Read<'a, Vec<ScreenText>>
     );
 
-    fn run(&mut self, (state_mutex, meshes, texts): Self::SystemData) {
+    fn run(&mut self, (state_mutex, meshes, _texts): Self::SystemData) {
         let mut state = state_mutex.lock().unwrap();
         let output = state.surface.get_current_texture().unwrap();
 
@@ -113,7 +113,14 @@ impl <'a> System <'a> for ViewSystem {
 
 
 /*************** VIEW SYSTEM *******************/
-pub struct UpdateViewMeshesSystem{}
+pub struct UpdateViewMeshesSystem;
+impl PluginSytem<'_> for UpdateViewMeshesSystem {
+    fn name(&self) -> &'static str {
+        "voxel_viewer_update_view_meshes_system"
+    }
+}
+
+
 impl <'a> System <'a> for UpdateViewMeshesSystem {
     type SystemData = (
         WriteExpect<'a, Mutex<State>>,

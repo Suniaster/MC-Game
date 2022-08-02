@@ -37,7 +37,7 @@ fn main() {
         .with(window::logs::FpsLoggerPlugin)
         .with(voxelviewer::plugin::VoxelPlugin)
         .with(common::CommonComponentsPlugin)
-        .add_system(terrain::TerrainSystem)
+        .with(terrain::TerrainPlugin)
     ;
     // Components
 
