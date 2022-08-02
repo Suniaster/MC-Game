@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 use common::PositionComponent;
 use nalgebra::Point3;
+use plugins::PluginSytem;
 use specs::prelude::*;
+
+pub mod system;
 
 use voxelviewer::view_system::components::*;
 
@@ -18,6 +21,13 @@ pub const CHUNK_HEIGHT: usize = 64;
 pub const CUBE_SIZE: f32 = 1.;
 pub const CHUNK_SIZE: f32 = GRID_SIZE as f32 * CUBE_SIZE;
 pub struct TerrainSystem;
+
+impl PluginSytem<'_> for TerrainSystem {
+    fn name(&self) -> &'static str {
+        "TerrainSystem"
+    }
+}
+
 impl <'a> System<'a> for TerrainSystem {
     type SystemData = (
         Entities<'a>,
