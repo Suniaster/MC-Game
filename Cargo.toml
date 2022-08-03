@@ -16,3 +16,4 @@ perlin2d = "0.2.6"
 nalgebra = "0.31.0"
 specs = "0.17.0"
 rapier3d = { version = "0.14.0", features = [ "simd-stable" ] }
+futures = "0.3.21"

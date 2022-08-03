@@ -1,10 +1,17 @@
-use specs::prelude::*;
-
+use specs::{prelude::*, rayon::{ThreadPool, ThreadPoolBuilder}};
 use common::PositionComponent;
 use nalgebra::Point3;
 use plugins::PluginSytem;
 
-pub struct TerrainSystem;
+pub struct TerrainSystem {
+    pool: ThreadPool
+}
+
+impl TerrainSystem {
+    pub fn new() -> Self {
+        Self { pool: ThreadPoolBuilder::new().build().unwrap() }
+    }
+}
 
 impl PluginSytem<'_> for TerrainSystem {
     fn name(&self) -> &'static str {
@@ -33,15 +40,22 @@ impl <'a> System<'a> for TerrainSystem {
         );
 
         for chunk_id in unloaded_ids {            
+            loaded_chunks
+                .chunks
+                .insert(chunk_id[1] * GRID_SIZE as isize + chunk_id[0], ());
+
+            let r = self.pool.scope(|_s|{
+                let chunk_x = chunk_id[0] as f32 * CHUNK_SIZE;
+                let chunk_z = chunk_id[1] as f32 * CHUNK_SIZE;
+                let chunk_pos = Point3::from([chunk_x, 0., chunk_z]);
+                return create_chunk_mat_at(chunk_pos);    
+            });
             let chunk_x = chunk_id[0] as f32 * CHUNK_SIZE;
             let chunk_z = chunk_id[1] as f32 * CHUNK_SIZE;
             let chunk_pos = Point3::from([chunk_x, 0., chunk_z]);
             let grid = create_chunk_mat_at(chunk_pos);
         
             // Insert
-            loaded_chunks
-                .chunks
-                .insert(chunk_id[1] * GRID_SIZE as isize + chunk_id[0], ());
                 
             let chunk = entities.create();
             let random_color:[f32;3] = [

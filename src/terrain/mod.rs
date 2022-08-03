@@ -19,6 +19,6 @@ impl Plugin for TerrainPlugin {
     fn build(&mut self, app: &mut App) {
         app.add_resource(LoadedChunks::new());
         
-        app.add_system(system::TerrainSystem);
+        app.add_system(system::TerrainSystem::new());
     }
 }

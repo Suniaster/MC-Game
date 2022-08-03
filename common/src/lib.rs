@@ -2,7 +2,7 @@ use nalgebra::Point3;
 use plugins::{Plugin, App};
 use specs::{Component, VecStorage};
 
-
+pub mod events;
 
 pub struct PositionComponent(pub Point3<f32>);
 impl Component for PositionComponent {type Storage = VecStorage<Self>;}
