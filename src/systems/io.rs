@@ -1,11 +1,8 @@
+use common::VelocityComponent;
 use nalgebra::{Vector3, UnitComplex};
 use specs::prelude::*;
 use voxelviewer::{view_system::{camera_system::CameraResource, components::LookingDirectionComponent, resources::DeviceEventBuffer}, camera::CameraController};
 use winit::event::{DeviceEvent, KeyboardInput, VirtualKeyCode, ElementState};
-
-use super::physics::VelocityComponent;
-
-
 
 pub struct IoSystem{
     camera_controller: CameraController,

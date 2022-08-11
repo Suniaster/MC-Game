@@ -1,3 +1,5 @@
+use systems::physics::PhysicsPlugin;
+
 
 mod systems;
 mod terrain;
@@ -33,11 +35,12 @@ fn main() {
     
     let mut app = plugins::App::new();
     app
+        .with(common::CommonComponentsPlugin)
         .with(window::WindowPlugin::default())
         .with(window::logs::FpsLoggerPlugin)
         .with(voxelviewer::plugin::VoxelPlugin)
-        .with(common::CommonComponentsPlugin)
         .with(terrain::TerrainPlugin)
+        .with(PhysicsPlugin)
     ;
     // Components
 

@@ -1,4 +1,5 @@
-use common::PositionComponent;
+use common::{PositionComponent, VelocityComponent, AddRigidBodyCubeFlag};
+use plugins::{Plugin, PluginSytem};
 use specs::prelude::*;
 
 use nalgebra::{Vector3, Point3, Isometry3};
@@ -77,8 +78,6 @@ impl PhysicsWorldResource {
 
 pub struct RigidBodyComponent(pub RigidBodyHandle);
 impl Component for RigidBodyComponent { type Storage = VecStorage<Self>;}
-pub struct VelocityComponent(pub Vector3<f32>);
-impl Component for VelocityComponent { type Storage = VecStorage<Self>;}
 
 pub struct PhysicsSystem;
 impl<'a> System<'a> for PhysicsSystem {
@@ -99,10 +98,6 @@ impl<'a> System<'a> for PhysicsSystem {
 }
 
 impl PhysicsSystem {
-    pub fn new() -> Self {
-        Self{}
-    }
-
     pub fn sync_physics(rb_set: &mut WriteExpect<RigidBodySet>, vel_s: &mut WriteStorage<VelocityComponent>, pos_s: &mut WriteStorage<PositionComponent>, rb_s: &ReadStorage<RigidBodyComponent>) {
         for (vel, rb) in (vel_s, rb_s).join() {
             let phy_rigid = rb_set.get_mut(rb.0).unwrap();
@@ -128,10 +123,6 @@ impl PhysicsSystem {
 }
 
 // **************** MANAGER
-#[derive(Default)]
-pub struct AddRigidBodyCubeFlag(pub f32);
-impl Component for AddRigidBodyCubeFlag { type Storage = HashMapStorage<Self>;}
-
 pub struct AddRigidCompoundShapeFlag(pub CubeTensor);
 impl Component for AddRigidCompoundShapeFlag { type Storage = HashMapStorage<Self>;}
 
@@ -224,5 +215,34 @@ impl PhysicsWorldManagerSystem {
         for ent in ents_added {
             arb_cube_s.remove(ent);
         }
+    }
+}
+
+/*** */
+impl PluginSytem<'_> for PhysicsSystem {
+    fn name(&self) -> &'static str {
+        "physics_system"
+    }
+}
+
+impl PluginSytem<'_> for PhysicsWorldManagerSystem{
+    fn name(&self) -> &'static str {
+        "physics_world_manager"
+    }
+}
+
+
+pub struct PhysicsPlugin;
+impl Plugin for PhysicsPlugin {
+    fn build(&mut self, app: &mut plugins::App) {
+        app.add_component_storage::<AddRigidCompoundShapeFlag>();
+        app.add_component_storage::<RigidBodyComponent>();
+
+        app.add_resource( RigidBodySet::new());
+        app.add_resource( ColliderSet::new() );
+        app.add_resource( PhysicsWorldResource::new());
+
+        app.add_system(PhysicsSystem);
+        app.add_system(PhysicsWorldManagerSystem);
     }
 }

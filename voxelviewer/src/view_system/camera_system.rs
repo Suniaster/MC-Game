@@ -1,4 +1,4 @@
-use std::sync::{Mutex};
+use std::{sync::{Mutex}, time::Duration};
 
 use common::PositionComponent;
 use specs::prelude::*;
@@ -51,5 +51,6 @@ impl<'a> System<'a> for CameraSystem {
             state.camera.yaw = look_dir.yaw;
             state.camera.pitch = look_dir.pitch;
         }
+        state.update(Duration::new(0, 0));
     }
 }
